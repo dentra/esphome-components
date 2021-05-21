@@ -1,0 +1,61 @@
+{
+    "configurations": [
+        {
+            "name": "ESP8266",
+            "includePath": [
+                "${workspaceFolder}/components/**",
+                "/usr/local/lib/python3.7/dist-packages",
+                "/home/vscode/.pio/libdeps/livingroom8266/ArduinoJson-esphomelib/src",
+                "/home/vscode/.pio/libdeps/livingroom8266/AsyncTCP-esphome/src",
+                "/home/vscode/.pio/libdeps/livingroom8266/ESPAsyncTCP-esphome/src",
+                "/home/vscode/.pio/libdeps/livingroom8266/ESPAsyncWebServer-esphome/src",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif8266/libraries/DNSServer/src",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif8266/libraries/Hash/src",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif8266/libraries/ESP8266mDNS/src",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif8266/libraries/ESP8266WiFi/src",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif8266/cores/esp8266",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif8266/tools/sdk/include",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif8266/tools/sdk/libc/xtensa-lx106-elf/include",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif8266/tools/sdk/lwip2/include",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif8266/variants/generic"
+            ],
+            "defines": [
+                "ARDUINO_ARCH_ESP8266"
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "linux-gcc-x64",
+            "compilerPath": "/home/vscode/.platformio/packages/toolchain-xtensa/bin/xtensa-lx106-elf-cc"
+            //"compileCommands": "/home/vscode/.pio/build/global/compile_commands.json"
+        },
+        {
+            "name": "ESP32",
+            "includePath": [
+                "${workspaceFolder}/components/**",
+                "/usr/local/lib/python3.7/dist-packages",
+                "/home/vscode/.pio/libdeps/livingroom32/ArduinoJson-esphomelib/src",
+                "/home/vscode/.pio/libdeps/livingroom32/AsyncTCP-esphome/src",
+                "/home/vscode/.pio/libdeps/livingroom32/ESPAsyncTCP-esphome/src",
+                "/home/vscode/.pio/libdeps/livingroom32/ESPAsyncWebServer-esphome/src",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif32/libraries/DNSServer/src",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif32/libraries/Hash/src",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif32/libraries/ESPmDNS/src",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif32/libraries/WiFi/src",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif32/cores/esp32",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif32/tools/sdk/include",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif32/tools/sdk/libc/xtensa-lx106-elf/include",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif32/tools/sdk/lwip2/include",
+                "/home/vscode/.platformio/packages/framework-arduinoespressif32/variants/nodemcu-32s"
+            ],
+            "defines": [
+                "ARDUINO_ARCH_ESP32"
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "linux-gcc-x64",
+            "compilerPath": "/home/vscode/.platformio/packages/toolchain-xtensa/bin/xtensa-lx106-elf-cc"
+            //"compileCommands": "/home/vscode/.pio/build/global/compile_commands.json"
+        }
+    ],
+    "version": 4
+}

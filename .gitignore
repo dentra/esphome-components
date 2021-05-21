@@ -1,0 +1,10 @@
+/.esphome/
+**/.pioenvs/
+**/.piolibdeps/
+**/src/
+**/lib/
+**/platformio.ini
+
+*.pyc
+
+/secrets.yaml
