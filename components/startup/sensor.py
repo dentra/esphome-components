@@ -7,7 +7,6 @@ from esphome.const import (
     DEVICE_CLASS_TIMESTAMP,
     UNIT_EMPTY,
 )
-from .. import *
 
 ICON_CLOCK_START = "mdi:clock-start"
 
