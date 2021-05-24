@@ -15,8 +15,8 @@ void EnergyMonitoring::dump_config() {
 }
 
 void EnergyMonitoring::setup() {
-  // wait this->wait_time_ miliseconds to try to reduce repeative publishing when input sensors report their values at
-  // same time
+  // wait this->wait_time_ miliseconds to try to reduce repeative publishing
+  // when input sensors report their values at same time
   if (this->wait_time_) {
     auto cb = [this](float) {
       if (!this->wait_start_) {
@@ -123,8 +123,8 @@ inline bool should_calc_reactive_power(float power, float apparent, float curren
   if (!(current > 0.005)) {
     return false;
   }
-  uint32_t difference = ((uint32_t) (apparent * 100) - (uint32_t) (power * 100)) / 10;
-  return (difference > 15) || (difference > (uint32_t) (apparent * 100 / 1000));
+  uint32_t difference = ((uint32_t)(apparent * 100) - (uint32_t)(power * 100)) / 10;
+  return (difference > 15) || (difference > (uint32_t)(apparent * 100 / 1000));
 }
 
 // Reactive Power (VAr)

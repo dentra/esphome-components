@@ -13,14 +13,14 @@ using sensor::Sensor;
 // TODO use Parented<EnergyStatistics>
 
 class TariffChangeTrigger : public Trigger<Sensor *> {
-public:
+ public:
   explicit TariffChangeTrigger(EnergyTariffs *parent) {
     parent->add_on_tariff_callback([this](Sensor *value) { this->trigger(value); });
   }
 };
 
 class BeforeTariffChangeTrigger : public Trigger<> {
-public:
+ public:
   explicit BeforeTariffChangeTrigger(EnergyTariffs *parent) {
     parent->add_on_before_tariff_callback([this] { this->trigger(); });
   }
@@ -55,5 +55,5 @@ protected:
 };
 */
 
-} // namespace energy_statistics
-} // namespace esphome
+}  // namespace energy_tariffs
+}  // namespace esphome

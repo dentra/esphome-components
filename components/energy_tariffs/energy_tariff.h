@@ -16,8 +16,8 @@ namespace energy_tariffs {
 using sensor::Sensor;
 
 // Time range.
-// In this customisation we assume that time is a minutes count of the day and calculated by formula: hour * 60 +
-// minute.
+// In this customisation we assume that time is a minutes count of the day and calculated by
+// formula: hour * 60 + minute.
 struct time_range_t {
   uint16_t min;
   uint16_t max;
