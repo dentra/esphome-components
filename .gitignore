@@ -8,3 +8,9 @@
 *.pyc
 
 /secrets.yaml
+
+/esphome
+/.pio
+
+/.vscode/
+!/.vscode/c_cpp_properties.json

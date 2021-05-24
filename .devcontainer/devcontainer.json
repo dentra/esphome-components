@@ -1,7 +1,6 @@
 {
 	"dockerFile": "Dockerfile",
 	"runArgs": [
-		//"--privileged",
 		"-e",
 		"ESPHOME_DASHBOARD_USE_PING=1"
 	],
@@ -42,8 +41,10 @@
 			"regex": "cpp",
 			"tuple": "cpp",
 			"type_traits": "cpp",
-			"utility": "cpp"
+			"utility": "cpp",
+			"string": "cpp"
 		},
+		"C_Cpp.clang_format_path": "/usr/bin/clang-format-7",
 	},
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
@@ -64,8 +65,7 @@
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
-	// Use 'postCreateCommand' to run commands after the container is created.
-	// "postCreateCommand": "gcc -v",
+	"postStartCommand": "(test ! -e esphome && ln -sv /usr/local/lib/python3.7/dist-packages/esphome esphome) || (test ! -e .pio && ln -sv /home/vscode/.pio .pio)",
 	// Comment out this line to run as root instead.
 	"remoteUser": "vscode",
 }
