@@ -1,71 +1,67 @@
 {
-	"dockerFile": "Dockerfile",
-	"runArgs": [
-		"-e",
-		"ESPHOME_DASHBOARD_USE_PING=1"
-	],
-	//"appPort": 6052,
-	// Set *default* container specific settings.json values on container create.
-	"settings": {
-		"terminal.integrated.defaultProfile.linux": "/bin/bash",
-		"diffEditor.ignoreTrimWhitespace": true,
-		"files.autoSave": "onFocusChange",
-		"files.trimTrailingWhitespace": true,
-		"editor.formatOnSave": true,
-		"editor.formatOnType": true,
-		"editor.formatOnPaste": false,
-		"python.pythonPath": "/usr/bin/python3",
-		"python.linting.pylintEnabled": true,
-		"python.linting.enabled": true,
-		"python.languageServer": "Pylance",
-		"python.formatting.provider": "black",
-		"yaml.customTags": [
-			"!secret scalar",
-			"!lambda scalar",
-			"!include_dir_named scalar",
-			"!include_dir_list scalar",
-			"!include_dir_merge_list scalar",
-			"!include_dir_merge_named scalar"
-		],
-		"files.exclude": {
-			"**/.git": true,
-			"**/.DS_Store": true,
-			"**/*.pyc": {
-				"when": "$(basename).py"
-			},
-			"**/__pycache__": true
-		},
-		"files.associations": {
-			"functional": "cpp",
-			"array": "cpp",
-			"regex": "cpp",
-			"tuple": "cpp",
-			"type_traits": "cpp",
-			"utility": "cpp",
-			"string": "cpp"
-		},
-		"C_Cpp.clang_format_path": "/usr/bin/clang-format-7",
-	},
-	// Add the IDs of extensions you want installed when the container is created.
-	"extensions": [
-		"editorconfig.editorconfig",
-		"aaron-bond.better-comments",
-		"coenraads.bracket-pair-colorizer-2",
-		// cpp
-		"ms-vscode.cpptools",
-		"jeff-hykin.better-cpp-syntax",
-		// python
-		"ms-python.python",
-		"ms-python.vscode-pylance",
-		"visualstudioexptteam.vscodeintellicode",
-		// yaml
-		"redhat.vscode-yaml",
-		// esphome yaml
-		"esphome.esphome-vscode",
-	],
-	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
-	"postStartCommand": "(test ! -e esphome && ln -sv /usr/local/lib/python3.7/dist-packages/esphome esphome) || (test ! -e .pio && ln -sv /home/vscode/.pio .pio)",
-	// Comment out this line to run as root instead.
-	"remoteUser": "vscode",
+  "dockerFile": "Dockerfile",
+  "runArgs": [
+    "-e",
+    "ESPHOME_DASHBOARD_USE_PING=1"
+  ],
+  //"appPort": 6052,
+  // Set *default* container specific settings.json values on container create.
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "/bin/bash",
+    "diffEditor.ignoreTrimWhitespace": true,
+    "files.autoSave": "onFocusChange",
+    "files.trimTrailingWhitespace": true,
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "editor.formatOnPaste": false,
+    "python.pythonPath": "/usr/bin/python3",
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": true,
+    "python.languageServer": "Pylance",
+    "python.formatting.provider": "black",
+    "yaml.customTags": [
+      "!secret scalar",
+      "!lambda scalar",
+      "!include_dir_named scalar",
+      "!include_dir_list scalar",
+      "!include_dir_merge_list scalar",
+      "!include_dir_merge_named scalar"
+    ],
+    "files.exclude": {
+      "**/.git": true,
+      "**/.DS_Store": true,
+      "**/*.pyc": {
+        "when": "$(basename).py"
+      },
+      "**/__pycache__": true
+    },
+    "files.associations": {
+      "**/.vscode/*.json": "jsonc"
+    },
+    "C_Cpp.clang_format_path": "/usr/bin/clang-format-7",
+  },
+  // Add the IDs of extensions you want installed when the container is created.
+  "extensions": [
+    // cpp
+    "ms-vscode.cpptools",
+    // python
+    "ms-python.python",
+    "visualstudioexptteam.vscodeintellicode",
+    // yaml
+    "redhat.vscode-yaml",
+    // esphome yaml
+    "esphome.esphome-vscode",
+    // editorconfig
+    "editorconfig.editorconfig",
+  ],
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  // "forwardPorts": [],
+  "postCreateCommand": [
+    ".devcontainer/post-create.sh"
+  ],
+  "postStartCommand": [
+    ".devcontainer/post-start.sh"
+  ],
+  // Comment out this line to run as root instead.
+  "remoteUser": "vscode",
 }

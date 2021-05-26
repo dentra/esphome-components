@@ -7,7 +7,7 @@ insert_final_newline = true
 charset = utf-8
 
 # python
-[*.{py}]
+[*.py]
 indent_style = space
 indent_size = 4
 
@@ -22,12 +22,17 @@ indent_style = space
 indent_size = 2
 
 # YAML
-[*.{yaml,yml}]
+[*.yaml]
 indent_style = space
 indent_size = 2
 quote_type = single
 
 # JSON
-[*.{json}]
+[*.json]
 indent_style = space
 indent_size = 2
+
+# Shell script
+[*.sh]
+indent_style = space
+indent_size = 4
