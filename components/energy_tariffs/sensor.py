@@ -75,8 +75,9 @@ def validate_tariff_time(value):
     parts = value.split("-")
     if len(parts) != 2:
         raise cv.Invalid("Time period should be HH:MM-HH:MM format")
-
-    return [time_period(parts[0]), time_period(parts[1])]
+    time_period(parts[0])
+    time_period(parts[1])
+    return value
 
 
 def validate_tariffs(config):
@@ -183,7 +184,9 @@ def to_code(config):
     for conf in config.get(CONF_TARIFFS, []):
         sens = cg.new_Pvariable(conf[CONF_ID])
         yield sensor.register_sensor(sens, conf)
-        for t in conf.get(CONF_TIME, []):
+        for tm in conf.get(CONF_TIME, []):
+            parts = tm.split("-")
+            t = [time_period(parts[0]), time_period(parts[1])]
             cg.add(sens.add_time(t[0].total_minutes, t[1].total_minutes))
         cg.add(var.add_tariff(sens))
         if CONF_SERVICE in conf:
