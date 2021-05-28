@@ -34,6 +34,11 @@ esphome:
 external_components:
   - source: github://dentra/esphome-components
 
+backup:
+  auth:
+    username: $web_username
+    password: $web_password
+
 wifi:
   ssid: $wifi_ssid
   password: $wifi_password

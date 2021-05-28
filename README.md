@@ -22,4 +22,5 @@ Get support of tariffs right in your energy meter.
 ## [Startup Sensor](components/startup/)
 Uptime sensor based on timestamp.
 
-
+## [Backup](components/backup/)
+Save your config back to firmware and download it.
