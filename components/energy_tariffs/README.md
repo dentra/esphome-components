@@ -6,6 +6,10 @@ Adds tariff support to your energy meter.
 
 ```yaml
 # Example configuration entry
+...
+external_components:
+  - source: github://dentra/esphome-components
+...
 - platform: "energy_tariffs"
     id: tariffs
     total: total
@@ -46,7 +50,7 @@ Provide energy consumption for specified time period.
 > One tariff (usually peak) is required to be default (without time).
 
 ### Configuration variables:
-* **time** (string): The time in `HH:MM-HH:MM` format.
+* **time** (List): The list of time periods in `HH:MM-HH:MM` format.
 * **service** (*Optional*, string): The name of service published to `Home Assistant`.
 * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
 
@@ -59,6 +63,9 @@ From [lambdas](https://esphome.io/guides/automations.html#config-lambda), you ca
   ...
   esphome:
     name: my_node
+  ...
+  external_components:
+    - source: github://dentra/esphome-components
   ...
   sensor:
     - platform: template

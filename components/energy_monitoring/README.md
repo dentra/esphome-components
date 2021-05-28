@@ -6,6 +6,10 @@ It calculates `Apparent Power`, `Reactive Power` and `Power Factor`.
 The configuration is very simple. Look at a sample below:
 ```yaml
 # Example configuration entry
+...
+external_components:
+  - source: github://dentra/esphome-components
+...
 sensor:
   - platform: "energy_monitoring"
     power: power_id

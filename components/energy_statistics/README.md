@@ -10,6 +10,10 @@ Gather statistics for:
 
 ```yaml
 # Example configuration entry
+...
+external_components:
+  - source: github://dentra/esphome-components
+...
 sensor:
   - platform: "energy_statistics"
     total: total
