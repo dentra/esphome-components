@@ -2,9 +2,11 @@
 
 Save your ESPHome device configuration in firmware and and recover it if you lost source files. Just download it from `http://yourdevice.local/config.yaml`.
 
-> WARNING: stored configuration is the same as shown by `esphome config` command. It fully worked but not the same as your original sources.
+> WARNING: You should backup your all your files, this solution only for emergency purpose. I am not responsible for the loss or inability to recover data.
 
-> WARNING: command line substitutions are not supported!
+> WARNING: Stored configuration is the same as shown by `esphome config` command. It is fully worked but not the same as your original sources.
+
+> WARNING: Command line substitutions, custom components and includes are not supported yet!
 
 The configuration is very simple. Look at a sample below:
 ```yaml
