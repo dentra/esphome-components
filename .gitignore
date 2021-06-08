@@ -4,6 +4,7 @@
 **/src/
 **/lib/
 **/platformio.ini
+**/partitions.csv
 
 *.pyc
 
