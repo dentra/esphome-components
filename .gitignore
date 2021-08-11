@@ -15,3 +15,7 @@
 
 /.vscode/
 
+compile_commands.json
+.clang_complete
+.gcc-flags.json
+.temp-clang-tidy.cpp

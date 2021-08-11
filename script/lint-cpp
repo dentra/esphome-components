@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -e
+set -x
+
+script/clang-tidy $@ --fix --all-headers
+script/clang-format $@ -i
