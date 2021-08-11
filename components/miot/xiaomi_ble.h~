@@ -1,0 +1,184 @@
+#pragma once
+
+#include "esphome/core/component.h"
+#include "esphome/components/esp32_ble_tracker/esp32_ble_tracker.h"
+#include "esphome/components/sensor/sensor.h"
+
+#ifdef ARDUINO_ARCH_ESP32
+
+namespace esphome {
+namespace xiaomi_ble {
+
+// https://iot.mi.com/new/doc/embedded-development/ble/object-definition
+enum Attribute : uint16_t {
+  /// General attributes.
+
+  // Sleep.
+  ATTR_SLEEP = 0x1002,
+  // RSSI. motion detection, 1 byte, 8-bit unsigned integer
+  ATTR_MOTION = 0x1003,
+  // temperature, 2 bytes, 16-bit signed integer (LE), 0.1 °C
+  ATTR_TEMPERATURE = 0x1004,
+  // Unknown attribute 0x1005.
+  ATTR_UNKNOWN_1005 = 0x1005,
+  // Humidity. 2 bytes, 16-bit signed integer (LE), 0.1 %
+  ATTR_HUMIDITY = 0x1006,
+  // Light illuminance. 3 bytes, 24-bit unsigned integer (LE), 1 lx
+  ATTR_ILLUMINANCE = 0x1007,
+  // soil moisture, 1 byte, 8-bit unsigned integer, 1 %
+  ATTR_SOIL_MOISTURE = 0x1008,
+  // conductivity, 2 bytes, 16-bit unsigned integer (LE), 1 µS/cm
+  ATTR_CONDUCTIVITY = 0x1009,
+  // Battery. 1 byte, 8-bit unsigned integer, 1 %
+  ATTR_BATTERY = 0x100A,
+  // Unknown attribute 0x100B.
+  ATTR_UNKNOWN_100B = 0x100B,
+  // Unknown attribute 0x100B.
+  ATTR_UNKNOWN_100C = 0x100C,
+  // temperature + humidity, 4 bytes, 16-bit signed integer (LE) each, 0.1 °C, 0.1 %
+  ATTR_TEMPERATURE_HUMIDITY = 0x100D,
+  // Lock.
+  ATTR_LOCK = 0x100E,
+  // Door. illuminance (+ motion), 3 bytes, 24-bit unsigned integer (LE), 1 lx
+  ATTR_DOOR = 0x100F,
+  // Formaldehyde, 2 bytes, 16-bit unsigned integer (LE), 0.01 mg / m3
+  ATTR_FORMALDEHYDE = 0x1010,
+  // Bind.
+  ATTR_BIND = 0x1011,
+  // Switch. on/off state, 1 byte, 8-bit unsigned integer
+  ATTR_SWITCH = 0x1012,
+  // Remaining amount of consumables. 1 byte, 8-bit unsigned integer, 1 %
+  ATTR_CONSUMABLE = 0x1013,
+  // Flooding. 1 byte, 8-bit unsigned integer, 0:dry or 1:wet
+  ATTR_FLOODING = 0x1014,
+  // Smoke.
+  ATTR_SMOKE = 0x015,
+  // Gas.
+  ATTR_GAS = 0x1016,
+  // No one moves. idle time since last motion, 4 byte, 32-bit unsigned integer, 1 min
+  ATTR_IDLE_TIME = 0x1017,
+  // Light intensity. light, 1 byte, 8-bit unsigned integer
+  ATTR_LIGHT = 0x1018,
+  // Door sensor. open/close state, 1 byte, 8-bit unsigned integer, 1:closed or 0,2:opened
+  ATTR_OPENING = 0x1019,
+  // Weight attributes.
+  ATTR_WEIGHT = 0x101A,
+  // No one moves over time.
+  ATTR_NO_MOVES = 0x101B,
+  // Smart pillow.
+  ATTR_SMART_PILLOW = 0x101C,
+  // Formaldehyde (new).
+  ATTR_ATTR_FORMALDEHYDE_NEW = 0x101D,
+
+  /// Vendor custom attributes.
+
+  // Body temperature (measured every second).
+  ATTR_BODY_TEMPERATURE = 0x2000,
+  // Mi Band (Huami).
+  ATTR_MI_BAND_HUAMI = 0x2001,
+  // Vacuum cleaner (Rui Mi).
+  ATTR_VACUUM_CLEANER_RUI_MI = 0x2002,
+  // Black plus bracelet (like one).
+  ATTR_BLACK_PLUS_BRACELET = 0x2003,
+
+  /// Vendor-defined event.
+
+  // Monitor (flowers and grasses).
+  ATTR_MONITOR = 0x3000,
+  // Sensor location (Qingping)
+  ATTR_SENSOR_LOCATION_QINGPING = 0x3001,
+  // Pomodoro event (Qingping)
+  ATTR_POMODORO_EVENT_QINGPING = 0x3002,
+  // Xiaobei toothbrush incident (Qinghe Xiaobei)
+  ATTR_XIAOBEI_TOOTHBRUSH_INCIDENT_QINGHE_XIAOBEI = 0x3003
+};
+
+struct XiaomiParseResult {
+  enum : uint16_t {
+    // MiFlora
+    TYPE_HHCCJCY01 = 0x0098,
+    // VegTrug Grow Care Garden
+    TYPE_GCLS002 = 0x03bc,
+    // FlowerPot, RoPot
+    TYPE_HHCCPOT002 = 0x015d,
+    // round body, segment LCD
+    TYPE_LYWSDCGQ = 0x01aa,
+    // rectangular body, e-ink display
+    TYPE_LYWSD02 = 0x045b,
+    // ClearGrass-branded, round body, e-ink display
+    TYPE_CGG1 = 0x0347,
+    // Qingping-branded, round body, e-ink display — with bindkeys
+    TYPE_CGG1_ENCRYPTED = 0x0B48,
+    // small square body, segment LCD, encrypted
+    TYPE_LYWSD03MMC = 0x055b,
+    // Cleargrass (Qingping) alarm clock, segment LCD
+    TYPE_CGD1 = 0x0576,
+    // Cleargrass (Qingping) Temp & RH Lite
+    TYPE_CGDK2 = 0x066F,
+    // Xiaomi (Honeywell) formaldehyde sensor, OLED display
+    TYPE_JQJCY01YM = 0x02df,
+    // Philips/Xiaomi BLE nightlight
+    TYPE_MUE4094RT = 0x03dd,
+    // Mosquito Repellent Smart Version
+    TYPE_WX08ZM = 0x040a,
+    // Xiaomi-Yeelight BLE nightlight
+    TYPE_MJYD02YLA = 0x07f6,
+    // square body, e-ink display
+    TYPE_MHOC401 = 0x0387,
+    // Xiaomi Smart Flood Sensor
+    TYPE_SJWS01LM = 0x0863,
+    // Xiaomi Mi Smart Home Door/Window Sensor 2
+    TYPE_MCCGQ02HL = 0x098b
+  };
+  uint16_t type;
+  std::string name;
+  optional<float> temperature;
+  optional<float> humidity;
+  optional<float> moisture;
+  optional<float> conductivity;
+  optional<float> illuminance;
+  optional<float> formaldehyde;
+  optional<float> battery_level;
+  optional<float> tablet;
+  optional<float> idle_time;
+  optional<bool> is_active;
+  optional<bool> has_motion;
+  optional<bool> is_light;
+  optional<bool> has_flooding;
+  optional<bool> has_opening;
+  bool has_data;        // 0x40
+  bool has_capability;  // 0x20
+  bool has_encryption;  // 0x08
+  bool is_duplicate;
+  int raw_offset;
+};
+
+struct XiaomiAESVector {
+  uint8_t key[16];
+  uint8_t plaintext[16];
+  uint8_t ciphertext[16];
+  uint8_t authdata[16];
+  uint8_t iv[16];
+  uint8_t tag[16];
+  size_t keysize;
+  size_t authsize;
+  size_t datasize;
+  size_t tagsize;
+  size_t ivsize;
+};
+
+bool parse_xiaomi_value(uint8_t value_type, const uint8_t *data, uint8_t value_length, XiaomiParseResult &result);
+bool parse_xiaomi_message(const std::vector<uint8_t> &message, XiaomiParseResult &result);
+optional<XiaomiParseResult> parse_xiaomi_header(const esp32_ble_tracker::ServiceData &service_data);
+bool decrypt_xiaomi_payload(std::vector<uint8_t> &raw, const uint8_t *bindkey, const uint64_t &address);
+bool report_xiaomi_results(const optional<XiaomiParseResult> &result, const std::string &address);
+
+class XiaomiListener : public esp32_ble_tracker::ESPBTDeviceListener {
+ public:
+  bool parse_device(const esp32_ble_tracker::ESPBTDevice &device) override;
+};
+
+}  // namespace xiaomi_ble
+}  // namespace esphome
+
+#endif
