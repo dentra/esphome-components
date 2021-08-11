@@ -6,7 +6,7 @@
 namespace esphome {
 namespace startup {
 
-static const char *TAG = "startup";
+static const char *const TAG = "startup";
 
 StartupSensor::StartupSensor() : start_(millis()){};
 

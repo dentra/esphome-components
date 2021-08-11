@@ -9,7 +9,7 @@ fi
 
 cpp_json=.vscode/c_cpp_properties.json
 if [ ! -f $cpp_json ]; then
-    pio init --ide vscode
+    pio init --ide vscode --silent
     sed -i "/\\/workspaces\/esphome\/include/d" $cpp_json
 else
     echo "Cpp environment already configured. To reconfigure it you could run one the following commands:"

@@ -1,11 +1,13 @@
+#include <cmath>
+
 #include "esphome/core/log.h"
 #include "energy_monitoring.h"
 
 namespace esphome {
 namespace energy_monitoring {
 
-static const char *TAG = "energy_monitoring";
-static const char *GAP = "  ";
+static const char *const TAG = "energy_monitoring";
+static const char *const GAP = "  ";
 
 void EnergyMonitoring::dump_config() {
   ESP_LOGCONFIG(TAG, "Energy monitoring sensors");
@@ -135,7 +137,7 @@ inline bool should_calc_reactive_power(float power, float apparent, float curren
 // q = sqrt(s * s - p * p)
 inline float EnergyMonitoring::calc_reactive_power_(float power, float apparent, float current) {
   if (should_calc_reactive_power(power, apparent, current)) {
-    return sqrt(apparent * apparent - power * power);
+    return std::sqrt(apparent * apparent - power * power);
   }
   return 0.0;
 }

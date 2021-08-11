@@ -69,7 +69,8 @@ class EnergyTariffs : public Component
 #ifdef USE_API
   ESPPreferenceObject rtc_;
   std::string time_offset_service_;
-  void set_time_offset_(float seconds);
+  // set time offset in seconds
+  void set_time_offset_(float value);
 #endif
 };  // class EnergyTariffs
 

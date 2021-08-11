@@ -5,16 +5,12 @@
 namespace esphome {
 namespace energy_tariffs {
 
-const char *TAG = "energy_tariffs";
-const char *GAP = "  ";
+const char *const TAG = "energy_tariffs";
+const char *const GAP = "  ";
 
 EnergyTariffs::~EnergyTariffs() {
-  if (this->tariff_callback_) {
-    delete this->tariff_callback_;
-  }
-  if (this->before_tariff_callback_) {
-    delete this->before_tariff_callback_;
-  }
+  delete this->tariff_callback_;
+  delete this->before_tariff_callback_;
 }
 
 void EnergyTariffs::dump_config() {

@@ -4,8 +4,8 @@
 namespace esphome {
 namespace energy_statistics {
 
-const char *TAG = "energy_statistics";
-const char *GAP = "  ";
+static const char *const TAG = "energy_statistics";
+static const char *const GAP = "  ";
 
 void EnergyStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Energy statistics sensors");
@@ -88,7 +88,7 @@ void EnergyStatistics::process_(float total) {
   }
 
   if (this->energy_month_ && !isnan(this->energy_.start_month)) {
-    this->energy_week_->publish_state(total - this->energy_.start_month);
+    this->energy_month_->publish_state(total - this->energy_.start_month);
   }
 
   // this->pref_.save(&(this->energy_));

@@ -3,7 +3,6 @@ import esphome.codegen as cg
 from esphome.core import TimePeriod
 from esphome.components import sensor, time
 from esphome import automation
-from esphome.core import coroutine
 from esphome.const import (
     CONF_ID,
     CONF_TIME_ID,
@@ -147,33 +146,31 @@ CONFIG_SCHEMA = cv.All(
 )
 
 
-@coroutine
-def setup_sensor(config, key, setter):
+async def setup_sensor(config, key, setter):
     if key not in config:
         return None
-    var = yield sensor.new_sensor(config[key])
+    var = await sensor.new_sensor(config[key])
     cg.add(setter(var))
     return var
 
 
-@coroutine
-def setup_input(config, key, setter):
+async def setup_input(config, key, setter):
     if key not in config:
         return None
-    var = yield cg.get_variable(config[key])
+    var = await cg.get_variable(config[key])
     cg.add(setter(var))
     return var
 
 
 # code generation entry point
-def to_code(config):
+async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
-    yield cg.register_component(var, config)
+    await cg.register_component(var, config)
 
-    yield setup_input(config, CONF_TIME_ID, var.set_time)
+    await setup_input(config, CONF_TIME_ID, var.set_time)
 
     # inputs
-    yield setup_input(config, CONF_TOTAL, var.set_total)
+    await setup_input(config, CONF_TOTAL, var.set_total)
 
     if CONF_TIME_OFFSET in config:
         cg.add(var.set_time_offset(config[CONF_TIME_OFFSET]))
@@ -183,7 +180,7 @@ def to_code(config):
     # exposed sensors
     for conf in config.get(CONF_TARIFFS, []):
         sens = cg.new_Pvariable(conf[CONF_ID])
-        yield sensor.register_sensor(sens, conf)
+        await sensor.register_sensor(sens, conf)
         for tm in conf.get(CONF_TIME, []):
             parts = tm.split("-")
             t = [time_period(parts[0]), time_period(parts[1])]
@@ -194,11 +191,11 @@ def to_code(config):
 
     for conf in config.get(CONF_ON_TARIFF, []):
         trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)
-        yield automation.build_automation(trigger, [(sensor.SensorPtr, "x")], conf)
+        await automation.build_automation(trigger, [(sensor.SensorPtr, "x")], conf)
 
     for conf in config.get(CONF_ON_BEFORE_TARIFF, []):
         trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)
-        yield automation.build_automation(trigger, [], conf)
+        await automation.build_automation(trigger, [], conf)
 
 
 # @automation.register_action('tariff.set', TariffSetAction,
@@ -207,19 +204,19 @@ def to_code(config):
 #        cv.Required(CONF_STATE): cv.templatable(cv.float_),
 #    }))
 # def tariff_set_offset_to_code(config, action_id, template_arg, args):
-#    paren = yield cg.get_variable(config[CONF_ID])
+#    paren = await cg.get_variable(config[CONF_ID])
 #    var = cg.new_Pvariable(action_id, template_arg, paren)
-#    template_ = yield cg.templatable(config[CONF_STATE], args, float)
+#    template_ = await cg.templatable(config[CONF_STATE], args, float)
 #    cg.add(var.set_state(template_))
-#    yield var
+#    await var
 
 # @automation.register_condition('tariff.is', TariffIsCondition, cv.Schema({
 #    cv.Required(CONF_ID): cv.use_id(EnergyStatistics),
 #    cv.Required(CONF_STATE): cv.templatable(EnergyTariffPtr),
 # }))
 # def tariff_is_to_code(config, condition_id, template_arg, args):
-#    paren = yield cg.get_variable(config[CONF_ID])
+#    paren = await cg.get_variable(config[CONF_ID])
 #    var = cg.new_Pvariable(condition_id, template_arg, paren)
-#    templ = yield cg.templatable(config[CONF_STATE], args, cg.std_string)
+#    templ = await cg.templatable(config[CONF_STATE], args, cg.std_string)
 #    cg.add(var.set_state(templ))
-#    yield var
+#    await var

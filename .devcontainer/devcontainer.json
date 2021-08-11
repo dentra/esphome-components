@@ -1,5 +1,13 @@
 {
   "dockerFile": "Dockerfile",
+  "build": {
+    "args": {
+      // ESPHome version
+      "esphome_version": "1.20.3",
+      // additional APT dependicies
+      "apt_deps": "bash-completion less"
+    }
+  },
   "runArgs": [
     "-e",
     "ESPHOME_DASHBOARD_USE_PING=1"
@@ -7,7 +15,7 @@
   //"appPort": 6052,
   // Set *default* container specific settings.json values on container create.
   "settings": {
-    "terminal.integrated.defaultProfile.linux": "/bin/bash",
+    "terminal.integrated.defaultProfile.linux": "bash",
     "diffEditor.ignoreTrimWhitespace": true,
     "files.autoSave": "onFocusChange",
     "files.trimTrailingWhitespace": true,
@@ -38,7 +46,7 @@
     "files.associations": {
       "**/.vscode/*.json": "jsonc"
     },
-    "C_Cpp.clang_format_path": "/usr/bin/clang-format-7",
+    "C_Cpp.clang_format_path": "/usr/bin/clang-format-11",
   },
   // Add the IDs of extensions you want installed when the container is created.
   "extensions": [

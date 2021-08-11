@@ -6,8 +6,8 @@
 namespace esphome {
 namespace energy_tariffs {
 
-extern const char *TAG;
-extern const char *GAP;
+extern const char *const TAG;
+extern const char *const GAP;
 
 void EnergyTariff::dump_config() {
   LOG_SENSOR(GAP, "Energy Tariff", this);

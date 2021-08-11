@@ -50,11 +50,11 @@ def _dump_config():
 
 
 @coroutine_with_priority(40.0)
-def to_code(config):
-    paren = yield cg.get_variable(config[CONF_WEB_SERVER_BASE_ID])
+async def to_code(config):
+    paren = await cg.get_variable(config[CONF_WEB_SERVER_BASE_ID])
 
     var = cg.new_Pvariable(config[CONF_ID], paren)
-    yield cg.register_component(var, config)
+    await cg.register_component(var, config)
 
     if CONF_AUTH in config:
         username = config[CONF_AUTH][CONF_USERNAME]

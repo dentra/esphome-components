@@ -13,8 +13,8 @@
 namespace esphome {
 namespace backup {
 
-static const char *TAG = "backup";
-static const char *URL = "/config.yaml";
+static const char *const TAG = "backup";
+static const char *const URL = "/config.yaml";
 
 void Backup::setup() {
   ESP_LOGCONFIG(TAG, "Setting up backup handler...");
