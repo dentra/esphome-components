@@ -2,7 +2,7 @@
 
 [![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/dentra/esphome-components)
 
-A collection of my ESPHome components especially for energy meters.
+A collection of my ESPHome components.
 
 To use this repository you should confugure it inside your yaml-configuration:
 ```yaml
