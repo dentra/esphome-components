@@ -35,3 +35,21 @@ sensor:
       name: Frequency
     update_interval: 30s
 ```
+
+And temporary solution to enable switch functionality (not tested yet):
+```yaml
+switch:
+  - platform: gpio
+    name: "Relay"
+    id: relay12
+    pin: GPIO12
+    inverted: true  # need to be checked
+binary_sensor:
+  - platform: gpio
+    pin: GPIO13
+    name: Button
+    inverted: true  # need to be checked
+    on_click:
+      then:
+        - switch.toggle: relay12
+```
