@@ -64,7 +64,10 @@ void ZMAi90v1::loop() {
   }
 }
 
-void ZMAi90v1::update() { this->write_array(DATA_REQUEST, sizeof(DATA_REQUEST)); }
+void ZMAi90v1::update() {
+  ESP_LOGD(TAG, "Sending request: %s", hexencode(DATA_REQUEST, sizeof(DATA_REQUEST)).c_str());
+  this->write_array(DATA_REQUEST, sizeof(DATA_REQUEST));
+}
 
 float ZMAi90v1::get_val(const uint8_t data[4], float mul) {
   float res = {};
