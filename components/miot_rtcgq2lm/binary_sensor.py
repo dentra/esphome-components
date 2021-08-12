@@ -3,9 +3,11 @@ import esphome.config_validation as cv
 from esphome.components import sensor, binary_sensor, esp32_ble_tracker
 from esphome.const import (
     CONF_DEVICE_CLASS,
+    CONF_ICON,
     CONF_IDLE_TIME,
     CONF_ILLUMINANCE,
     CONF_LIGHT,
+    CONF_TIMEOUT,
     DEVICE_CLASS_EMPTY,
     DEVICE_CLASS_ILLUMINANCE,
     DEVICE_CLASS_LIGHT,
@@ -41,14 +43,12 @@ CONFIG_SCHEMA = binary_sensor.BINARY_SENSOR_SCHEMA.extend(
                 ): binary_sensor.device_class,
             }
         ),
+        cv.Optional(CONF_TIMEOUT): binary_sensor.BINARY_SENSOR_SCHEMA,
         cv.Optional(CONF_IDLE_TIME): sensor.sensor_schema(
             UNIT_SECOND, ICON_TIMELAPSE, 0, DEVICE_CLASS_EMPTY
         ),
         cv.Optional(CONF_ILLUMINANCE): sensor.sensor_schema(
             UNIT_LUX, ICON_EMPTY, 0, DEVICE_CLASS_ILLUMINANCE, STATE_CLASS_MEASUREMENT
-        ),
-        cv.Optional(CONF_): sensor.sensor_schema(
-            UNIT_SECOND, ICON_TIMELAPSE, 0, DEVICE_CLASS_EMPTY
         ),
     },
 ).extend(miot.MIOT_BLE_DEVICE_SCHEMA)
@@ -59,6 +59,9 @@ async def to_code(config):
     if CONF_LIGHT in config:
         sens = await binary_sensor.new_binary_sensor(config[CONF_LIGHT])
         cg.add(var.set_light(sens))
+    if CONF_TIMEOUT in config:
+        sens = await binary_sensor.new_binary_sensor(config[CONF_TIMEOUT])
+        cg.add(var.set_timeout(sens))
     if CONF_IDLE_TIME in config:
         sens = await sensor.new_sensor(config[CONF_IDLE_TIME])
         cg.add(var.set_idle_time(sens))

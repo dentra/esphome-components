@@ -26,6 +26,9 @@ class MiotMCCGQ02HL : public miot::MiotComponent, public binary_sensor::BinarySe
   binary_sensor::BinarySensor *alert_{nullptr};
 
   void process_object_(const miot::BLEObject &obj) override;
+
+  void process_door_sensor_(const miot::BLEObject &obj);
+  void process_light_intensity_(const miot::BLEObject &obj);
 };
 
 }  // namespace miot_mccgq02hl

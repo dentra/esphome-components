@@ -20,6 +20,8 @@ class MiotSJWS01LM : public miot::MiotComponent, public binary_sensor::BinarySen
 
  protected:
   void process_object_(const miot::BLEObject &obj) override;
+
+  void process_flooding_(const miot::BLEObject &obj);
 };
 
 }  // namespace miot_sjws01lm

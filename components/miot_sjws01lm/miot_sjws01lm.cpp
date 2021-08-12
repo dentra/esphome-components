@@ -13,11 +13,23 @@ void MiotSJWS01LM::dump_config() {
   LOG_BINARY_SENSOR("  ", "Flood Detector", this);
 }
 
-void MiotSJWS01LM::process_object_(const miot::BLEObject &obj) {
-  auto flooding = obj.get_bool(miot::ATTR_FLOODING);
+void MiotSJWS01LM::process_flooding_(const miot::BLEObject &obj) {
+  auto flooding = obj.get_bool();
   if (flooding.has_value()) {
-    ESP_LOGD(TAG, "  Flooding: %s", YESNO(*flooding));
+    ESP_LOGD(TAG, "Flooding: %s", YESNO(*flooding));
     this->publish_state(*flooding);
+  }
+}
+
+void MiotSJWS01LM::process_object_(const miot::BLEObject &obj) {
+  switch (obj.id) {
+    case miot::MIID_FLOODING:
+      this->process_flooding_(obj);
+      break;
+
+    default:
+      this->process_default_(obj);
+      break;
   }
 }
 

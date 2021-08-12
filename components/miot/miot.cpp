@@ -185,17 +185,23 @@ bool MiotComponent::parse_device(const esp32_ble_tracker::ESPBTDevice &device) {
   return true;
 }
 
-bool MiotComponent::process_mibeacon_(const MiBeacon &mib) {
-  if (!MiotListener::process_mibeacon_(mib)) {
-    return false;
-  }
-  if (this->battery_level_) {
-    auto battery_level = mib.object.get_uint8(ATTR_BATTERY);
-    if (battery_level.has_value()) {
-      this->battery_level_->publish_state(*battery_level);
+void MiotComponent::process_default_(const miot::BLEObject &obj) {
+  switch (obj.id) {
+    case MIID_BATTERY: {
+      if (this->battery_level_) {
+        auto battery_level = obj.get_uint8();
+        if (battery_level.has_value()) {
+          this->battery_level_->publish_state(*battery_level);
+        }
+      }
+      break;
     }
+
+    default:
+      ESP_LOGD(TAG, "[%04X] Unhandled object attribute: %04X, value: %s", this->get_product_id(), obj.id,
+               hexencode(obj.data).c_str());
+      break;
   }
-  return true;
 }
 
 void MiotComponent::dump_config_(const char *TAG) const {

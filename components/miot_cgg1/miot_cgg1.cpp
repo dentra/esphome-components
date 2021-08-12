@@ -14,36 +14,60 @@ void MiotCGG1::dump_config() {
   LOG_SENSOR("  ", "Humidity", this->humidity_);
 }
 
-struct TemperatureHumidity {
-  uint16_t temperature;
-  uint16_t humidity;
-};
-
-void MiotCGG1::process_object_(const miot::BLEObject &obj) {
-  auto temperature = obj.get_uint16(miot::ATTR_TEMPERATURE);
+void MiotCGG1::process_temperature_(const miot::BLEObject &obj) {
+  auto temperature = obj.get_int16();
   if (temperature.has_value()) {
     const auto t = *temperature * 0.1f;
-    ESP_LOGD(TAG, "  Temperature %.1f°C", t);
+    ESP_LOGD(TAG, "Temperature %.1f°C", t);
     this->publish_state(t);
   }
-  auto humidity = obj.get_uint16(miot::ATTR_HUMIDITY);
-  if (humidity.has_value()) {
-    const auto h = *humidity * 0.1f;
-    ESP_LOGD(TAG, " Humidity %.1f%%", h);
-    if (this->humidity_ != nullptr) {
+}
+
+void MiotCGG1::process_humidity_(const miot::BLEObject &obj) {
+  if (this->humidity_ != nullptr) {
+    auto humidity = obj.get_uint16();
+    if (humidity.has_value()) {
+      const auto h = *humidity * 0.1f;
+      ESP_LOGD(TAG, "Humidity %.1f%%", h);
       this->humidity_->publish_state(h);
     }
   }
-  auto both = obj.get_typed<TemperatureHumidity>(miot::ATTR_TEMPERATURE_HUMIDITY);
+}
+void MiotCGG1::process_temperature_humidity_(const miot::BLEObject &obj) {
+  struct TemperatureHumidity {
+    uint16_t temperature;
+    uint16_t humidity;
+  };
+  auto both = obj.get_typed<TemperatureHumidity>();
   if (both.has_value()) {
     const auto t = (*both)->temperature * 0.1f;
-    const auto h = (*both)->humidity * 0.1f;
-    ESP_LOGD(TAG, "  Temperature %.1f°C", t);
-    ESP_LOGD(TAG, "  Humidity %.1f%%", h);
+    ESP_LOGD(TAG, "Temperature %.1f°C", t);
     this->publish_state(t);
     if (this->humidity_ != nullptr) {
+      const auto h = (*both)->humidity * 0.1f;
+      ESP_LOGD(TAG, "Humidity %.1f%%", h);
       this->humidity_->publish_state(h);
     }
+  }
+}
+
+void MiotCGG1::process_object_(const miot::BLEObject &obj) {
+  switch (obj.id) {
+    case miot::MIID_TEMPERATURE:
+      this->process_temperature_(obj);
+      break;
+
+    case miot::MIID_HUMIDITY:
+      this->process_humidity_(obj);
+      break;
+
+    case miot::MIID_TEMPERATURE_HUMIDITY:
+      this->process_temperature_humidity_(obj);
+      break;
+
+    default:
+      this->process_default_(obj);
+      break;
   }
 }
 

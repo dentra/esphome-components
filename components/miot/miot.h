@@ -13,42 +13,52 @@ namespace miot {
 using bindkey_t = uint8_t[16];
 
 struct BLEObject {
-  BLEObject() : id(ATTR_UNINITIALIZED){};
+  BLEObject() : id(MIID_UNINITIALIZED){};
   BLEObject(RawBLEObject *obj) : id(obj->id), data(obj->data, obj->data + obj->data_len) {}
 
-  Attribute id;
+  MIID id;
   std::vector<uint8_t> data;
 
   // get 8 bit value as boolean.
-  optional<bool> get_bool(Attribute check_id) const { return get_uint8(check_id); }
-  // get 8 bit value.
-  optional<uint8_t> get_uint8(Attribute check_id) const {
-    if (check_id == id && data.size() == sizeof(uint8_t)) {
+  optional<bool> get_bool() const { return get_uint8(); }
+  // get 8 bit unsigned value.
+  optional<uint8_t> get_uint8() const {
+    if (data.size() == sizeof(uint8_t)) {
       return data[0];
     }
     return {};
   }
-  // get 16 bit value.
-  optional<uint16_t> get_uint16(Attribute check_id) const {
-    if (check_id == id && data.size() == sizeof(uint16_t)) {
+  // get 16 bit signed value.
+  optional<int16_t> get_int16() const {
+    if (data.size() == sizeof(int16_t)) {
+      return *reinterpret_cast<const int16_t *>(data.data());
+    }
+    return {};
+  }
+  // get 16 bit unsigned value.
+  optional<uint16_t> get_uint16() const {
+    if (data.size() == sizeof(uint16_t)) {
       return *reinterpret_cast<const uint16_t *>(data.data());
     }
     return {};
   }
-  // get 32 or 24 bit values.
-  optional<uint32_t> get_uint32(Attribute check_id) const {
-    if (check_id == id) {
-      if (data.size() == sizeof(uint32_t)) {
-        return *reinterpret_cast<const uint32_t *>(data.data());
-      } else if (data.size() == sizeof(uint32_t) - 1) {
-        return (*reinterpret_cast<const uint32_t *>(data.data())) & 0x00FFFFFF;
-      }
+  // get 24 bit unsigned values.
+  optional<uint32_t> get_uint24() const {
+    if (data.size() == sizeof(uint32_t) - 1) {
+      return (*reinterpret_cast<const uint32_t *>(data.data())) & 0x00FFFFFF;
     }
     return {};
   }
-  // get typed value. example: obj.get_typed<MyData>(ATTR_XXX);
-  template<typename T> optional<const T *> get_typed(Attribute check_id) const {
-    if (check_id == id && data.size() == sizeof(T)) {
+  // get 32 or 24 bit unsigned values.
+  optional<uint32_t> get_uint32() const {
+    if (data.size() == sizeof(uint32_t)) {
+      return *reinterpret_cast<const uint32_t *>(data.data());
+    }
+    return {};
+  }
+  // get typed value. example: obj.get_typed<MyData>(MIID_XXX);
+  template<typename T> optional<const T *> get_typed() const {
+    if (data.size() == sizeof(T)) {
       return reinterpret_cast<const T *>(data.data());
     }
     return {};
@@ -105,8 +115,9 @@ class MiotComponent : public Component, public MiotListener {
   sensor::Sensor *battery_level_{nullptr};
   sensor::Sensor *rssi_{nullptr};
 
-  bool process_mibeacon_(const MiBeacon &mib) override;
   void dump_config_(const char *TAG) const;
+
+  void process_default_(const miot::BLEObject &obj);
 };
 
 }  // namespace miot
