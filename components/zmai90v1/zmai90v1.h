@@ -3,6 +3,8 @@
 #include "esphome/core/component.h"
 #include "esphome/components/uart/uart.h"
 #include "esphome/components/sensor/sensor.h"
+#include "esphome/components/switch/switch.h"
+#include "esphome/components/binary_sensor/binary_sensor.h"
 
 namespace esphome {
 namespace zmai90v1 {
@@ -20,11 +22,16 @@ struct zmai90_data_t {
   uint8_t checksum;
 } PACKED;
 
-class ZMAi90v1 : public PollingComponent, public uart::UARTDevice {
+class ZMAi90v1 : public PollingComponent, public switch_::Switch, public uart::UARTDevice {
  public:
   void dump_config() override;
+  void setup() override;
   void loop() override;
   void update() override;
+
+  void set_switch_pin(GPIOPin *pin) { switch_pin_ = pin; }
+  void set_button_pin(GPIOPin *pin) { button_pin_ = pin; }
+  void set_button(binary_sensor::BinarySensor *button) { button_ = button; }
 
   void set_energy(sensor::Sensor *value) { this->energy_ = value; }
   void set_voltage(sensor::Sensor *value) { this->voltage_ = value; }
@@ -36,6 +43,9 @@ class ZMAi90v1 : public PollingComponent, public uart::UARTDevice {
   void set_power_factor(sensor::Sensor *value) { this->power_factor_ = value; }
 
  protected:
+  GPIOPin *switch_pin_ = {};
+  GPIOPin *button_pin_ = {};
+  binary_sensor::BinarySensor *button_ = {};
   sensor::Sensor *energy_ = {};
   sensor::Sensor *voltage_ = {};
   sensor::Sensor *current_ = {};
@@ -47,6 +57,8 @@ class ZMAi90v1 : public PollingComponent, public uart::UARTDevice {
 
   float get_val(const uint8_t data[4], float mul);
   uint8_t calc_crc_(const zmai90_data_t &data);
+
+  void write_state(bool state) override;
 };
 
 }  // namespace zmai90v1
