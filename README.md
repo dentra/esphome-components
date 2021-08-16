@@ -26,3 +26,6 @@ Uptime sensor based on timestamp.
 
 ## [Backup](components/backup/)
 Save your config back to firmware and download it.
+
+## [ZMAi-90 v1](components/zmai90v1/)
+Turn your ZMAi-90 on V9821 chip into ESPHome device.
