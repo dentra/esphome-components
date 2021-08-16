@@ -1,8 +1,5 @@
 # Xiaomi Mi Smart Home Door/Window Sensor 2 (MCCGQ02HL)
 
-This component is based on https://github.com/adamklis/esphome/tree/dev/esphome/components/xiaomi_mccgq02hl
-and allow compilation using great `ESPHome` `external_components` feature.
-
 Sample configuration:
 ```yaml
 external_components:
