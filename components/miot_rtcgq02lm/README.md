@@ -1,4 +1,4 @@
-# Xiaomi Mi Smart Home Door/Window Sensor 2 (MCCGQ02HL)
+# Xiaomi Mi Smart Home Occupancy Sensor 2 (RTCGQ02LM)
 
 Sample configuration:
 ```yaml
@@ -7,15 +7,18 @@ external_components:
 
 binary_sensor:
   - platform: miot_mccgq02hl
-    mac_address: "E4:AA:EC:34:77:53"
-    bindkey: "574adf25535c9752b9bb6c31b0833442"
-    name: "MCCGQ02HL Door/Window Sensor"
+    mac_address: "54:EF:44:E2:26:AC"
+    bindkey: "7d4811c43c6fa9f11bb3fe24c817f2b0"
+    name: "RTCGQ02LM Motion Sensor 2"
+    # BinarySensor (Optional), device configured timeout
+    timeout:
+      name: "RTCGQ02LM Timeout"
+    # Sensor (Optional), Time in seconds of inactivity
+    idle_time:
+      name: "RTCGQ02LM Idle Time"
     # BinarySensor (Optional), Light intensivity: on - strong light, off - weak light
     light:
-      name: "MCCGQ02HL Light"
-    # BinarySensor (Optional), Alert enabled when door/window has opened a long (device configured) time
-    alert:
-      name: "MCCGQ02HL Alert"
+      name: "RTCGQ02LM Light"
     # Sensor (Optional), Battey Level, %
     battery_level:
       name: "RTCGQ02LM Battery Level"

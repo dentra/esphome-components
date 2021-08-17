@@ -29,3 +29,12 @@ Save your config back to firmware and download it.
 
 ## [ZMAi-90 v1](components/zmai90v1/)
 Turn your ZMAi-90 on V9821 chip into ESPHome device.
+
+## [Xiaomi Mi Smart Home Door/Window Sensor 2 (MCCGQ02HL)](components/miot_mccgq02hl/)
+New Xiaomi BLE device.
+
+## [Xiaomi Flood Sensor (SJWS01LM)](components/miot_sjws01lm/)
+New Xiaomi BLE device.
+
+## [Xiaomi Mi Smart Home Occupancy Sensor 2 (RTCGQ02LM)](components/miot_rtcgq02lm/)
+New Xiaomi BLE device.

@@ -9,12 +9,12 @@
 #ifdef ARDUINO_ARCH_ESP32
 
 namespace esphome {
-namespace miot_rtcgq2lm {
+namespace miot_rtcgq02lm {
 
-class MiotRTCGQ2LM : public miot::MiotComponent, public binary_sensor::BinarySensor {
+class MiotRTCGQ02LM : public miot::MiotComponent, public binary_sensor::BinarySensor {
  public:
   uint16_t get_product_id() const override { return 0x0A8D; }
-  const char *get_product_code() const override { return "RTCGQ2LM"; }
+  const char *get_product_code() const override { return "RTCGQ02LM"; }
 
   void dump_config() override;
 
@@ -37,7 +37,7 @@ class MiotRTCGQ2LM : public miot::MiotComponent, public binary_sensor::BinarySen
   void process_light_intensity_(const miot::BLEObject &obj);
 };
 
-}  // namespace miot_rtcgq2lm
+}  // namespace miot_rtcgq02lm
 }  // namespace esphome
 
 #endif

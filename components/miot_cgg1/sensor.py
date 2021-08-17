@@ -1,9 +1,8 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import sensor, binary_sensor, esp32_ble_tracker
+from esphome.components import sensor, miot
 from esphome.const import (
     CONF_HUMIDITY,
-    CONF_TEMPERATURE,
     DEVICE_CLASS_HUMIDITY,
     DEVICE_CLASS_TEMPERATURE,
     ICON_EMPTY,
@@ -11,8 +10,6 @@ from esphome.const import (
     UNIT_CELSIUS,
     UNIT_PERCENT,
 )
-
-from esphome.components import miot
 
 CODEOWNERS = ["@dentra"]
 AUTO_LOAD = ["miot"]

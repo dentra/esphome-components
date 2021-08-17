@@ -1,12 +1,11 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import sensor, binary_sensor, esp32_ble_tracker
+from esphome.components import miot, binary_sensor
 from esphome.const import (
     CONF_DEVICE_CLASS,
     DEVICE_CLASS_MOISTURE,
 )
 
-from esphome.components import miot
 
 DEVICE_CLASS_FLOODING = DEVICE_CLASS_MOISTURE
 

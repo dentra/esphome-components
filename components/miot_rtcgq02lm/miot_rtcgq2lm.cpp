@@ -4,20 +4,20 @@
 #include "miot_rtcgq2lm.h"
 
 namespace esphome {
-namespace miot_rtcgq2lm {
+namespace miot_rtcgq02lm {
 
 static const char *TAG = "miot_rtcgq2lm";
 
-void MiotRTCGQ2LM::dump_config() {
+void MiotRTCGQ02LM::dump_config() {
   this->dump_config_(TAG);
-  LOG_BINARY_SENSOR("  ", "Motion Sensor", this);
+  LOG_BINARY_SENSOR("  ", "Occupancy Sensor 2", this);
   LOG_BINARY_SENSOR("  ", "Light", this->light_);
   LOG_BINARY_SENSOR("  ", "Timeout", this->timeout_);
   LOG_SENSOR("  ", "Idle Time", this->idle_time_);
   LOG_SENSOR("  ", "Illuminance", this->illuminance_);
 }
 
-void MiotRTCGQ2LM::process_idle_time_(const miot::BLEObject &obj) {
+void MiotRTCGQ02LM::process_idle_time_(const miot::BLEObject &obj) {
   auto idle_time = obj.get_uint32();
   if (idle_time.has_value()) {
     ESP_LOGD(TAG, "Idle time: %d s", *idle_time);
@@ -31,7 +31,7 @@ void MiotRTCGQ2LM::process_idle_time_(const miot::BLEObject &obj) {
   }
 }
 
-void MiotRTCGQ2LM::process_someone_is_moving_with_light_event_(const miot::BLEObject &obj) {
+void MiotRTCGQ02LM::process_someone_is_moving_with_light_event_(const miot::BLEObject &obj) {
   auto illuminance = obj.get_uint24();
   if (illuminance.has_value()) {
     ESP_LOGD(TAG, "Motion with light: %d lx", *illuminance);
@@ -48,7 +48,7 @@ void MiotRTCGQ2LM::process_someone_is_moving_with_light_event_(const miot::BLEOb
   }
 }
 
-void MiotRTCGQ2LM::process_timeout_(const miot::BLEObject &obj) {
+void MiotRTCGQ02LM::process_timeout_(const miot::BLEObject &obj) {
   auto timeout = obj.get_uint32();
   if (timeout.has_value()) {
     ESP_LOGD(TAG, "Timeout: %d s", *timeout);
@@ -59,7 +59,7 @@ void MiotRTCGQ2LM::process_timeout_(const miot::BLEObject &obj) {
   }
 }
 
-void MiotRTCGQ2LM::process_light_intensity_(const miot::BLEObject &obj) {
+void MiotRTCGQ02LM::process_light_intensity_(const miot::BLEObject &obj) {
   if (this->light_ != nullptr) {
     auto light = obj.get_bool();
     if (light.has_value()) {
@@ -69,7 +69,7 @@ void MiotRTCGQ2LM::process_light_intensity_(const miot::BLEObject &obj) {
   }
 }
 
-void MiotRTCGQ2LM::process_object_(const miot::BLEObject &obj) {
+void MiotRTCGQ02LM::process_object_(const miot::BLEObject &obj) {
   switch (obj.id) {
     case miot::MIID_IDLE_TIME:
       this->process_idle_time_(obj);
@@ -93,7 +93,7 @@ void MiotRTCGQ2LM::process_object_(const miot::BLEObject &obj) {
   }
 }
 
-}  // namespace miot_rtcgq2lm
+}  // namespace miot_rtcgq02lm
 }  // namespace esphome
 
 #endif
