@@ -25,15 +25,21 @@ void ZMAi90v1::dump_config() {
 }
 
 void ZMAi90v1::setup() {
+  this->switch_pin_->setup();
   auto switch_state = this->get_initial_state();
   if (switch_state.has_value()) {
     write_state(*switch_state);
   }
+
+  if (this->button_ != nullptr) {
+    this->button_pin_->setup();
+    this->button_->publish_initial_state(!this->button_pin_->digital_read());
+  }
 }
 
 void ZMAi90v1::loop() {
-  if (this->button_) {
-    this->button_->publish_state(this->button_pin_->digital_read());
+  if (this->button_ != nullptr) {
+    this->button_->publish_state(!this->button_pin_->digital_read());
   }
 
   zmai90_data_t data = {};

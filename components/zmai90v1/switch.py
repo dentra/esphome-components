@@ -195,7 +195,7 @@ FINAL_VALIDATE_SCHEMA = cv.All(
 def add_button_trigger_(id_: core.ID, switch_, button_):
     id = id_.id + "_"
     trigger = cg.new_Pvariable(
-        cv.declare_id(binary_sensor.ClickTrigger)(id + "trigger"),
+        cv.declare_id(binary_sensor.ClickTrigger)(id + "clicktrigger"),
         button_,
         50,
         350,
@@ -206,7 +206,7 @@ def add_button_trigger_(id_: core.ID, switch_, button_):
         trigger,
     )
     action = cg.new_Pvariable(
-        cv.declare_id(switch.ToggleAction)(id + "action"),
+        cv.declare_id(switch.ToggleAction)(id + "toggleaction"),
         cg.TemplateArguments(),
         switch_,
     )
