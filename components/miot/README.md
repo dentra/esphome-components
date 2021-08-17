@@ -1,18 +1,18 @@
 # MIOT BLE platform
 
-The implementation is quite different from ESPHome Xiaomi platform, but by MI specs, more clear and without magic and now under heavy development to conform need of other devices.
+The implementation is quite different from ESPHome Xiaomi platform, but developed by MI specs, more clear and without magic and now under heavy development to conform need of other devices.
 
 Support addidig devices by `lambda`
 
 ```yaml
 miot:
- on_miot_advertise:
-    - mac_address: $mac_motion
-      bindkey: $key_motion
-       debug: true
-       then:
-         lambda: |-
-           ESP_LOGW("$node_name", "on_miot_advertise - $mac_motion");
+  on_miot_advertise:
+    - mac_address: "54:EF:44:E2:26:AC"
+      bindkey: "7d4811c43c6fa9f11bb3fe24c817f2b0"
+      debug: true
+      then:
+        lambda: |-
+          ESP_LOGW("main", "on_miot_advertise, miid: %d", x.id);
 ```
 
-The `x` labmda variable contains [BLEObject](miot.h#L15)
+The `x` is a labmda variable witch [BLEObject](miot.h#L15)
