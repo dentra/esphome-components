@@ -1,5 +1,5 @@
 from esphome.cpp_types import Component
-from esphome.core import ID
+from esphome.core import ID, Lambda
 from esphome import automation
 import esphome.codegen as cg
 import esphome.config_validation as cv
@@ -8,8 +8,10 @@ from esphome.const import (
     CONF_BATTERY_LEVEL,
     CONF_BINDKEY,
     CONF_ID,
+    CONF_LAMBDA,
     CONF_MAC_ADDRESS,
     CONF_ON_BLE_SERVICE_DATA_ADVERTISE,
+    CONF_THEN,
     CONF_TRIGGER_ID,
     DEVICE_CLASS_BATTERY,
     DEVICE_CLASS_SIGNAL_STRENGTH,
@@ -60,6 +62,9 @@ CONFIG_SCHEMA = cv.Schema(
                     cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(MiotAdvertiseTrigger),
                     cv.Optional(CONF_PRODUCT_ID): cv.uint32_t,
                     cv.Optional(CONF_DEBUG): cv.boolean,
+                    cv.Optional(
+                        CONF_THEN, default={CONF_LAMBDA: Lambda("")}
+                    ): automation.validate_action_list,
                 }
             ).extend(MIOT_BLE_DEVICE_CORE_SCHEMA),
         ),
@@ -138,4 +143,5 @@ async def to_code(config):
             cg.add(trigger.set_product_id(conf[CONF_PRODUCT_ID]))
         if conf.get(CONF_DEBUG, False):
             cg.add(trigger.set_debug(True))
-        await automation.build_automation(trigger, [(BLEObjectConstRef, "x")], conf)
+        if CONF_THEN in conf:
+            await automation.build_automation(trigger, [(BLEObjectConstRef, "x")], conf)

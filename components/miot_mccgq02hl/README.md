@@ -7,8 +7,11 @@ external_components:
 
 binary_sensor:
   - platform: miot_mccgq02hl
-    mac_address: "E4:AA:EC:34:77:53"
-    bindkey: "574adf25535c9752b9bb6c31b0833442"
+    # String (Required), device MAC-address.
+    mac_address: "device-mac-address"
+    # String, (Optional), device bind key
+    bindkey: "device-bin-key"
+     # String, (Optional), the name of binary sensor
     name: "MCCGQ02HL Door/Window Sensor"
     # BinarySensor (Optional), Light intensivity: on - strong light, off - weak light
     light:

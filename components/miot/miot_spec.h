@@ -740,7 +740,7 @@ struct ButtonEvent {
   // Button number, value range 0~9.
   uint16_t index = 0xFFFF;
   // Type of event.
-  enum : uint8_t {
+  enum Type : uint8_t {
     CLICK = 0x00,
     DOUBLE_CLICK = 0x01,
     LONG_PRESS = 0x02,

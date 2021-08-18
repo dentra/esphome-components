@@ -7,8 +7,11 @@ external_components:
 
 binary_sensor:
   - platform: miot_mccgq02hl
-    mac_address: "54:EF:44:E2:26:AC"
-    bindkey: "7d4811c43c6fa9f11bb3fe24c817f2b0"
+    # String (Required), device MAC-address.
+    mac_address: "device-mac-address"
+    # String, (Optional), device bind key
+    bindkey: "device-bin-key"
+    # String, (Optional), the name of binary sensor
     name: "RTCGQ02LM Motion Sensor 2"
     # BinarySensor (Optional), device configured timeout
     timeout:

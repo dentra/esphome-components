@@ -1,23 +1,25 @@
-# Xiaomi Flood Sensor (SJWS01LM)
-
+# Xiaomi ClearGrass Bluetooth Hygrothermograph (CGG1)
 
 Sample configuration:
 ```yaml
 external_components:
   - source: github://dentra/esphome-components
 
-binary_sensor:
-  - platform: miot_sjws01lm
+sensor:
+  - platform: miot_cgg1
     # String (Required), device MAC-address.
     mac_address: "device-mac-address"
     # String, (Optional), device bind key
     bindkey: "device-bin-key"
-    # String, (Optional), the name of binary sensor
-    name: "SJWS01LM Water Leak"
+     # String, (Optional), the name of sensor
+    name: "CGG1 Temperature"
+    # Sensor (Optional), Humidity, %
+    humidity:
+      name: "CGG1 Humidity"
     # Sensor (Optional), Battey Level, %
     battery_level:
-      name: "RTCGQ02LM Battery Level"
+      name: "CGG1 Battery Level"
     # Sensor (Optional), Signal strength, dB
     rssi:
-      name: "RTCGQ02LM RSSI"
+      name: "CGG1 RSSI"
 ```
