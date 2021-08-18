@@ -28,7 +28,10 @@ sensor:
       - button: "off"
         # List, Any automation
         then:
-          lambda: // do something
+          - homeassistant.service:
+              service: notify.html5
+              data:
+                title: Off button was pressed
     # List, Automation (Optional), The automation activated when you log pressed specified button
     on_long_press:
       # String (Required), The button name (case insensitive):
@@ -40,7 +43,10 @@ sensor:
       - button: "-"
       # List, Any automation
         then:
-          lambda: // do something
+          - homeassistant.service:
+              service: notify.html5
+              data:
+                title: Minus button was long pressed
 ```
 
 thanks to @Slavissy
