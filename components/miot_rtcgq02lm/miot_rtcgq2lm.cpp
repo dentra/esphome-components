@@ -14,13 +14,12 @@ void MiotRTCGQ02LM::dump_config() {
   LOG_BINARY_SENSOR("  ", "Light", this->light_);
   LOG_BINARY_SENSOR("  ", "Timeout", this->timeout_);
   LOG_SENSOR("  ", "Idle Time", this->idle_time_);
-  LOG_SENSOR("  ", "Illuminance", this->illuminance_);
+  // LOG_SENSOR("  ", "Illuminance", this->illuminance_);
 }
 
 void MiotRTCGQ02LM::process_idle_time_(const miot::BLEObject &obj) {
-  auto idle_time = obj.get_uint32();
+  const auto idle_time = obj.get_idle_time();
   if (idle_time.has_value()) {
-    ESP_LOGD(TAG, "Idle time: %d s", *idle_time);
     if (this->idle_time_ != nullptr) {
       this->idle_time_->publish_state(*idle_time);
     }
@@ -31,14 +30,13 @@ void MiotRTCGQ02LM::process_idle_time_(const miot::BLEObject &obj) {
   }
 }
 
-void MiotRTCGQ02LM::process_someone_is_moving_with_light_event_(const miot::BLEObject &obj) {
-  auto illuminance = obj.get_uint24();
+void MiotRTCGQ02LM::process_motion_with_light_event_(const miot::BLEObject &obj) {
+  const auto illuminance = obj.get_motion_with_light_event();
   if (illuminance.has_value()) {
-    ESP_LOGD(TAG, "Motion with light: %d lx", *illuminance);
     this->publish_state(true);
-    if (this->illuminance_ != nullptr) {
-      this->illuminance_->publish_state(*illuminance);
-    }
+    // if (this->illuminance_ != nullptr) {
+    //   this->illuminance_->publish_state(*illuminance);
+    // }
     if (this->light_ != nullptr) {
       this->light_->publish_state(*illuminance == 0x100);
     }
@@ -49,9 +47,8 @@ void MiotRTCGQ02LM::process_someone_is_moving_with_light_event_(const miot::BLEO
 }
 
 void MiotRTCGQ02LM::process_timeout_(const miot::BLEObject &obj) {
-  auto timeout = obj.get_uint32();
+  const auto timeout = obj.get_timeout();
   if (timeout.has_value()) {
-    ESP_LOGD(TAG, "Timeout: %d s", *timeout);
     this->publish_state(false);
     if (this->timeout_ != nullptr) {
       this->timeout_->publish_state(*timeout != 0);
@@ -61,9 +58,8 @@ void MiotRTCGQ02LM::process_timeout_(const miot::BLEObject &obj) {
 
 void MiotRTCGQ02LM::process_light_intensity_(const miot::BLEObject &obj) {
   if (this->light_ != nullptr) {
-    auto light = obj.get_bool();
+    const auto light = obj.get_light_intensity();
     if (light.has_value()) {
-      ESP_LOGD(TAG, "Light: %s", YESNO(*light));
       this->light_->publish_state(*light);
     }
   }
@@ -75,8 +71,8 @@ void MiotRTCGQ02LM::process_object_(const miot::BLEObject &obj) {
       this->process_idle_time_(obj);
       break;
 
-    case miot::MIID_SOMEONE_IS_MOVING_WITH_LIGHT_EVENT:
-      this->process_someone_is_moving_with_light_event_(obj);
+    case miot::MIID_MOTION_WITH_LIGHT_EVENT:
+      this->process_motion_with_light_event_(obj);
       break;
 
     case miot::MIID_TIMEOUT:

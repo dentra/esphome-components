@@ -15,38 +15,27 @@ void MiotCGG1::dump_config() {
 }
 
 void MiotCGG1::process_temperature_(const miot::BLEObject &obj) {
-  auto temperature = obj.get_int16();
+  const auto temperature = obj.get_temperature();
   if (temperature.has_value()) {
-    const auto t = *temperature * 0.1f;
-    ESP_LOGD(TAG, "Temperature %.1f°C", t);
-    this->publish_state(t);
+    this->publish_state(*temperature);
   }
 }
 
 void MiotCGG1::process_humidity_(const miot::BLEObject &obj) {
   if (this->humidity_ != nullptr) {
-    auto humidity = obj.get_uint16();
+    const auto humidity = obj.get_humidity();
     if (humidity.has_value()) {
-      const auto h = *humidity * 0.1f;
-      ESP_LOGD(TAG, "Humidity %.1f%%", h);
-      this->humidity_->publish_state(h);
+      this->humidity_->publish_state(*humidity);
     }
   }
 }
+
 void MiotCGG1::process_temperature_humidity_(const miot::BLEObject &obj) {
-  struct TemperatureHumidity {
-    uint16_t temperature;
-    uint16_t humidity;
-  };
-  auto both = obj.get_typed<TemperatureHumidity>();
-  if (both.has_value()) {
-    const auto t = (*both)->temperature * 0.1f;
-    ESP_LOGD(TAG, "Temperature %.1f°C", t);
-    this->publish_state(t);
+  const auto temperature_humidity = obj.get_temperature_humidity();
+  if (temperature_humidity.has_value()) {
+    this->publish_state(temperature_humidity->temperature);
     if (this->humidity_ != nullptr) {
-      const auto h = (*both)->humidity * 0.1f;
-      ESP_LOGD(TAG, "Humidity %.1f%%", h);
-      this->humidity_->publish_state(h);
+      this->humidity_->publish_state(temperature_humidity->humidity);
     }
   }
 }

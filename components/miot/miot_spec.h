@@ -221,7 +221,7 @@ enum MIID : uint16_t {
   //
   // Note: This event is only for human sensors with both light sensors,
   //       and separate human sensors can use MIID_CLOSE_TO_EVENT
-  MIID_SOMEONE_IS_MOVING_WITH_LIGHT_EVENT = 0x000F,
+  MIID_MOTION_WITH_LIGHT_EVENT = 0x000F,
 
   // Toothbrush event.
   //
@@ -728,6 +728,26 @@ struct RawBLEObject {
   // The maximum effective data length for each Object is 10 bytes (Byte).
   uint8_t data[13];
 } PACKED;
+
+// Object returned by MIID_TEMPERATURE_HUMIDITY.
+struct TemperatureHumidity {
+  float temperature = {};
+  float humidity = {};
+};
+
+// Object returned by MIID_BUTTON_EVENT.
+struct ButtonEvent {
+  // Button number, value range 0~9.
+  uint16_t index = 0xFFFF;
+  // Type of event.
+  enum : uint8_t {
+    CLICK = 0x00,
+    DOUBLE_CLICK = 0x01,
+    LONG_PRESS = 0x02,
+    TRIPLE_CLICK = 0x03,
+    _UNINITIALIZED = 0xFF,
+  } type = _UNINITIALIZED;
+};
 
 }  // namespace miot
 }  // namespace esphome

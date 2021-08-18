@@ -1,11 +1,10 @@
 #pragma once
+#ifdef ARDUINO_ARCH_ESP32
 
 #include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/esp32_ble_tracker/esp32_ble_tracker.h"
 #include "../miot/miot.h"
-
-#ifdef ARDUINO_ARCH_ESP32
 
 namespace esphome {
 namespace miot_cgg1 {

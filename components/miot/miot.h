@@ -56,13 +56,43 @@ struct BLEObject {
     }
     return {};
   }
-  // get typed value. example: obj.get_typed<MyData>(MIID_XXX);
+  // get typed value. example: obj.get_typed<MyData>();
   template<typename T> optional<const T *> get_typed() const {
     if (data.size() == sizeof(T)) {
       return reinterpret_cast<const T *>(data.data());
     }
     return {};
   }
+  // Value for MIID_DOOR_SENSOR.
+  // See MIID_DOOR_SENSOR for detailed description for returning value.
+  optional<uint8_t> get_door_sensor() const;
+  // Value for MIID_IDLE_TIME.
+  // returns idle time in seconds.
+  optional<uint32_t> get_idle_time() const;
+  // Value for MIID_TIMEOUT.
+  // returns timeout in seconds.
+  optional<uint32_t> get_timeout() const;
+  // Value for MIID_MOTION_WITH_LIGHT_EVENT.
+  // returns illuminance in lux.
+  optional<uint32_t> get_motion_with_light_event() const;
+  // Value for MIID_FLOODING.
+  // returns true on flooding or false if not.
+  optional<bool> get_flooding() const;
+  // Value for MIID_LIGHT_INTENSITY.
+  // returns true for a strong and false for a weak light.
+  optional<bool> get_light_intensity() const;
+  // Value for MIID_TEMPERATURE.
+  // returns temperature in °C.
+  optional<float> get_temperature() const;
+  // Value for MIID_HUMIDITY.
+  // returns humidity in %.
+  optional<float> get_humidity() const;
+  // Value for MIID_TEMPERATURE_HUMIDITY.
+  // returns TemperatureHumidity object.
+  optional<const TemperatureHumidity> get_temperature_humidity() const;
+  // Value for MIID_BUTTON_EVENT.
+  // returns ButtonEvent object.
+  optional<const ButtonEvent> get_button_event() const;
 };
 
 struct MiBeacon {

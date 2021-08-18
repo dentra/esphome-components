@@ -14,9 +14,8 @@ void MiotSJWS01LM::dump_config() {
 }
 
 void MiotSJWS01LM::process_flooding_(const miot::BLEObject &obj) {
-  auto flooding = obj.get_bool();
+  const auto flooding = obj.get_flooding();
   if (flooding.has_value()) {
-    ESP_LOGD(TAG, "Flooding: %s", YESNO(*flooding));
     this->publish_state(*flooding);
   }
 }

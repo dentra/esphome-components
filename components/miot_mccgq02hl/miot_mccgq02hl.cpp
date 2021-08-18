@@ -17,11 +17,10 @@ void MiotMCCGQ02HL::dump_config() {
 }
 
 void MiotMCCGQ02HL::process_door_sensor_(const miot::BLEObject &obj) {
-  auto opening = obj.get_uint8();
+  const auto opening = obj.get_door_sensor();
   if (!opening.has_value()) {
     return;
   }
-  ESP_LOGD(TAG, "Opening: %" PRIu8, *opening);
   switch (*opening) {
     case 0x01: {  // closed
       this->publish_state(false);
@@ -52,9 +51,8 @@ void MiotMCCGQ02HL::process_door_sensor_(const miot::BLEObject &obj) {
 
 void MiotMCCGQ02HL::process_light_intensity_(const miot::BLEObject &obj) {
   if (this->light_ != nullptr) {
-    auto light = obj.get_bool();
+    const auto light = obj.get_light_intensity();
     if (light.has_value()) {
-      ESP_LOGD(TAG, "Light: %s", YESNO(*light));
       this->light_->publish_state(*light);
     }
   }
