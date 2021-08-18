@@ -22,6 +22,7 @@ sensor:
       # String (Required), The button name (case insensitive):
       #     on, off, dimmable or sun or moon, plus or +, moonlight or M, minus or -
       button: "on"
+      # List, Any automation
       then:
         lambda: // do something
     # Automation (Optional), The automation activated when you log pressed specified button
@@ -29,6 +30,7 @@ sensor:
       # String (Required), The button name (case insensitive):
       #     on, off, dimmable or sun or moon, plus or +, moonlight or M, minus or -
       button: "+"
+      # List, Any automation
       then:
         lambda: // do something
 ```
