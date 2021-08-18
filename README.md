@@ -30,7 +30,7 @@ Save your config back to firmware and download it.
 ## [ZMAi-90 v1](components/zmai90v1/)
 Turn your ZMAi-90 on V9821 chip into ESPHome device.
 
-## MIOT Platform
+## [MIOT Platform](components/miot/)
 The MIOT Platform is alternative implementation of Xiaomi BLE protocol.
 At this moment there are list of supported device:
  * [Xiaomi Mi Smart Home Door/Window Sensor 2 (MCCGQ02HL)](components/miot_mccgq02hl/)
