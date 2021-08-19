@@ -2,7 +2,6 @@
 #ifdef ARDUINO_ARCH_ESP32
 
 #include "esphome/core/component.h"
-#include "esphome/components/sensor/sensor.h"
 #include "esphome/components/binary_sensor/binary_sensor.h"
 #include "esphome/components/esp32_ble_tracker/esp32_ble_tracker.h"
 #include "../miot/miot.h"
@@ -24,7 +23,7 @@ class MiotMCCGQ02HL : public miot::MiotComponent, public binary_sensor::BinarySe
   binary_sensor::BinarySensor *light_{nullptr};
   binary_sensor::BinarySensor *alert_{nullptr};
 
-  void process_object_(const miot::BLEObject &obj) override;
+  bool process_object_(const miot::BLEObject &obj) override;
 
   void process_door_sensor_(const miot::BLEObject &obj);
   void process_light_intensity_(const miot::BLEObject &obj);

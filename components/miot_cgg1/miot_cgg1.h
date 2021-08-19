@@ -21,7 +21,7 @@ class MiotCGG1 : public miot::MiotComponent, public sensor::Sensor {
  protected:
   sensor::Sensor *humidity_{nullptr};
 
-  void process_object_(const miot::BLEObject &obj) override;
+  bool process_object_(const miot::BLEObject &obj) override;
 
   void process_temperature_(const miot::BLEObject &obj);
   void process_humidity_(const miot::BLEObject &obj);

@@ -20,16 +20,16 @@ void MiotSJWS01LM::process_flooding_(const miot::BLEObject &obj) {
   }
 }
 
-void MiotSJWS01LM::process_object_(const miot::BLEObject &obj) {
+bool MiotSJWS01LM::process_object_(const miot::BLEObject &obj) {
   switch (obj.id) {
     case miot::MIID_FLOODING:
       this->process_flooding_(obj);
       break;
 
     default:
-      this->process_default_(obj);
-      break;
+      return this->process_default_(obj);
   }
+  return true;
 }
 
 }  // namespace miot_sjws01lm

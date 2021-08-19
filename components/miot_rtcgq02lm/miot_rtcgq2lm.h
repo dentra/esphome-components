@@ -28,7 +28,7 @@ class MiotRTCGQ02LM : public miot::MiotComponent, public binary_sensor::BinarySe
   sensor::Sensor *idle_time_{nullptr};
   // sensor::Sensor *illuminance_{nullptr};
 
-  void process_object_(const miot::BLEObject &obj) override;
+  bool process_object_(const miot::BLEObject &obj) override;
 
   void process_idle_time_(const miot::BLEObject &obj);
   void process_motion_with_light_event_(const miot::BLEObject &obj);

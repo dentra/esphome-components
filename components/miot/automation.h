@@ -22,7 +22,10 @@ class MiotAdvertiseTrigger : public Trigger<const BLEObject &>, public MiotListe
   bool debug_ = {};
   uint16_t product_id_ = {};
   bool process_mibeacon_(const MiBeacon &mib) override;
-  void process_object_(const BLEObject &obj) override { this->trigger(obj); };
+  bool process_object_(const BLEObject &obj) override {
+    this->trigger(obj);
+    return true;
+  };
 };
 
 }  // namespace miot

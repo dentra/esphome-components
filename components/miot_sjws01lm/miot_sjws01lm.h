@@ -1,7 +1,6 @@
 #pragma once
 #ifdef ARDUINO_ARCH_ESP32
 #include "esphome/core/component.h"
-#include "esphome/components/sensor/sensor.h"
 #include "esphome/components/binary_sensor/binary_sensor.h"
 #include "esphome/components/esp32_ble_tracker/esp32_ble_tracker.h"
 #include "../miot/miot.h"
@@ -17,7 +16,7 @@ class MiotSJWS01LM : public miot::MiotComponent, public binary_sensor::BinarySen
   void dump_config() override;
 
  protected:
-  void process_object_(const miot::BLEObject &obj) override;
+  bool process_object_(const miot::BLEObject &obj) override;
 
   void process_flooding_(const miot::BLEObject &obj);
 };

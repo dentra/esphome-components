@@ -59,9 +59,6 @@ CONFIG_SCHEMA = cv.Schema(
 
 
 async def to_code(config):
-    if CONF_BATTERY_LEVEL in config or miot.CONF_RSSI in config:
-        await miot.new_device(config)
-
     parent = await cg.get_variable(config[esp32_ble_tracker.CONF_ESP32_BLE_ID])
     for conf in config.get(CONF_ON_CLICK, []):
         trigger = cg.new_Pvariable(

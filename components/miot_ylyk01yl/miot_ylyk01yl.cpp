@@ -10,7 +10,7 @@ static const char *TAG = "miot_ylyk01yl";
 
 void MiotYLYK01YL::dump_config() { this->dump_config_(TAG); }
 
-void MiotYLYK01YL::process_object_(const miot::BLEObject &obj) { this->process_default_(obj); }
+bool MiotYLYK01YL::process_object_(const miot::BLEObject &obj) { return this->process_default_(obj); }
 
 }  // namespace miot_ylyk01yl
 }  // namespace esphome

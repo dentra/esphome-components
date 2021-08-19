@@ -21,11 +21,24 @@ class MiotYLYK01YLTrigger : public Trigger<>, public miot::MiotListener {
  protected:
   miot::ButtonEvent::Type type_;
   uint16_t index_;
-  void process_object_(const miot::BLEObject &obj) override {
-    const auto button_event = obj.get_button_event();
-    if (button_event.has_value() && button_event->type == this->type_ && button_event->index == this->index_) {
-      this->trigger();
+  bool process_object_(const miot::BLEObject &obj) override {
+    switch (obj.id) {
+      case miot::MIID_BUTTON_EVENT: {
+        const auto button_event = obj.get_button_event();
+        if (button_event.has_value() && button_event->type == this->type_ && button_event->index == this->index_) {
+          this->trigger();
+          return true;
+        }
+        return false;
+      }
+      case miot::MIID_SIMPLE_PAIRING_EVENT:
+        // skip this event
+        // do not know how to process it yet.
+        return false;
+      default:
+        return this->process_unhandled_(obj);
     }
+    return false;
   }
 };
 

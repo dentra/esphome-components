@@ -725,29 +725,10 @@ struct RawMiBeaconHeader {
 struct RawBLEObject {
   MIID id;
   uint8_t data_len;
-  // The maximum effective data length for each Object is 10 bytes (Byte).
+  // The maximum effective data length for each Object is 10 bytes.
+  // 13 - is an align to 16 bytes of whole struct size.
   uint8_t data[13];
 } PACKED;
-
-// Object returned by MIID_TEMPERATURE_HUMIDITY.
-struct TemperatureHumidity {
-  float temperature = {};
-  float humidity = {};
-};
-
-// Object returned by MIID_BUTTON_EVENT.
-struct ButtonEvent {
-  // Button number, value range 0~9.
-  uint16_t index = 0xFFFF;
-  // Type of event.
-  enum Type : uint8_t {
-    CLICK = 0x00,
-    DOUBLE_CLICK = 0x01,
-    LONG_PRESS = 0x02,
-    TRIPLE_CLICK = 0x03,
-    _UNINITIALIZED = 0xFF,
-  } type = _UNINITIALIZED;
-};
 
 }  // namespace miot
 }  // namespace esphome

@@ -65,7 +65,7 @@ void MiotRTCGQ02LM::process_light_intensity_(const miot::BLEObject &obj) {
   }
 }
 
-void MiotRTCGQ02LM::process_object_(const miot::BLEObject &obj) {
+bool MiotRTCGQ02LM::process_object_(const miot::BLEObject &obj) {
   switch (obj.id) {
     case miot::MIID_IDLE_TIME:
       this->process_idle_time_(obj);
@@ -84,9 +84,9 @@ void MiotRTCGQ02LM::process_object_(const miot::BLEObject &obj) {
       break;
 
     default:
-      this->process_default_(obj);
-      break;
+      return this->process_default_(obj);
   }
+  return true;
 }
 
 }  // namespace miot_rtcgq02lm

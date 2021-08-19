@@ -58,7 +58,7 @@ void MiotMCCGQ02HL::process_light_intensity_(const miot::BLEObject &obj) {
   }
 }
 
-void MiotMCCGQ02HL::process_object_(const miot::BLEObject &obj) {
+bool MiotMCCGQ02HL::process_object_(const miot::BLEObject &obj) {
   switch (obj.id) {
     case miot::MIID_DOOR_SENSOR:
       this->process_door_sensor_(obj);
@@ -69,9 +69,9 @@ void MiotMCCGQ02HL::process_object_(const miot::BLEObject &obj) {
       break;
 
     default:
-      this->process_default_(obj);
-      break;
+      return this->process_default_(obj);
   }
+  return true;
 }
 
 }  // namespace miot_mccgq02hl

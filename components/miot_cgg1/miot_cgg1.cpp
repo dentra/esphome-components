@@ -40,7 +40,7 @@ void MiotCGG1::process_temperature_humidity_(const miot::BLEObject &obj) {
   }
 }
 
-void MiotCGG1::process_object_(const miot::BLEObject &obj) {
+bool MiotCGG1::process_object_(const miot::BLEObject &obj) {
   switch (obj.id) {
     case miot::MIID_TEMPERATURE:
       this->process_temperature_(obj);
@@ -55,9 +55,9 @@ void MiotCGG1::process_object_(const miot::BLEObject &obj) {
       break;
 
     default:
-      this->process_default_(obj);
-      break;
+      return this->process_default_(obj);
   }
+  return true;
 }
 
 }  // namespace miot_cgg1
