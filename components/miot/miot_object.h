@@ -28,7 +28,7 @@ struct ButtonEvent {
     TRIPLE_CLICK = 0x03,
     _UNINITIALIZED = 0xFF,
   } type = _UNINITIALIZED;
-};
+} PACKED;
 
 struct BLEObject {
   BLEObject() : id(MIID_UNINITIALIZED){};
