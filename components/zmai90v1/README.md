@@ -2,7 +2,7 @@
 
 The `zmai90v1` sensor platform allows you to use `ZMAi-90` energy meters sensors with `ESPHome`.
 
-> This page refers to version V1 (V9821) of the `ZMAi-90`, which has been out of stock for a while. For using the newer V2 (TYWE3W) see [zmai90.yaml](../../zmai90.yaml) or V3 (WB3S) please fill the request (I have solution).
+> This page refers to version V1 (V9821) of the `ZMAi-90`, which has been out of stock for a while. For using the newer V2 (TYWE3S) see [zmai90.yaml](../../zmai90.yaml) or V3 (WB3S) please fill the request (I have solution).
 
 ```yaml
 # Example configuration entry
