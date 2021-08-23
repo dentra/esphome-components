@@ -48,7 +48,7 @@ class MiotListener : public esp32_ble_tracker::ESPBTDeviceListener {
   virtual bool process_object_(const BLEObject &obj) = 0;
   virtual bool process_mibeacon_(const MiBeacon &mib);
 
-  optional<MiBeacon> parse_mibeacon_(const std::vector<uint8_t> &raw);
+  bool parse_mibeacon_(const std::vector<uint8_t> &raw);
   optional<BLEObject> decrypt_mibeacon_(const MiBeacon &mib, const uint8_t *data, size_t size);
 };
 

@@ -67,32 +67,34 @@ optional<BLEObject> MiotListener::decrypt_mibeacon_(const MiBeacon &mib, const u
   return BLEObject(reinterpret_cast<RawBLEObject *>(result));
 }
 
-optional<MiBeacon> MiotListener::parse_mibeacon_(const std::vector<uint8_t> &raw) {
+bool MiotListener::parse_mibeacon_(const std::vector<uint8_t> &raw) {
   if (raw.size() < sizeof(RawMiBeaconHeader)) {
     MIOT_LOGW("Invalid MiBeacon data length: %s", hexencode(raw).c_str());
-    return {};
+    return false;
   }
+
+  MIOT_LOGD("Got MiBeacon: %s", hexencode(raw).c_str());
 
   auto mib = MiBeacon(reinterpret_cast<const RawMiBeaconHeader *>(raw.data()));
 
   if (this->get_product_id() != 0 && this->get_product_id() != mib.product_id) {
     MIOT_LOGW("Product ID does't match data product ID %04X", mib.product_id);
-    return {};
+    return false;
   }
 
   if (mib.frame_control.mesh) {
     MIOT_LOGW("Device data is a mesh type device");
-    return {};
+    return false;
   }
 
   if (mib.frame_control.version < 2) {
     MIOT_LOGW("Device data is using old data format: %" PRIu8, mib.frame_control.version);
-    return {};
+    return false;
   }
 
   if (this->last_frame_counter_ == mib.frame_counter) {
     MIOT_LOGV("Duplicate data packet received: %" PRIu8, this->last_frame_counter_);
-    return {};
+    return false;
   }
   this->last_frame_counter_ = mib.frame_counter;
 
@@ -104,7 +106,7 @@ optional<MiBeacon> MiotListener::parse_mibeacon_(const std::vector<uint8_t> &raw
     data = data + sizeof(esp_bd_addr_t);
     if (mib.mac_address != this->address_) {
       MIOT_LOGW("MAC address doesn't match data MAC address %12" PRIX64, mib.mac_address);
-      return {};
+      return false;
     }
   }
 
@@ -121,7 +123,7 @@ optional<MiBeacon> MiotListener::parse_mibeacon_(const std::vector<uint8_t> &raw
     if (mib.frame_control.is_encrypted) {
       if (!this->have_bindkey()) {
         MIOT_LOGW("Object is encryped but bindkey is not configured");
-        return {};
+        return false;
       }
       const uint8_t *mic = raw.data() + raw.size() - sizeof(uint32_t);
       mib.message_integrity_check = *reinterpret_cast<const uint32_t *>(mic);
@@ -134,19 +136,19 @@ optional<MiBeacon> MiotListener::parse_mibeacon_(const std::vector<uint8_t> &raw
         auto obj = this->decrypt_mibeacon_(mib, data, rnd + 1 - data);
         if (!obj.has_value()) {
           MIOT_LOGW("Decryption failed");
-          return {};
+          return false;
         }
         mib.object = *obj;
       } else {
         MIOT_LOGW("Can't decrypt object of version %" PRIu8, mib.frame_control.version);
-        return {};
+        return false;
       }
     } else {
       mib.object = BLEObject((RawBLEObject *) data);
     }
   }
 
-  return mib;
+  return this->process_mibeacon_(mib);
 }
 
 bool MiotListener::parse_device(const esp32_ble_tracker::ESPBTDevice &device) {
@@ -161,13 +163,7 @@ bool MiotListener::parse_device(const esp32_ble_tracker::ESPBTDevice &device) {
       MIOT_LOGV("No Xiaomi ServiceData UUID (FE95) found");
       continue;
     }
-    auto mib = this->parse_mibeacon_(service_data.data);
-    if (mib.has_value()) {
-      MIOT_LOGD("Got MiBeacon: %s", hexencode(service_data.data).c_str());
-      if (this->process_mibeacon_(*mib)) {
-        return true;
-      }
-    }
+    return this->parse_mibeacon_(service_data.data);
   }
 
   return false;
