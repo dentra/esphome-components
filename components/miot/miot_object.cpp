@@ -146,6 +146,17 @@ optional<const ButtonEvent> BLEObject::get_button_event() const {
   }
   return res;
 }
+
+optional<float> BLEObject::get_illuminance() const {
+  CHECK_MIID(MIID_ILLUMINANCE);
+  const auto illuminance = this->get_uint24();
+  if (!illuminance.has_value()) {
+    return illuminance;
+  }
+  ESP_LOGD(TAG, "Illuminance %u lx", *illuminance);
+  return *illuminance;
+}
+
 }  // namespace miot
 }  // namespace esphome
 #endif

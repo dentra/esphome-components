@@ -84,39 +84,66 @@ struct BLEObject {
     }
     return {};
   }
-  // Value for MIID_BATTERY.
-  // return battery level in %.
+  /**
+   * Value for MIID_BATTERY.
+   * @return battery level in %.
+   */
   optional<uint8_t> get_battery_level() const;
-  // Value for MIID_DOOR_SENSOR.
-  // See MIID_DOOR_SENSOR for detailed description for returning value.
+  /**
+   * Value for MIID_DOOR_SENSOR.
+   * @return See MIID_DOOR_SENSOR for detailed description for returning value.
+   */
   optional<uint8_t> get_door_sensor() const;
-  // Value for MIID_IDLE_TIME.
-  // returns idle time in seconds.
+  /**
+   * Value for MIID_IDLE_TIME.
+   * @return idle time in seconds.
+   */
   optional<uint32_t> get_idle_time() const;
-  // Value for MIID_TIMEOUT.
-  // returns timeout in seconds.
+  /**
+   * Value for MIID_TIMEOUT.
+   * @return timeout in seconds.
+   */
   optional<uint32_t> get_timeout() const;
-  // Value for MIID_MOTION_WITH_LIGHT_EVENT.
-  // returns illuminance in lux.
+  /**
+   * Value for MIID_MOTION_WITH_LIGHT_EVENT.
+   * @return illuminance in lux.
+   */
   optional<uint32_t> get_motion_with_light_event() const;
-  // Value for MIID_FLOODING.
-  // returns true on flooding or false if not.
+  /**
+   * Value for MIID_FLOODING.
+   * @return true on flooding or false if not.
+   */
   optional<bool> get_flooding() const;
-  // Value for MIID_LIGHT_INTENSITY.
-  // returns true for a strong and false for a weak light.
+  /**
+   * Value for MIID_LIGHT_INTENSITY.
+   * @return true for a strong and false for a weak light.
+   */
   optional<bool> get_light_intensity() const;
-  // Value for MIID_TEMPERATURE.
-  // returns temperature in °C.
+  /**
+   * Value for MIID_TEMPERATURE.
+   * @return temperature in °C.
+   */
   optional<float> get_temperature() const;
-  // Value for MIID_HUMIDITY.
-  // returns humidity in %.
+  /**
+   * Value for MIID_HUMIDITY.
+   * @return humidity in %.
+   */
   optional<float> get_humidity() const;
-  // Value for MIID_TEMPERATURE_HUMIDITY.
-  // returns TemperatureHumidity object.
+  /**
+   * Value for MIID_TEMPERATURE_HUMIDITY.
+   * @return TemperatureHumidity object.
+   */
   optional<const TemperatureHumidity> get_temperature_humidity() const;
-  // Value for MIID_BUTTON_EVENT.
-  // returns ButtonEvent object.
+  /**
+   * Value for MIID_BUTTON_EVENT.
+   * @return ButtonEvent object.
+   */
   optional<const ButtonEvent> get_button_event() const;
+  /**
+   * Value for MIID_ILLUMINANCE.
+   * @return illuminance in lux, range 0-120000.
+   */
+  optional<float> get_illuminance() const;
 };
 
 }  // namespace miot
