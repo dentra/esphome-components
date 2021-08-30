@@ -1,4 +1,4 @@
-# Xiaomi Mi Smart Home Occupancy Sensor 2 (RTCGQ02LM)
+# Qingping Motion & Ambient Light Sensor (CGPR1)
 
 Sample configuration:
 ```yaml
@@ -6,26 +6,21 @@ external_components:
   - source: github://dentra/esphome-components
 
 binary_sensor:
-  - platform: miot_mccgq02hl
+  - platform: miot_cgpr1
     # String (Required), device MAC-address.
     mac_address: "device-mac-address"
     # String, (Optional), device bind key
     bindkey: "device-bin-key"
     # String, (Optional), the name of binary sensor
-    name: "RTCGQ02LM Motion Sensor 2"
-    # BinarySensor (Optional), device configured timeout
-    timeout:
-      name: "RTCGQ02LM Timeout"
+    name: "CGPR1 Motion"
+    # Sensor (Optional), Illuminance, lux
+    illuminance:
+      name: "CGPR1 Illuminance"
     # Sensor (Optional), Time in seconds of inactivity
     idle_time:
-      name: "RTCGQ02LM Idle Time"
-    # BinarySensor (Optional), Light intensivity: on - strong light, off - weak light
-    light:
-      name: "RTCGQ02LM Light"
+      name: "CGPR1 Idle Time"
     # Sensor (Optional), Battey Level, %
     battery_level:
-      name: "RTCGQ02LM Battery Level"
+      name: "CGPR1 Battery Level"
     # Sensor (Optional), Signal strength, dB
-    rssi:
-      name: "RTCGQ02LM RSSI"
 ```

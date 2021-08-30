@@ -20,7 +20,7 @@ from esphome.const import (
 CODEOWNERS = ["@dentra"]
 AUTO_LOAD = ["miot"]
 
-miot_cgpr1_ns = cg.esphome_ns.namespace("miot_cgpr1_ns")
+miot_cgpr1_ns = cg.esphome_ns.namespace("miot_cgpr1")
 MiotCGPR1 = miot_cgpr1_ns.class_(
     "MiotCGPR1", miot.MiotComponent, binary_sensor.BinarySensor
 )
