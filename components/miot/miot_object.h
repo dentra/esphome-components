@@ -31,10 +31,13 @@ struct ButtonEvent {
 } PACKED;
 
 struct BLEObject {
-  BLEObject() : id(MIID_UNINITIALIZED){};
+  BLEObject() : id(MIID_UNINITIALIZED) {}
+  BLEObject(const uint8_t *encrypted_begin, const uint8_t *encrypted_end)
+      : id(MIID_UNINITIALIZED), data(encrypted_begin, encrypted_end) {}
   BLEObject(RawBLEObject *obj) : id(obj->id), data(obj->data, obj->data + obj->data_len) {}
 
   MIID id;
+  // holds encryped data when id==MIID_UNINITIALIZED
   std::vector<uint8_t> data;
 
   // get 8 bit value as boolean.

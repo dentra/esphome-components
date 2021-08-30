@@ -10,27 +10,41 @@ namespace miot {
 
 static const char *const TAG = "miot";
 
-#define _MIOT_LOG(logger, format, ...) \
-  logger(TAG, "%12" PRIX64 " [%04X] " format, this->address_, this->get_product_id(), ##__VA_ARGS__)
+bool MiBeaconTracker::parse_device(const esp32_ble_tracker::ESPBTDevice &device) {
+  bool processed = false;
+  for (auto &service_data : device.get_service_datas()) {
+    if (service_data.uuid.contains(0x95, 0xFE)) {
+      return this->parse_mibeacon_(device.address_uint64(), service_data.data);
+    }
+  }
+  return false;
+}
 
-#define MIOT_LOGW(format, ...) _MIOT_LOG(ESP_LOGW, format, ##__VA_ARGS__)
-#define MIOT_LOGD(format, ...) _MIOT_LOG(ESP_LOGD, format, ##__VA_ARGS__)
-#define MIOT_LOGV(format, ...) _MIOT_LOG(ESP_LOGV, format, ##__VA_ARGS__)
+bool MiBeaconTracker::decrypt_mibeacon2_(MiotListener *listener, MiBeacon &mib) const {
+  ESP_LOGW(TAG, "%12" PRIX64 " [%04X] Can't decrypt object of version %" PRIu8, listener->get_address(),
+           listener->get_product_id(), mib.frame_control.version);
+  return false;
+}
 
-optional<BLEObject> MiotListener::decrypt_mibeacon_(const MiBeacon &mib, const uint8_t *data, size_t size) {
+bool MiBeaconTracker::decrypt_mibeacon4_(MiotListener *listener, MiBeacon &mib) const {
+  const uint8_t *data = mib.object.data.data();
+  size_t size = mib.object.data.size();
   if (size > sizeof(RawBLEObject)) {
-    MIOT_LOGW("Encryped data is too large");
-    return {};
+    ESP_LOGW(TAG, "%12" PRIX64 " [%04X] Encryped data is too large", listener->get_address(),
+             listener->get_product_id());
+    return false;
   }
 
   mbedtls_ccm_context ctx;
   mbedtls_ccm_init(&ctx);
 
-  int ret = mbedtls_ccm_setkey(&ctx, MBEDTLS_CIPHER_ID_AES, this->bindkey_, sizeof(bindkey_t) * 8);  // 8 bits per byte
+  int ret = mbedtls_ccm_setkey(&ctx, MBEDTLS_CIPHER_ID_AES, listener->get_bindkey(),
+                               sizeof(bindkey_t) * 8);  // 8 bits per byte
   if (ret != 0) {
-    MIOT_LOGW("mbedtls_ccm_setkey failed: %d", ret);
+    ESP_LOGW(TAG, "%12" PRIX64 " [%04X] mbedtls_ccm_setkey failed: %d", listener->get_address(),
+             listener->get_product_id(), ret);
     mbedtls_ccm_free(&ctx);
-    return {};
+    return false;
   }
 
   struct {
@@ -38,7 +52,7 @@ optional<BLEObject> MiotListener::decrypt_mibeacon_(const MiBeacon &mib, const u
     uint16_t product_id;
     uint32_t random_number;
   } PACKED nonce;
-  memcpy(nonce.mac, &this->address_, sizeof(esp_bd_addr_t));
+  memcpy(nonce.mac, &listener->get_address(), sizeof(esp_bd_addr_t));
   nonce.product_id = mib.product_id;
   nonce.random_number = mib.random_number;
 
@@ -53,50 +67,42 @@ optional<BLEObject> MiotListener::decrypt_mibeacon_(const MiBeacon &mib, const u
   ret = mbedtls_ccm_auth_decrypt(&ctx, size, iv, iv_len, add, add_len, data, result, tag, tag_len);
   mbedtls_ccm_free(&ctx);
   if (ret != 0) {
-    MIOT_LOGW("mbedtls_ccm_auth_decrypt failed: %d", ret);
+    ESP_LOGW(TAG, "%12" PRIX64 " [%04X] mbedtls_ccm_auth_decrypt failed: %d", listener->get_address(),
+             listener->get_product_id(), ret);
     ESP_LOGW(TAG, "   mac: %02X:%02X:%02X:%02X:%02X:%02X", nonce.mac[5], nonce.mac[4], nonce.mac[3], nonce.mac[2],
              nonce.mac[1], nonce.mac[0]);
-    ESP_LOGW(TAG, "   key: %s", hexencode(this->bindkey_, sizeof(bindkey_t)).c_str());
-    ESP_LOGW(TAG, "    lv: %s", hexencode(iv, iv_len).c_str());
+    ESP_LOGW(TAG, "   key: %s", hexencode(listener->get_bindkey(), sizeof(bindkey_t)).c_str());
+    ESP_LOGW(TAG, "    iv: %s", hexencode(iv, iv_len).c_str());
     ESP_LOGW(TAG, "   add: %s", hexencode(add, add_len).c_str());
     ESP_LOGW(TAG, "   tag: %s", hexencode(tag, tag_len).c_str());
     ESP_LOGW(TAG, "  data: %s", hexencode(data, size).c_str());
-    return {};
-  }
-
-  return BLEObject(reinterpret_cast<RawBLEObject *>(result));
-}
-
-bool MiotListener::parse_mibeacon_(const std::vector<uint8_t> &raw) {
-  if (raw.size() < sizeof(RawMiBeaconHeader)) {
-    MIOT_LOGW("Invalid MiBeacon data length: %s", hexencode(raw).c_str());
     return false;
   }
 
-  MIOT_LOGD("Got MiBeacon: %s", hexencode(raw).c_str());
+  mib.object = BLEObject(reinterpret_cast<RawBLEObject *>(result));
+
+  return true;
+}
+
+bool MiBeaconTracker::parse_mibeacon_(const uint64_t &address, const std::vector<uint8_t> &raw) const {
+  if (raw.size() < sizeof(RawMiBeaconHeader)) {
+    ESP_LOGW("Invalid MiBeacon data length: %s", hexencode(raw).c_str());
+    return false;
+  }
+
+  ESP_LOGD(TAG, "Got MiBeacon: %s", hexencode(raw).c_str());
 
   auto mib = MiBeacon(reinterpret_cast<const RawMiBeaconHeader *>(raw.data()));
 
-  if (this->get_product_id() != 0 && this->get_product_id() != mib.product_id) {
-    MIOT_LOGW("Product ID does't match data product ID %04X", mib.product_id);
-    return false;
-  }
-
   if (mib.frame_control.mesh) {
-    MIOT_LOGW("Device data is a mesh type device");
+    ESP_LOGW(TAG, "Device data is a mesh type device");
     return false;
   }
 
   if (mib.frame_control.version < 2) {
-    MIOT_LOGW("Device data is using old data format: %" PRIu8, mib.frame_control.version);
+    ESP_LOGW(TAG, "Device data is using old data format: %" PRIu8, mib.frame_control.version);
     return false;
   }
-
-  if (this->last_frame_counter_ == mib.frame_counter) {
-    MIOT_LOGV("Duplicate data packet received: %" PRIu8, this->last_frame_counter_);
-    return false;
-  }
-  this->last_frame_counter_ = mib.frame_counter;
 
   auto data = raw.data() + sizeof(RawMiBeaconHeader);
 
@@ -104,10 +110,6 @@ bool MiotListener::parse_mibeacon_(const std::vector<uint8_t> &raw) {
     mib.mac_address =
         (*reinterpret_cast<const uint64_t *>(data)) & 0x0000FFFFFFFFFFFFul;  // mac address 6 bytes + 2 bytes for uint64
     data = data + sizeof(esp_bd_addr_t);
-    if (mib.mac_address != this->address_) {
-      MIOT_LOGW("MAC address doesn't match data MAC address %12" PRIX64, mib.mac_address);
-      return false;
-    }
   }
 
   if (mib.frame_control.capability_include) {
@@ -119,66 +121,83 @@ bool MiotListener::parse_mibeacon_(const std::vector<uint8_t> &raw) {
     }
   }
 
+  BLEObject *encryped_obj = nullptr;
   if (mib.frame_control.object_include) {
     if (mib.frame_control.is_encrypted) {
-      if (!this->have_bindkey()) {
-        MIOT_LOGW("Object is encryped but bindkey is not configured");
-        return false;
-      }
       const uint8_t *mic = raw.data() + raw.size() - sizeof(uint32_t);
       mib.message_integrity_check = *reinterpret_cast<const uint32_t *>(mic);
 
       const uint8_t *rnd = mic - sizeof(uint32_t);
       // random_number combined with frame_counter to become a 4-byte Counter for anti-replay
       mib.random_number = ((*reinterpret_cast<const uint32_t *>(rnd)) & 0xFFFFFF00) | mib.frame_counter;
-      if (mib.frame_control.version > 3) {
-        // random number size is 3 bytes length, so add one.
-        auto obj = this->decrypt_mibeacon_(mib, data, rnd + 1 - data);
-        if (!obj.has_value()) {
-          MIOT_LOGW("Decryption failed");
-          return false;
-        }
-        mib.object = *obj;
-      } else {
-        MIOT_LOGW("Can't decrypt object of version %" PRIu8, mib.frame_control.version);
-        return false;
-      }
+      rnd++;  // random number size is 3 bytes length, so add one.
+      encryped_obj = new BLEObject(data, rnd);
     } else {
       mib.object = BLEObject((RawBLEObject *) data);
     }
   }
 
-  return this->process_mibeacon_(mib);
-}
-
-bool MiotListener::parse_device(const esp32_ble_tracker::ESPBTDevice &device) {
-  if (device.address_uint64() != this->address_) {
-    MIOT_LOGV("Unknown MAC address");
-    return false;
-  }
-  MIOT_LOGV("MAC address found: %s", device.address_str().c_str());
-
-  for (auto &service_data : device.get_service_datas()) {
-    if (!service_data.uuid.contains(0x95, 0xFE)) {
-      MIOT_LOGV("No Xiaomi ServiceData UUID (FE95) found");
+  bool processed = false;
+  for (auto listener : listeners_) {
+    if (address != listener->get_address()) {
       continue;
     }
-    return this->parse_mibeacon_(service_data.data);
+    if (mib.frame_control.mac_include && address != mib.mac_address) {
+      ESP_LOGW(TAG, "%12" PRIX64 " [%04X] MAC address doesn't match data MAC address %12" PRIX64,
+               listener->get_address(), listener->get_product_id(), mib.mac_address);
+      continue;
+    }
+    if (encryped_obj != nullptr) {
+      if (!listener->have_bindkey()) {
+        ESP_LOGW(TAG, "%12" PRIX64 " [%04X] Object is encryped but bindkey is not configured", listener->get_address(),
+                 listener->get_product_id());
+        continue;
+      }
+      mib.object = *encryped_obj;
+      if (mib.frame_control.version > 3) {
+        if (!this->decrypt_mibeacon4_(listener, mib)) {
+          continue;
+        }
+      } else {
+        if (!this->decrypt_mibeacon2_(listener, mib)) {
+          continue;
+        }
+      }
+    }
+    if (listener->process_mibeacon(mib)) {
+      processed = true;
+    }
   }
 
-  return false;
+  delete encryped_obj;
+
+  return processed;
 }
 
-bool MiotListener::process_mibeacon_(const MiBeacon &mib) {
+bool MiotListener::process_mibeacon(const MiBeacon &mib) {
+  if (this->get_product_id() != mib.product_id) {
+    return false;
+  }
+
+  if (this->frame_counter_ == mib.frame_counter) {
+    ESP_LOGD(TAG, "%12" PRIX64 " [%04X] Duplicate data packet received: %" PRIu8, this->address_,
+             this->get_product_id(), mib.frame_counter);
+    return true;
+  }
+  this->frame_counter_ = mib.frame_counter;
+
   if (!mib.frame_control.object_include) {
     return false;
   }
-  MIOT_LOGD("Got BLEObject: ID: %04X, data: %s", mib.object.id, hexencode(mib.object.data).c_str());
+
+  ESP_LOGD(TAG, "%12" PRIX64 " [%04X] Got BLEObject: ID: %04X, data: %s", this->address_, this->get_product_id(),
+           mib.object.id, hexencode(mib.object.data).c_str());
   return this->process_object_(mib.object);
 }
 
 bool MiotListener::process_unhandled_(const miot::BLEObject &obj) {
-  MIOT_LOGW("Unhandled object attribute: %04X, value: %s", obj.id, hexencode(obj.data).c_str());
+  ESP_LOGW(TAG, "%12" PRIX64 " [%04X] Unhandled object attribute: %04X, value: %s", this->address_,
+           this->get_product_id(), obj.id, hexencode(obj.data).c_str());
   return false;
 }
 
@@ -189,16 +208,6 @@ bool MiotListener::have_bindkey() const {
     }
   }
   return false;
-}
-
-bool MiotComponent::parse_device(const esp32_ble_tracker::ESPBTDevice &device) {
-  if (!MiotListener::parse_device(device)) {
-    return false;
-  }
-  if (this->rssi_ != nullptr) {
-    this->rssi_->publish_state(device.get_rssi());
-  }
-  return true;
 }
 
 bool MiotComponent::process_default_(const miot::BLEObject &obj) {
@@ -226,7 +235,6 @@ void MiotComponent::dump_config_(const char *TAG) const {
     ESP_LOGCONFIG(TAG, "  Bindkey: %s", hexencode(this->bindkey_, sizeof(bindkey_t)).c_str());
   }
   LOG_SENSOR("  ", "Battery Level", this->battery_level_);
-  LOG_SENSOR("  ", "RSSI", this->rssi_);
 }
 
 }  // namespace miot

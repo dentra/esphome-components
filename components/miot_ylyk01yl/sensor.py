@@ -59,22 +59,21 @@ CONFIG_SCHEMA = cv.Schema(
 
 
 async def to_code(config):
-    parent = await cg.get_variable(config[esp32_ble_tracker.CONF_ESP32_BLE_ID])
     for conf in config.get(CONF_ON_CLICK, []):
         trigger = cg.new_Pvariable(
             conf[CONF_TRIGGER_ID],
-            parent,
             ButtonEventType.CLICK,
             BUTTON_NAMES[conf[CONF_BUTTON]],
         )
+        await miot.register_miot_device(trigger, config)
         await miot.setup_device_core_(trigger, config)
         await automation.build_automation(trigger, [], conf)
     for conf in config.get(CONF_ON_LONG_PRESS, []):
         trigger = cg.new_Pvariable(
             conf[CONF_TRIGGER_ID],
-            parent,
             ButtonEventType.LONG_PRESS,
             BUTTON_NAMES[conf[CONF_BUTTON]],
         )
+        await miot.register_miot_device(trigger, config)
         await miot.setup_device_core_(trigger, config)
         await automation.build_automation(trigger, [], conf)
