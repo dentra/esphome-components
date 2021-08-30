@@ -11,7 +11,7 @@ static const char *TAG = "miot_mccgq02hl";
 
 void MiotMCCGQ02HL::dump_config() {
   this->dump_config_(TAG);
-  LOG_BINARY_SENSOR("  ", "Door/Window Open Sensor 2", this);
+  LOG_BINARY_SENSOR("  ", "Opening", this);
   LOG_BINARY_SENSOR("  ", "Light", this->light_);
   LOG_BINARY_SENSOR("  ", "Alert", this->alert_);
 }

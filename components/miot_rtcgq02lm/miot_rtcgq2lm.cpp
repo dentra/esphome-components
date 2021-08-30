@@ -10,7 +10,7 @@ static const char *TAG = "miot_rtcgq2lm";
 
 void MiotRTCGQ02LM::dump_config() {
   this->dump_config_(TAG);
-  LOG_BINARY_SENSOR("  ", "Occupancy Sensor 2", this);
+  LOG_BINARY_SENSOR("  ", "Motion", this);
   LOG_BINARY_SENSOR("  ", "Light", this->light_);
   LOG_BINARY_SENSOR("  ", "Timeout", this->timeout_);
   LOG_SENSOR("  ", "Idle Time", this->idle_time_);
@@ -20,10 +20,10 @@ void MiotRTCGQ02LM::dump_config() {
 void MiotRTCGQ02LM::process_idle_time_(const miot::BLEObject &obj) {
   const auto idle_time = obj.get_idle_time();
   if (idle_time.has_value()) {
+    this->publish_state(*idle_time == 0);
     if (this->idle_time_ != nullptr) {
       this->idle_time_->publish_state(*idle_time);
     }
-    this->publish_state(*idle_time == 0);
     if (this->timeout_ != nullptr) {
       this->timeout_->publish_state(*idle_time != 0);
     }

@@ -10,7 +10,7 @@ static const char *TAG = "miot_sjws01lm";
 
 void MiotSJWS01LM::dump_config() {
   this->dump_config_(TAG);
-  LOG_BINARY_SENSOR("  ", "Flood Detector", this);
+  LOG_BINARY_SENSOR("  ", "Flooding", this);
 }
 
 void MiotSJWS01LM::process_flooding_(const miot::BLEObject &obj) {
