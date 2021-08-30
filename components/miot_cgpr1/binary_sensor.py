@@ -50,6 +50,9 @@ CONFIG_SCHEMA = binary_sensor.BINARY_SENSOR_SCHEMA.extend(
 
 async def to_code(config):
     var = await miot.new_binary_sensor_device(config)
+    if CONF_LIGHT in config:
+        sens = await binary_sensor.new_binary_sensor(config[CONF_LIGHT])
+        cg.add(var.set_light(sens))
     if CONF_IDLE_TIME in config:
         sens = await sensor.new_sensor(config[CONF_IDLE_TIME])
         cg.add(var.set_idle_time(sens))

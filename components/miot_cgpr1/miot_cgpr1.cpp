@@ -11,6 +11,7 @@ static const char *TAG = "miot_cgpr1";
 void MiotCGPR1::dump_config() {
   this->dump_config_(TAG);
   LOG_BINARY_SENSOR("  ", "Motion", this);
+  LOG_BINARY_SENSOR("  ", "Light", this->light_);
   LOG_SENSOR("  ", "Idle Time", this->idle_time_);
   LOG_SENSOR("  ", "Illuminance", this->illuminance_);
 }
@@ -44,6 +45,15 @@ void MiotCGPR1::process_illuminance_(const miot::BLEObject &obj) {
   }
 }
 
+void MiotCGPR1::process_light_intensity_(const miot::BLEObject &obj) {
+  if (this->light_ != nullptr) {
+    const auto light = obj.get_light_intensity();
+    if (light.has_value()) {
+      this->light_->publish_state(*light);
+    }
+  }
+}
+
 bool MiotCGPR1::process_object_(const miot::BLEObject &obj) {
   switch (obj.id) {
     case miot::MIID_IDLE_TIME:
@@ -56,6 +66,10 @@ bool MiotCGPR1::process_object_(const miot::BLEObject &obj) {
 
     case miot::MIID_ILLUMINANCE:
       this->process_illuminance_(obj);
+      break;
+
+    case miot::MIID_LIGHT_INTENSITY:
+      this->process_light_intensity_(obj);
       break;
 
     default:

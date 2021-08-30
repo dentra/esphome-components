@@ -19,6 +19,9 @@ binary_sensor:
     # Sensor (Optional), Time in seconds of inactivity
     idle_time:
       name: "CGPR1 Idle Time"
+    # BinarySensor (Optional), Light intensivity: on - strong light, off - weak light
+    light:
+      name: "CGPR1 Light"
     # Sensor (Optional), Battey Level, %
     battery_level:
       name: "CGPR1 Battery Level"
