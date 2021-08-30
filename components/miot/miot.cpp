@@ -180,7 +180,7 @@ bool MiotListener::process_mibeacon(const MiBeacon &mib) {
   }
 
   if (this->frame_counter_ == mib.frame_counter) {
-    ESP_LOGD(TAG, "%12" PRIX64 " [%04X] Duplicate data packet received: %" PRIu8, this->address_,
+    ESP_LOGV(TAG, "%12" PRIX64 " [%04X] Duplicate data packet received: %" PRIu8, this->address_,
              this->get_product_id(), mib.frame_counter);
     return true;
   }

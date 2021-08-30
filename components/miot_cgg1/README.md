@@ -19,7 +19,4 @@ sensor:
     # Sensor (Optional), Battey Level, %
     battery_level:
       name: "CGG1 Battery Level"
-    # Sensor (Optional), Signal strength, dB
-    rssi:
-      name: "CGG1 RSSI"
 ```

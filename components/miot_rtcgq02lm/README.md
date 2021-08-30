@@ -25,7 +25,4 @@ binary_sensor:
     # Sensor (Optional), Battey Level, %
     battery_level:
       name: "RTCGQ02LM Battery Level"
-    # Sensor (Optional), Signal strength, dB
-    rssi:
-      name: "RTCGQ02LM RSSI"
 ```
