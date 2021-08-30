@@ -16,5 +16,13 @@ binary_sensor:
     name: "SJWS01LM Water Leak"
     # Sensor (Optional), Battey Level, %
     battery_level:
-      name: "RTCGQ02LM Battery Level"
+      name: "SJWS01LM Battery Level"
+```
+
+Now signal strength of a BLE device (RSSI) is not a part of this component, but you could easily add it:
+```yaml
+sensor:
+  - platform: ble_rssi
+    mac_address: "device-mac-address"
+    name: "SJWS01LM RSSI"
 ```

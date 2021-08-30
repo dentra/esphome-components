@@ -26,3 +26,11 @@ binary_sensor:
     battery_level:
       name: "RTCGQ02LM Battery Level"
 ```
+
+Now signal strength of a BLE device (RSSI) is not a part of this component, but you could easily add it:
+```yaml
+sensor:
+  - platform: ble_rssi
+    mac_address: "device-mac-address"
+    name: "RTCGQ02LM RSSI"
+```
