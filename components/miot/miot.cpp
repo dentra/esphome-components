@@ -4,6 +4,7 @@
 #include "inttypes.h"
 
 #include "miot.h"
+#include "miot_decrypt.h"
 
 namespace esphome {
 namespace miot {
@@ -18,70 +19,6 @@ bool MiBeaconTracker::parse_device(const esp32_ble_tracker::ESPBTDevice &device)
     }
   }
   return false;
-}
-
-bool MiBeaconTracker::decrypt_mibeacon2_(MiotListener *listener, MiBeacon &mib) const {
-  ESP_LOGW(TAG, "%12" PRIX64 " [%04X] Can't decrypt object of version %" PRIu8, listener->get_address(),
-           listener->get_product_id(), mib.frame_control.version);
-  return false;
-}
-
-bool MiBeaconTracker::decrypt_mibeacon4_(MiotListener *listener, MiBeacon &mib) const {
-  const uint8_t *data = mib.object.data.data();
-  size_t size = mib.object.data.size();
-  if (size > sizeof(RawBLEObject)) {
-    ESP_LOGW(TAG, "%12" PRIX64 " [%04X] Encryped data is too large", listener->get_address(),
-             listener->get_product_id());
-    return false;
-  }
-
-  mbedtls_ccm_context ctx;
-  mbedtls_ccm_init(&ctx);
-
-  int ret = mbedtls_ccm_setkey(&ctx, MBEDTLS_CIPHER_ID_AES, listener->get_bindkey(),
-                               sizeof(bindkey_t) * 8);  // 8 bits per byte
-  if (ret != 0) {
-    ESP_LOGW(TAG, "%12" PRIX64 " [%04X] mbedtls_ccm_setkey failed: %d", listener->get_address(),
-             listener->get_product_id(), ret);
-    mbedtls_ccm_free(&ctx);
-    return false;
-  }
-
-  struct {
-    esp_bd_addr_t mac;
-    uint16_t product_id;
-    uint32_t random_number;
-  } PACKED nonce;
-  memcpy(nonce.mac, &listener->get_address(), sizeof(esp_bd_addr_t));
-  nonce.product_id = mib.product_id;
-  nonce.random_number = mib.random_number;
-
-  const uint8_t *iv = reinterpret_cast<const uint8_t *>(&nonce);
-  const size_t iv_len = sizeof(nonce);
-  const uint8_t add[] = {0x11};
-  const size_t add_len = sizeof(add);
-  const uint8_t *tag = reinterpret_cast<const uint8_t *>(&mib.message_integrity_check);
-  const size_t tag_len = sizeof(mib.message_integrity_check);
-
-  uint8_t result[sizeof(RawBLEObject)];
-  ret = mbedtls_ccm_auth_decrypt(&ctx, size, iv, iv_len, add, add_len, data, result, tag, tag_len);
-  mbedtls_ccm_free(&ctx);
-  if (ret != 0) {
-    ESP_LOGW(TAG, "%12" PRIX64 " [%04X] mbedtls_ccm_auth_decrypt failed: %d", listener->get_address(),
-             listener->get_product_id(), ret);
-    ESP_LOGW(TAG, "   mac: %02X:%02X:%02X:%02X:%02X:%02X", nonce.mac[5], nonce.mac[4], nonce.mac[3], nonce.mac[2],
-             nonce.mac[1], nonce.mac[0]);
-    ESP_LOGW(TAG, "   key: %s", hexencode(listener->get_bindkey(), sizeof(bindkey_t)).c_str());
-    ESP_LOGW(TAG, "    iv: %s", hexencode(iv, iv_len).c_str());
-    ESP_LOGW(TAG, "   add: %s", hexencode(add, add_len).c_str());
-    ESP_LOGW(TAG, "   tag: %s", hexencode(tag, tag_len).c_str());
-    ESP_LOGW(TAG, "  data: %s", hexencode(data, size).c_str());
-    return false;
-  }
-
-  mib.object = BLEObject(reinterpret_cast<RawBLEObject *>(result));
-
-  return true;
 }
 
 bool MiBeaconTracker::parse_mibeacon_(const uint64_t &address, const std::vector<uint8_t> &raw) const {
@@ -155,11 +92,11 @@ bool MiBeaconTracker::parse_mibeacon_(const uint64_t &address, const std::vector
       }
       mib.object = *encryped_obj;
       if (mib.frame_control.version > 3) {
-        if (!this->decrypt_mibeacon4_(listener, mib)) {
+        if (!decrypt_mibeacon45(listener, mib)) {
           continue;
         }
       } else {
-        if (!this->decrypt_mibeacon2_(listener, mib)) {
+        if (!decrypt_mibeacon23(listener, mib)) {
           continue;
         }
       }

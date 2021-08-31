@@ -39,8 +39,6 @@ class MiBeaconTracker : public esp32_ble_tracker::ESPBTDeviceListener, public Co
   std::vector<MiotListener *> listeners_ = {};
 
   bool parse_mibeacon_(const uint64_t &address, const std::vector<uint8_t> &data) const;
-  bool decrypt_mibeacon2_(MiotListener *listener, MiBeacon &mib) const;
-  bool decrypt_mibeacon4_(MiotListener *listener, MiBeacon &mib) const;
 };
 
 class MiotListener {
