@@ -1,4 +1,4 @@
-# Xiaomi ClearGrass Bluetooth Hygrothermograph (CGG1)
+# Xiaomi Mi Temperature and Humidity Monitor 2 (LYWSD03MMC)
 
 Sample configuration:
 ```yaml
@@ -6,19 +6,19 @@ external_components:
   - source: github://dentra/esphome-components
 
 sensor:
-  - platform: miot_cgg1
+  - platform: miot_lywsd03mmc
     # String (Required), device MAC-address.
     mac_address: "device-mac-address"
     # String, (Optional), device bind key
     bindkey: "device-bin-key"
     # String, (Optional), the name of sensor
-    name: "CGG1 Temperature"
+    name: "LYWSD03MMC Temperature"
     # Sensor (Optional), Humidity, %
     humidity:
-      name: "CGG1 Humidity"
+      name: "LYWSD03MMC Humidity"
     # Sensor (Optional), Battey Level, %
     battery_level:
-      name: "CGG1 Battery Level"
+      name: "LYWSD03MMC Battery Level"
 ```
 
 Now signal strength of a BLE device (RSSI) is not a part of this component, but you could easily add it:
@@ -26,5 +26,7 @@ Now signal strength of a BLE device (RSSI) is not a part of this component, but 
 sensor:
   - platform: ble_rssi
     mac_address: "device-mac-address"
-    name: "CGG1 RSSI"
+    name: "LYWSD03MMC RSSI"
 ```
+
+thanks to @xrays72
