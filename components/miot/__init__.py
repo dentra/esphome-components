@@ -110,13 +110,6 @@ MIOT_BLE_DEVICE_SCHEMA = cv.Schema(
             DEVICE_CLASS_BATTERY,
             STATE_CLASS_MEASUREMENT,
         ),
-        cv.Optional(CONF_RSSI): sensor.sensor_schema(
-            UNIT_DECIBEL,
-            ICON_EMPTY,
-            0,
-            DEVICE_CLASS_SIGNAL_STRENGTH,
-            STATE_CLASS_MEASUREMENT,
-        ),
     }
 ).extend(MIOT_BLE_DEVICE_CORE_SCHEMA)
 
@@ -149,9 +142,6 @@ async def new_device(config):
     if CONF_BATTERY_LEVEL in config:
         sens = await sensor.new_sensor(config[CONF_BATTERY_LEVEL])
         cg.add(var.set_battery_level(sens))
-    if CONF_RSSI in config:
-        sens = await sensor.new_sensor(config[CONF_RSSI])
-        cg.add(var.set_rssi(sens))
 
     return var
 

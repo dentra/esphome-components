@@ -42,3 +42,6 @@ At this moment there are list of supported device:
  * [Xiaomi Mi Temperature and Humidity Monitor 2 (LYWSD03MMC)](components/miot_lywsd03mmc/)
 
 And growing...
+
+## [MIOT Explorer](components/miot_explorer/)
+MIOT Platform based component to explore new BLE devices from Xiaomi ecosystem.

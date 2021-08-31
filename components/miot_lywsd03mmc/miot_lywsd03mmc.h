@@ -3,7 +3,6 @@
 
 #include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
-#include "esphome/components/esp32_ble_tracker/esp32_ble_tracker.h"
 #include "../miot/miot.h"
 
 namespace esphome {
@@ -25,11 +24,6 @@ class MiotLYWSD03MMC : public miot::MiotComponent, public sensor::Sensor {
 
   void process_temperature_(const miot::BLEObject &obj);
   void process_humidity_(const miot::BLEObject &obj);
-};
-
-class MiotCGG1Encrypted : public miot::MiotComponent {
- public:
-  uint16_t get_product_id() const override { return 0x0B48; }
 };
 
 }  // namespace miot_lywsd03mmc

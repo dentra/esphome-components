@@ -1,7 +1,6 @@
 #pragma once
 #ifdef ARDUINO_ARCH_ESP32
 
-#include "esphome/components/esp32_ble_tracker/esp32_ble_tracker.h"
 #include "esphome/core/automation.h"
 #include "../miot/miot.h"
 #include "miot_ylyk01yl.h"
