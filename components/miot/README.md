@@ -4,6 +4,8 @@ The implementation is quite different from ESPHome Xiaomi platform, but develope
 
 Support easily debugging Xiaomi BLE beacons.
 
+> Also you colud use [MIOT Explorer](../miot_explorer/) to grab sesnors information.
+
 ```yaml
 external_components:
   - source: github://dentra/esphome-components
