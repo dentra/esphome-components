@@ -13,7 +13,7 @@ bool decrypt_mibeacon45(const MiotListener *listener, MiBeacon &mib) {
   const uint8_t *data = mib.object.data.data();
   size_t size = mib.object.data.size();
   if (size > sizeof(RawBLEObject)) {
-    ESP_LOGW(TAG, "%12" PRIX64 " [%04X] Encryped data is too large", listener->get_address(),
+    ESP_LOGW(TAG, "%12" PRIX64 " [%04X] Encrypted data is too large", listener->get_address(),
              listener->get_product_id());
     return false;
   }
@@ -71,7 +71,7 @@ bool decrypt_mibeacon23(const MiotListener *listener, MiBeacon &mib) {
   const uint8_t *data = mib.object.data.data();
   size_t size = mib.object.data.size();
   if (size > sizeof(RawBLEObject)) {
-    ESP_LOGW(TAG, "%12" PRIX64 " [%04X] Encryped data is too large", listener->get_address(),
+    ESP_LOGW(TAG, "%12" PRIX64 " [%04X] Encrypted data is too large", listener->get_address(),
              listener->get_product_id());
     return false;
   }

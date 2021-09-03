@@ -92,7 +92,7 @@ bool MiBeaconTracker::parse_mibeacon_(const esp32_ble_tracker::ESPBTDevice &devi
     }
   }
 
-  BLEObject *encryped_obj = nullptr;
+  BLEObject *encrypted_obj = nullptr;
   if (mib.frame_control.object_include) {
     if (mib.frame_control.is_encrypted) {
       const uint8_t *mic = raw.data() + raw.size() - sizeof(uint32_t);
@@ -102,7 +102,7 @@ bool MiBeaconTracker::parse_mibeacon_(const esp32_ble_tracker::ESPBTDevice &devi
       // random_number combined with frame_counter to become a 4-byte Counter for anti-replay
       mib.random_number = ((*reinterpret_cast<const uint32_t *>(rnd)) & 0xFFFFFF00) | mib.frame_counter;
       rnd++;  // random number size is 3 bytes length, so add one.
-      encryped_obj = new BLEObject(data, rnd);
+      encrypted_obj = new BLEObject(data, rnd);
     } else {
       mib.object = BLEObject((RawBLEObject *) data);
     }
@@ -118,13 +118,13 @@ bool MiBeaconTracker::parse_mibeacon_(const esp32_ble_tracker::ESPBTDevice &devi
                listener->get_address(), listener->get_product_id(), mib.mac_address);
       continue;
     }
-    if (encryped_obj != nullptr) {
+    if (encrypted_obj != nullptr) {
       if (!listener->have_bindkey()) {
-        ESP_LOGW(TAG, "%12" PRIX64 " [%04X] Object is encryped but bindkey is not configured", listener->get_address(),
+        ESP_LOGW(TAG, "%12" PRIX64 " [%04X] Object is encrypted but bindkey is not configured", listener->get_address(),
                  listener->get_product_id());
         continue;
       }
-      mib.object = *encryped_obj;
+      mib.object = *encrypted_obj;
       if (mib.frame_control.version > 3) {
         if (!decrypt_mibeacon45(listener, mib)) {
           continue;
@@ -140,12 +140,12 @@ bool MiBeaconTracker::parse_mibeacon_(const esp32_ble_tracker::ESPBTDevice &devi
     }
   }
 
-  delete encryped_obj;
+  delete encrypted_obj;
 
   if (!processed) {
     const int rssi = device.get_rssi();
     ESP_LOGD(TAG, "  %s [%04X]%s %s RSSI=%d %s", device.get_name().c_str(), mib.product_id,
-             mib.frame_control.is_encrypted ? " (encryped)" : "", device.address_str().c_str(), rssi,
+             mib.frame_control.is_encrypted ? " (encrypted)" : "", device.address_str().c_str(), rssi,
              get_signal_bars(rssi));
     if (!mib.frame_control.is_encrypted && mib.frame_control.object_include) {
       ESP_LOGD(TAG, "  Object:");

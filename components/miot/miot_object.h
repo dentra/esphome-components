@@ -37,7 +37,7 @@ struct BLEObject {
   BLEObject(RawBLEObject *obj) : id(obj->id), data(obj->data, obj->data + obj->data_len) {}
 
   MIID id;
-  // holds encryped data when id==MIID_UNINITIALIZED
+  // holds encrypted data when id==MIID_UNINITIALIZED
   std::vector<uint8_t> data;
 
   // get 8 bit value as boolean.
