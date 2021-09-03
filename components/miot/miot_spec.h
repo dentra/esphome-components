@@ -303,6 +303,9 @@ enum MIID : uint16_t {
   // Signed variable, the unit is 0.1 degrees, example: 1A 01 = 0x011A = 282 means 28.2 degrees.
   MIID_TEMPERATURE = 0x1004,
 
+  //! Water boil.
+  MIID_WATER_BOIL = 0x1005,
+
   // Humidity.
   //
   // uint16_t humidity;
