@@ -1,5 +1,7 @@
 # Xiaomi ClearGrass Bluetooth Hygrothermograph (CGG1)
 
+> You colud automaticaly get bindkey from Xiaomi Cloud by configuring `xiaomi_account` property in [MIOT](../miot/) platform.
+
 Sample configuration:
 ```yaml
 external_components:

@@ -1,5 +1,7 @@
 # Xiaomi Mi Smart Home Occupancy Sensor 2 (RTCGQ02LM)
 
+> You colud automaticaly get bindkey from Xiaomi Cloud by configuring `xiaomi_account` property in [MIOT](../miot/) platform.
+
 Sample configuration:
 ```yaml
 external_components:

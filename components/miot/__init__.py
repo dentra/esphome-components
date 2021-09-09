@@ -1,5 +1,6 @@
+import logging
 from esphome.cpp_types import Component
-from esphome.core import ID, Lambda
+from esphome.core import CORE, Lambda
 from esphome import automation
 import esphome.codegen as cg
 import esphome.config_validation as cv
@@ -10,17 +11,20 @@ from esphome.const import (
     CONF_ID,
     CONF_LAMBDA,
     CONF_MAC_ADDRESS,
+    CONF_NAME,
+    CONF_PASSWORD,
+    CONF_SERVERS,
     CONF_THEN,
     CONF_TRIGGER_ID,
+    CONF_UPDATE_INTERVAL,
+    CONF_USERNAME,
     DEVICE_CLASS_BATTERY,
-    DEVICE_CLASS_SIGNAL_STRENGTH,
     ESP_PLATFORM_ESP32,
     ICON_BATTERY,
-    ICON_EMPTY,
     STATE_CLASS_MEASUREMENT,
-    UNIT_DECIBEL,
     UNIT_PERCENT,
 )
+from .xiaomi_beaconkeys import XiaomiBeaconkeys
 
 CODEOWNERS = ["@dentra"]
 ESP_PLATFORMS = [ESP_PLATFORM_ESP32]
@@ -31,6 +35,11 @@ CONF_ON_MIOT_ADVERTISE = "on_miot_advertise"
 CONF_PRODUCT_ID = "product_id"
 CONF_RSSI = "rssi"
 CONF_DEBUG = "debug"
+CONF_XIAOMI_ACCOUNT = "xiaomi_account"
+
+DEFAULT_SERVERS = ["cn", "de", "us", "ru", "tw", "sg", "in", "i2"]
+
+_LOGGER = logging.getLogger(__name__)
 
 miot_ns = cg.esphome_ns.namespace("miot")
 MiBeaconTracker = miot_ns.class_(
@@ -80,6 +89,17 @@ CONFIG_SCHEMA = (
     cv.Schema(
         {
             cv.GenerateID(): cv.declare_id(MiBeaconTracker),
+            cv.Optional(CONF_XIAOMI_ACCOUNT): cv.Schema(
+                {
+                    cv.Required(CONF_USERNAME): cv.string_strict,
+                    cv.Required(CONF_PASSWORD): cv.string_strict,
+                    cv.Optional(CONF_UPDATE_INTERVAL, default="1d"): cv.update_interval,
+                    cv.Optional(CONF_SERVERS, default=DEFAULT_SERVERS): cv.All(
+                        cv.ensure_list(cv.one_of(*DEFAULT_SERVERS, lower=True)),
+                        cv.Length(min=1),
+                    ),
+                }
+            ),
             cv.Optional(CONF_ON_MIOT_ADVERTISE): automation.validate_automation(
                 cv.Schema(
                     {
@@ -131,6 +151,22 @@ async def setup_device_core_(var, config):
     cg.add(var.set_address(config[CONF_MAC_ADDRESS].as_hex))
     if CONF_BINDKEY in config:
         cg.add(var.set_bindkey(as_bindkey(config[CONF_BINDKEY])))
+    else:
+        conf = CORE.config["miot"].get(CONF_XIAOMI_ACCOUNT)
+        if conf:
+            xbk = XiaomiBeaconkeys(
+                username=conf[CONF_USERNAME],
+                password=conf[CONF_PASSWORD],
+                servers=conf[CONF_SERVERS],
+                storage_path=CORE.build_path,
+                update_interval=conf[CONF_UPDATE_INTERVAL].total_seconds,
+            )
+            bindkey = xbk.get(config[CONF_MAC_ADDRESS])
+            if bindkey:
+                _LOGGER.info(
+                    f"Got bindkey for {config[CONF_MAC_ADDRESS]} {config.get(CONF_NAME, '')}"
+                )
+                cg.add(var.set_bindkey(as_bindkey(bindkey)))
 
 
 async def new_device(config):

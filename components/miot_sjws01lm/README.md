@@ -1,5 +1,6 @@
 # Xiaomi Flood Sensor (SJWS01LM)
 
+> You colud automaticaly get bindkey from Xiaomi Cloud by configuring `xiaomi_account` property in [MIOT](../miot/) platform.
 
 Sample configuration:
 ```yaml

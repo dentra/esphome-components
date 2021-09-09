@@ -1,9 +1,8 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import automation
-from esphome.components import esp32_ble_tracker, miot
+from esphome.components import miot
 from esphome.const import (
-    CONF_BATTERY_LEVEL,
     CONF_ON_CLICK,
     CONF_TRIGGER_ID,
 )

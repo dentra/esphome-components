@@ -43,5 +43,7 @@ At this moment there are list of supported device:
 
 And growing...
 
+> Now with automatic bindkey extraction from Xiaomi Cloud.
+
 ## [MIOT Explorer](components/miot_explorer/)
 MIOT Platform based component to explore new BLE devices from Xiaomi ecosystem.
