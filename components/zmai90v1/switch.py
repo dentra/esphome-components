@@ -27,10 +27,10 @@ from esphome.const import (
     ESP_PLATFORM_ESP8266,
     ICON_CURRENT_AC,
     ICON_EMPTY,
-    LAST_RESET_TYPE_AUTO,
     STATE_CLASS_MEASUREMENT,
     UNIT_EMPTY,
     UNIT_HERTZ,
+    UNIT_KILOWATT_HOURS,
     UNIT_VOLT,
     UNIT_AMPERE,
     UNIT_VOLT_AMPS,
@@ -45,7 +45,6 @@ CODEOWNERS = ["@dentra"]
 AUTO_LOAD = ["switch", "sensor", "binary_sensor"]
 DEPENDENCIES = ["uart"]
 
-UNIT_KWATT_HOURS = "kWh"
 CONF_SWITCH_PIN = "switch_pin"
 CONF_BUTTON_PIN = "button_pin"
 CONF_BUTTON = "button"
@@ -95,12 +94,11 @@ CONFIG_SCHEMA = (
                 }
             ),
             cv.Optional(CONF_ENERGY): sensor.sensor_schema(
-                UNIT_KWATT_HOURS,
+                UNIT_KILOWATT_HOURS,
                 ICON_EMPTY,
                 2,
                 DEVICE_CLASS_ENERGY,
                 STATE_CLASS_MEASUREMENT,
-                LAST_RESET_TYPE_AUTO,
             ),
             cv.Optional(CONF_VOLTAGE): sensor.sensor_schema(
                 UNIT_VOLT, ICON_EMPTY, 2, DEVICE_CLASS_VOLTAGE

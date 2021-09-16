@@ -10,13 +10,12 @@ from esphome.const import (
     CONF_TRIGGER_ID,
     CONF_SERVICE,
     DEVICE_CLASS_ENERGY,
+    UNIT_KILOWATT_HOURS,
 )
 
 CODEOWNERS = ["@dentra"]
 
 DEPENDENCIES = ["time"]
-
-UNIT_KWATT_HOURS = "kWh"
 
 # CONF_CURRENT_TARIFF = 'current_tariff'
 CONF_TARIFFS = "tariffs"
@@ -106,7 +105,7 @@ def validate_tariffs(config):
 
 
 TARIFF_SCHEMA = sensor.sensor_schema(
-    UNIT_KWATT_HOURS, ICON_TARIFF, 2, DEVICE_CLASS_ENERGY
+    UNIT_KILOWATT_HOURS, ICON_TARIFF, 2, DEVICE_CLASS_ENERGY
 ).extend(
     {
         cv.GenerateID(): cv.declare_id(EnergyTariff),
