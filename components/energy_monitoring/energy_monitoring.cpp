@@ -1,5 +1,3 @@
-#include <cmath>
-
 #include "esphome/core/log.h"
 #include "energy_monitoring.h"
 

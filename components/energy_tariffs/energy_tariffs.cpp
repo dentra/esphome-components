@@ -5,8 +5,8 @@
 namespace esphome {
 namespace energy_tariffs {
 
-const char *const TAG = "energy_tariffs";
-const char *const GAP = "  ";
+static const char *const TAG = "energy_tariffs";
+static const char *const GAP = "  ";
 
 EnergyTariffs::~EnergyTariffs() {
   delete this->tariff_callback_;
