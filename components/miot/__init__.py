@@ -4,7 +4,7 @@ from esphome.core import CORE, Lambda
 from esphome import automation
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import binary_sensor, esp32_ble_tracker, sensor
+from esphome.components import binary_sensor, esp32_ble_tracker, sensor, text_sensor
 from esphome.const import (
     CONF_BATTERY_LEVEL,
     CONF_BINDKEY,
@@ -28,7 +28,7 @@ from .xiaomi_beaconkeys import XiaomiBeaconkeys
 
 CODEOWNERS = ["@dentra"]
 ESP_PLATFORMS = [ESP_PLATFORM_ESP32]
-AUTO_LOAD = ["esp32_ble_tracker"]
+AUTO_LOAD = ["esp32_ble_tracker", "sensor"]
 
 CONF_MIOT_ID = "miot_id"
 CONF_ON_MIOT_ADVERTISE = "on_miot_advertise"
@@ -182,15 +182,21 @@ async def new_device(config):
     return var
 
 
+async def new_sensor_device(config):
+    var = await new_device(config)
+    await sensor.register_sensor(var, config)
+    return var
+
+
 async def new_binary_sensor_device(config):
     var = await new_device(config)
     await binary_sensor.register_binary_sensor(var, config)
     return var
 
 
-async def new_sensor_device(config):
+async def new_text_sensor_device(config):
     var = await new_device(config)
-    await sensor.register_sensor(var, config)
+    await text_sensor.register_text_sensor(var, config)
     return var
 
 
