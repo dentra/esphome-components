@@ -8,7 +8,7 @@ external_components:
   - source: github://dentra/esphome-components
 
 binary_sensor:
-  - platform: miot_mccgq02hl
+  - platform: miot_rtcgq02lm
     # String (Required), device MAC-address.
     mac_address: "device-mac-address"
     # String, (Optional), device bind key
