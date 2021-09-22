@@ -26,6 +26,12 @@ struct MiBeacon {
   BLEObject object = {};
   uint32_t random_number = {};
   uint32_t message_integrity_check = {};
+  bool has_object() const { return frame_control.object_include; }
+  bool has_address() const { return frame_control.mac_include; }
+  bool has_capability() const { return frame_control.capability_include; }
+  bool has_io_capability() const { return frame_control.capability_include && capability.io; }
+  bool is_mesh() const { return frame_control.mesh; }
+  bool is_registered() const { return frame_control.registered; }
 };
 
 class MiotListener;
