@@ -22,8 +22,6 @@ class MiotYLYK01YLTrigger : public Trigger<>, public miot::MiotListener {
       case miot::MIID_BUTTON_EVENT: {
         const auto button_event = obj.get_button_event();
         if (button_event.has_value()) {
-          ESP_LOGD("miot_ylyk01yl", "Checking trigger button event: type %" PRIu8 " == %" PRIu8 " and index %u == %u",
-                   this->type_, button_event->type, this->index_, button_event->index);
           if (this->type_ == button_event->type && this->index_ == button_event->index) {
             this->trigger();
             return true;
@@ -33,7 +31,6 @@ class MiotYLYK01YLTrigger : public Trigger<>, public miot::MiotListener {
       }
       case miot::MIID_SIMPLE_PAIRING_EVENT:
         // skip this event
-        // do not know how to process it yet.
         return false;
       default:
         return this->process_unhandled_(obj);
