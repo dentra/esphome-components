@@ -1,9 +1,10 @@
+from esphome.components.esp32_ble_tracker import CONF_ESP32_BLE_ID
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import miot, text_sensor
+from esphome.components import miot, text_sensor, ble_client
 
 CODEOWNERS = ["@dentra"]
-AUTO_LOAD = ["miot"]
+AUTO_LOAD = ["miot", "sensor", "text_sensor", "switch"]
 
 miot_explorer_ns = cg.esphome_ns.namespace("miot_explorer")
 MiotExplorer = miot_explorer_ns.class_(
@@ -18,5 +19,4 @@ CONFIG_SCHEMA = text_sensor.TEXT_SENSOR_SCHEMA.extend(
 
 
 async def to_code(config):
-    var = await miot.new_device(config)
-    await text_sensor.register_text_sensor(var, config)
+    await miot.new_text_sensor_device(config)

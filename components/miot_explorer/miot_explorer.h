@@ -3,6 +3,8 @@
 #include <map>
 #include "esphome/core/component.h"
 #include "esphome/components/text_sensor/text_sensor.h"
+#include "esphome/components/switch/switch.h"
+#include "esphome/components/ble_client/ble_client.h"
 #include "../miot/miot.h"
 
 namespace esphome {
@@ -24,6 +26,8 @@ class MiotExplorer : public miot::MiotComponent, public text_sensor::TextSensor 
   bool process_object_(const miot::BLEObject &obj) override;
   void process_any_(miot::MIID miid, const std::string &name, const std::string &data);
   void process_any_(miot::MIID miid, const std::string &name, const optional<uint8_t> &value);
+  void process_any_(miot::MIID miid, const std::string &name, const optional<uint16_t> &value);
+  void process_any_(miot::MIID miid, const std::string &name, const optional<miot::MIID> &value);
   void process_any_(miot::MIID miid, const std::string &name, const optional<uint32_t> &value);
   void process_any_(miot::MIID miid, const std::string &name, const optional<bool> &value);
   void process_any_(miot::MIID miid, const std::string &name, const optional<float> &value);

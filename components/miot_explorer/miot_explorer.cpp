@@ -8,7 +8,7 @@
 namespace esphome {
 namespace miot_explorer {
 
-static const char *TAG = "miot_explorer";
+static const char *const TAG = "miot_explorer";
 
 void MiotExplorer::dump_config() {
   this->dump_config_(TAG);
@@ -31,38 +31,41 @@ bool MiotExplorer::process_object_(const miot::BLEObject &obj) {
     case miot::MIID_BATTERY:
       this->process_default_(obj);
       break;
+    case miot::MIID_SIMPLE_PAIRING_EVENT:
+      this->process_any_(obj.id, "Pairing object", obj.get_pairing_object());
+      break;
     case miot::MIID_DOOR_SENSOR:
-      this->process_any_(miot::MIID_DOOR_SENSOR, "Opening", obj.get_door_sensor());
+      this->process_any_(obj.id, "Opening", obj.get_door_sensor());
       break;
     case miot::MIID_IDLE_TIME:
-      this->process_any_(miot::MIID_IDLE_TIME, "Idle time", obj.get_idle_time());
+      this->process_any_(obj.id, "Idle time", obj.get_idle_time());
       break;
     case miot::MIID_TIMEOUT:
-      this->process_any_(miot::MIID_TIMEOUT, "Timeout", obj.get_timeout());
+      this->process_any_(obj.id, "Timeout", obj.get_timeout());
       break;
     case miot::MIID_MOTION_WITH_LIGHT_EVENT:
-      this->process_any_(miot::MIID_MOTION_WITH_LIGHT_EVENT, "Motion with light", obj.get_motion_with_light_event());
+      this->process_any_(obj.id, "Motion with light", obj.get_motion_with_light_event());
       break;
     case miot::MIID_FLOODING:
-      this->process_any_(miot::MIID_FLOODING, "Flooding", obj.get_flooding());
+      this->process_any_(obj.id, "Flooding", obj.get_flooding());
       break;
     case miot::MIID_LIGHT_INTENSITY:
-      this->process_any_(miot::MIID_LIGHT_INTENSITY, "Light intensity", obj.get_light_intensity());
+      this->process_any_(obj.id, "Light intensity", obj.get_light_intensity());
       break;
     case miot::MIID_TEMPERATURE:
-      this->process_any_(miot::MIID_TEMPERATURE, "Temperature", obj.get_temperature());
+      this->process_any_(obj.id, "Temperature", obj.get_temperature());
       break;
     case miot::MIID_HUMIDITY:
-      this->process_any_(miot::MIID_HUMIDITY, "Humidity", obj.get_humidity());
+      this->process_any_(obj.id, "Humidity", obj.get_humidity());
       break;
     case miot::MIID_TEMPERATURE_HUMIDITY:
-      this->process_any_(miot::MIID_HUMIDITY, "Temperture/Humidity", obj.get_temperature_humidity());
+      this->process_any_(obj.id, "Temperture/Humidity", obj.get_temperature_humidity());
       break;
     case miot::MIID_BUTTON_EVENT:
-      this->process_any_(miot::MIID_BUTTON_EVENT, "Button event", obj.get_button_event());
+      this->process_any_(obj.id, "Button event", obj.get_button_event());
       break;
     case miot::MIID_ILLUMINANCE:
-      this->process_any_(miot::MIID_ILLUMINANCE, "Illuminance", obj.get_illuminance());
+      this->process_any_(obj.id, "Illuminance", obj.get_illuminance());
       break;
     default:
       this->process_any_(obj.id, "", hexencode(obj.data));
@@ -89,6 +92,18 @@ void MiotExplorer::process_any_(miot::MIID miid, const std::string &name, const 
 }
 
 void MiotExplorer::process_any_(miot::MIID miid, const std::string &name, const optional<uint8_t> &value) {
+  if (value.has_value()) {
+    this->process_any_(miid, name, to_string(*value));
+  }
+}
+
+void MiotExplorer::process_any_(miot::MIID miid, const std::string &name, const optional<uint16_t> &value) {
+  if (value.has_value()) {
+    this->process_any_(miid, name, to_string(*value));
+  }
+}
+
+void MiotExplorer::process_any_(miot::MIID miid, const std::string &name, const optional<miot::MIID> &value) {
   if (value.has_value()) {
     this->process_any_(miid, name, to_string(*value));
   }
