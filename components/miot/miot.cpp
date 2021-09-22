@@ -13,11 +13,6 @@ namespace miot {
 
 static const char *const TAG = "miot";
 
-#define ANSI_RED "\033[0;31m"
-#define ANSI_GREEN "\033[0;32m"
-#define ANSI_YELLOW "\033[0;33m"
-#define ANSI_WHITE "\033[0;37m"
-#define ANSI_CLEAR "\033[0m"
 // Unicode: U+2582, UTF-8: E2 96 82
 #define UNI_LOWER_ONE_QUARTER_BLOCK "\xe2\x96\x82"
 // Unicode: U+2584, UTF-8: E2 96 84
@@ -29,19 +24,21 @@ static const char *const TAG = "miot";
 
 const char *const get_signal_bars(int rssi) {
   if (rssi >= -50) {
-    return ANSI_GREEN UNI_LOWER_ONE_QUARTER_BLOCK UNI_LOWER_HALF_BLOCK UNI_LOWER_THREE_QUARTERS_BLOCK UNI_FULL_BLOCK
-        ANSI_CLEAR;
+    return ESPHOME_LOG_COLOR(ESPHOME_LOG_COLOR_GREEN) UNI_LOWER_ONE_QUARTER_BLOCK UNI_LOWER_HALF_BLOCK
+        UNI_LOWER_THREE_QUARTERS_BLOCK UNI_FULL_BLOCK ESPHOME_LOG_RESET_COLOR;
   }
   if (rssi >= -65) {
-    return ANSI_YELLOW UNI_LOWER_ONE_QUARTER_BLOCK UNI_LOWER_HALF_BLOCK UNI_LOWER_THREE_QUARTERS_BLOCK ANSI_WHITE
-        UNI_FULL_BLOCK ANSI_CLEAR;
+    return ESPHOME_LOG_COLOR(ESPHOME_LOG_COLOR_YELLOW)
+        UNI_LOWER_ONE_QUARTER_BLOCK UNI_LOWER_HALF_BLOCK UNI_LOWER_THREE_QUARTERS_BLOCK ESPHOME_LOG_COLOR(
+            ESPHOME_LOG_COLOR_GRAY) UNI_FULL_BLOCK ESPHOME_LOG_RESET_COLOR;
   }
   if (rssi >= -85) {
-    return ANSI_YELLOW UNI_LOWER_ONE_QUARTER_BLOCK UNI_LOWER_HALF_BLOCK ANSI_WHITE UNI_LOWER_THREE_QUARTERS_BLOCK
-        UNI_FULL_BLOCK ANSI_CLEAR;
+    return ESPHOME_LOG_COLOR(ESPHOME_LOG_COLOR_YELLOW)
+        UNI_LOWER_ONE_QUARTER_BLOCK UNI_LOWER_HALF_BLOCK ESPHOME_LOG_COLOR(ESPHOME_LOG_COLOR_GRAY)
+            UNI_LOWER_THREE_QUARTERS_BLOCK UNI_FULL_BLOCK ESPHOME_LOG_RESET_COLOR;
   }
-  return ANSI_RED UNI_LOWER_ONE_QUARTER_BLOCK ANSI_WHITE UNI_LOWER_HALF_BLOCK UNI_LOWER_THREE_QUARTERS_BLOCK
-      UNI_FULL_BLOCK ANSI_CLEAR;
+  return ESPHOME_LOG_COLOR(ESPHOME_LOG_COLOR_RED) UNI_LOWER_ONE_QUARTER_BLOCK ESPHOME_LOG_COLOR(ESPHOME_LOG_COLOR_GRAY)
+      UNI_LOWER_HALF_BLOCK UNI_LOWER_THREE_QUARTERS_BLOCK UNI_FULL_BLOCK ESPHOME_LOG_RESET_COLOR;
 }
 
 bool MiBeaconTracker::parse_device(const esp32_ble_tracker::ESPBTDevice &device) {
@@ -57,7 +54,7 @@ bool MiBeaconTracker::parse_device(const esp32_ble_tracker::ESPBTDevice &device)
 bool MiBeaconTracker::parse_mibeacon_(const esp32_ble_tracker::ESPBTDevice &device,
                                       const std::vector<uint8_t> &raw) const {
   if (raw.size() < sizeof(RawMiBeaconHeader)) {
-    ESP_LOGW("Invalid MiBeacon data length: %s", hexencode(raw).c_str());
+    ESP_LOGW(TAG, "Invalid MiBeacon data length: %s", hexencode(raw).c_str());
     return false;
   }
 
@@ -95,9 +92,15 @@ bool MiBeaconTracker::parse_mibeacon_(const esp32_ble_tracker::ESPBTDevice &devi
   BLEObject *encrypted_obj = nullptr;
   if (mib.frame_control.object_include) {
     if (mib.frame_control.is_encrypted) {
-      const uint8_t *mic = raw.data() + raw.size() - sizeof(uint32_t);
-      mib.message_integrity_check = *reinterpret_cast<const uint32_t *>(mic);
-
+      const uint8_t *end = raw.data() + raw.size();
+      const uint8_t *mic;
+      if (mib.frame_control.version > 3) {
+        mic = end - sizeof(uint32_t);
+        mib.message_integrity_check = *reinterpret_cast<const uint32_t *>(mic);
+      } else {
+        mic = end - sizeof(uint8_t);
+        mib.message_integrity_check = *reinterpret_cast<const uint8_t *>(mic);
+      }
       const uint8_t *rnd = mic - sizeof(uint32_t);
       // random_number combined with frame_counter to become a 4-byte Counter for anti-replay
       mib.random_number = ((*reinterpret_cast<const uint32_t *>(rnd)) & 0xFFFFFF00) | mib.frame_counter;
@@ -109,7 +112,7 @@ bool MiBeaconTracker::parse_mibeacon_(const esp32_ble_tracker::ESPBTDevice &devi
   }
 
   bool processed = false;
-  for (auto listener : listeners_) {
+  for (auto listener : this->listeners_) {
     if (device.address_uint64() != listener->get_address()) {
       continue;
     }
@@ -173,7 +176,7 @@ bool MiotListener::process_mibeacon(const MiBeacon &mib) {
     return false;
   }
 
-  ESP_LOGD(TAG, "%12" PRIX64 " [%04X] Got BLEObject: ID: %04X, data: %s", this->address_, this->get_product_id(),
+  ESP_LOGV(TAG, "%12" PRIX64 " [%04X] Got BLEObject: ID: %04X, data: %s", this->address_, this->get_product_id(),
            mib.object.id, hexencode(mib.object.data).c_str());
   return this->process_object_(mib.object);
 }
