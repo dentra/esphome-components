@@ -47,3 +47,6 @@ And growing...
 
 ## [MIOT Explorer](components/miot_explorer/)
 MIOT Platform based component to explore new BLE devices from Xiaomi ecosystem.
+
+## [MIOT Yeelight Remote pair](components/miot_ylxx0xyl_pair/)
+Obtain beakonkey for Yeelight Remote (YLYK01YL), Dimmer (YLKG07YL/YLKG08YL), Bathroom Heater Remote (YLYB01YL-BHFRC), Fan Remote (YLYK01YL-VENFAN) and Ventilator Fan Remote (YLYK01YL-FANCL).
