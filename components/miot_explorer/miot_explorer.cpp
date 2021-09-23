@@ -84,7 +84,6 @@ void MiotExplorer::process_any_(miot::MIID miid, const std::string &name, const 
     char tmp[12] = {};
     sprintf(tmp, " [%04X] ", miid);
     sens->set_name(this->get_name() + tmp + name);
-    sens->set_disabled_by_default(false);
     App.register_text_sensor(sens);
     this->sensors_[miid] = sens;
   }
