@@ -1,3 +1,4 @@
+from esphome.const import CONF_NAME
 from esphome.components.esp32_ble_tracker import CONF_ESP32_BLE_ID
 import esphome.codegen as cg
 import esphome.config_validation as cv
@@ -14,6 +15,7 @@ MiotExplorer = miot_explorer_ns.class_(
 CONFIG_SCHEMA = text_sensor.TEXT_SENSOR_SCHEMA.extend(
     {
         cv.GenerateID(): cv.declare_id(MiotExplorer),
+        cv.Required(CONF_NAME): cv.string,
     }
 ).extend(miot.MIOT_BLE_DEVICE_SCHEMA)
 
