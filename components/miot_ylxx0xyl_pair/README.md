@@ -14,6 +14,10 @@ Sample configuration:
 external_components:
   - source: github://dentra/esphome-components
 
+# do not include ble_client if you already configure it for other purpose
+ble_client:
+  - mac_address: "00:00:00:00:00:00" # workaraund to include ble_client but not use them
+
 text_sensor:
   - platform: miot_ylxx0xyl_pair
     name: "miot_ylxx0xyl_pair Status"
