@@ -31,6 +31,8 @@ miot:
     bindkey: "device-bin-key"
     # enable debug BLE messages, DO NOT USE IN PRODUCTION
     debug: true
+    then:
+      lambda: // empty action
 ```
 
 You can use automation to operate with [BLEObject](miot.h#L15) via `x` variable in lambda.
