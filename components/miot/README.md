@@ -50,7 +50,7 @@ miot:
     # enable debug BLE messages, DO NOT USE IN PRODUCTION
     debug: true
     then:
-      lambda:
+      lambda: |-
         ESP_LOGW("main", "on_miot_advertise, miid: %d", x.id);
 ```
 
