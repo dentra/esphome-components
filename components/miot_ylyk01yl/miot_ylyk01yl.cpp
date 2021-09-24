@@ -6,11 +6,23 @@
 namespace esphome {
 namespace miot_ylyk01yl {
 
-static const char *TAG = "miot_ylyk01yl";
+static const char *const TAG = "miot_ylyk01yl";
 
 void MiotYLYK01YL::dump_config() { this->dump_config_(TAG); }
 
-bool MiotYLYK01YL::process_object_(const miot::BLEObject &obj) { return this->process_default_(obj); }
+bool MiotYLYK01YL::process_object_(const miot::BLEObject &obj) {
+  switch (obj.id) {
+    case miot::MIID_BUTTON_EVENT:
+      // processed by automation
+      return false;
+    case miot::MIID_SIMPLE_PAIRING_EVENT:
+      // skip pairing event
+      return false;
+    default:
+      return this->process_unhandled_(obj);
+  }
+  return false;
+}
 
 }  // namespace miot_ylyk01yl
 }  // namespace esphome
