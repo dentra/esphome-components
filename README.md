@@ -38,6 +38,7 @@ At this moment there are list of supported device:
  * [Yeelight Remote Control Smart LED Ceiling Light (YLYK01YL)](components/miot_ylyk01yl/)
  * [Qingping Motion & Ambient Light Sensor (CGPR1)](components/miot_cgpr1/)
  * [Xiaomi Mi Temperature and Humidity Monitor 2 (LYWSD03MMC)](components/miot_lywsd03mmc/)
+ * [Yeelight Remote Control 1S (YLAI003)](components/miot_ylai003/)
 
 And growing...
 
