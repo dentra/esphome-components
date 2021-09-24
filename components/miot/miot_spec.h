@@ -271,7 +271,8 @@ enum MIID : uint16_t {
   //   0x00: click
   //   0x01: double-click
   //   0x02: long press
-  //   0x03: triple click
+  //   0x03: triple click / knob rotation
+  //   0x04: click the key to release
   MIID_BUTTON_EVENT = 0x1001,
 
   /// General attributes.
