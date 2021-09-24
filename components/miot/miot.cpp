@@ -1,5 +1,3 @@
-
-
 #ifdef ARDUINO_ARCH_ESP32
 #include "esphome/core/log.h"
 #include "mbedtls/ccm.h"
@@ -58,17 +56,16 @@ bool MiBeaconTracker::parse_mibeacon_(const esp32_ble_tracker::ESPBTDevice &devi
     return false;
   }
 
-  ESP_LOGD(TAG, "Got MiBeacon: %s", hexencode(raw).c_str());
-
   auto mib = MiBeacon(reinterpret_cast<const RawMiBeaconHeader *>(raw.data()));
 
   if (mib.frame_control.mesh) {
-    ESP_LOGW(TAG, "Device data is a mesh type device");
+    ESP_LOGW(TAG, "Device data is a mesh type device: %s", hexencode(raw).c_str());
     return false;
   }
 
   if (mib.frame_control.version < 2) {
-    ESP_LOGW(TAG, "Device data is using old data format: %" PRIu8, mib.frame_control.version);
+    ESP_LOGW(TAG, "Device data is using old data format %" PRIu8 ": %s", mib.frame_control.version,
+             hexencode(raw).c_str());
     return false;
   }
 
@@ -145,7 +142,9 @@ bool MiBeaconTracker::parse_mibeacon_(const esp32_ble_tracker::ESPBTDevice &devi
 
   delete encrypted_obj;
 
+#if ESPHOME_LOG_LEVEL >= ESPHOME_LOG_LEVEL_DEBUG
   if (!processed) {
+    ESP_LOGD(TAG, "Got MiBeacon: %s", hexencode(raw).c_str());
     const int rssi = device.get_rssi();
     ESP_LOGD(TAG, "  %s [%04X]%s %s RSSI=%d %s", device.get_name().c_str(), mib.product_id,
              mib.frame_control.is_encrypted ? " (encrypted)" : "", device.address_str().c_str(), rssi,
@@ -156,6 +155,7 @@ bool MiBeaconTracker::parse_mibeacon_(const esp32_ble_tracker::ESPBTDevice &devi
       ESP_LOGD(TAG, "    data: %s", hexencode(mib.object.data.data(), mib.object.data.size()).c_str());
     }
   }
+#endif
 
   return true;
 }
