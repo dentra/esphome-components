@@ -29,6 +29,10 @@ binary_sensor:
       name: "RTCGQ02LM Battery Level"
 ```
 
+In opposite to the main sensor which can report their state immediately the `timeout` fires only when no motion is detected as configured timeout in Mi Home app.
+
+The `idle_time` additionally fires 2 times when no motion detected for a long time. It will report 0s at start motion, 120 when mo motion is 3 min ago and 300 when mo motion is 5 min ago.
+
 Now signal strength of a BLE device (RSSI) is not a part of this component, but you could easily add it:
 ```yaml
 sensor:
