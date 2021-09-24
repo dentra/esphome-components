@@ -6,7 +6,7 @@
 namespace esphome {
 namespace miot_rtcgq02lm {
 
-static const char *TAG = "miot_rtcgq2lm";
+static const char *const TAG = "miot_rtcgq2lm";
 
 void MiotRTCGQ02LM::dump_config() {
   this->dump_config_(TAG);

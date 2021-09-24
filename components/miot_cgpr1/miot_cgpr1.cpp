@@ -6,7 +6,7 @@
 namespace esphome {
 namespace miot_cgpr1 {
 
-static const char *TAG = "miot_cgpr1";
+static const char *const TAG = "miot_cgpr1";
 
 void MiotCGPR1::dump_config() {
   this->dump_config_(TAG);

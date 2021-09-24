@@ -7,7 +7,7 @@
 namespace esphome {
 namespace miot {
 
-static const char *TAG = "miot.automation";
+static const char *const TAG = "miot.automation";
 
 static void dump(const MiBeacon &mib) {
   ESP_LOGD(TAG, "  Product ID: %04X", mib.product_id);
