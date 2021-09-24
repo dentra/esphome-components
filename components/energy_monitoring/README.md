@@ -3,6 +3,8 @@
 This componet allows you to get additional measurements features with you favorite energy meter.
 It calculates `Apparent Power`, `Reactive Power` and `Power Factor`.
 
+> You can take a look at sample of usage of Energy* components in configuartion for `ZMAi-90` energy meter based on `TYWE3S`: [zmai90.yaml](../zmai90.yaml)
+
 The configuration is very simple. Look at a sample below:
 ```yaml
 # Example configuration entry

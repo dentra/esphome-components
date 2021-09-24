@@ -10,8 +10,6 @@ external_components:
   - source: github://dentra/esphome-components
 ```
 
-> You can take a look at sample of usage of those components in configuartion for `ZMAi-90` energy meter based on `TYWE3S`: [zmai90.yaml](zmai90.yaml)
-
 ## [Energy Monitoring](components/energy_monitoring/)
 Turn additional measurements features in your energy meter.
 

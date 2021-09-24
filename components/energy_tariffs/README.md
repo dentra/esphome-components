@@ -2,6 +2,8 @@
 
 Adds tariff support to your energy meter.
 
+> You can take a look at sample of usage of Energy* components in configuartion for `ZMAi-90` energy meter based on `TYWE3S`: [zmai90.yaml](../zmai90.yaml)
+
 > Detailed description will be provided soon...
 
 ```yaml

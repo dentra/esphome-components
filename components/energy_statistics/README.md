@@ -8,6 +8,8 @@ Gather statistics for:
 
 > All stats does not survive power loss, but if you need this please make a request and I will add it shortly.
 
+> You can take a look at sample of usage of Energy* components in configuartion for `ZMAi-90` energy meter based on `TYWE3S`: [zmai90.yaml](../zmai90.yaml)
+
 ```yaml
 # Example configuration entry
 ...
