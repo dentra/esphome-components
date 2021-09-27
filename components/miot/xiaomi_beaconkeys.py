@@ -1,5 +1,6 @@
 import json
 import io
+import pathlib
 import time
 import logging
 from pathlib import Path
@@ -66,6 +67,8 @@ class XiaomiBeaconkeys:
 
         for server in self._servers:
             self.process_server_(server)
+
+        pathlib.Path(self._storage).parent.mkdir(parents=True, exist_ok=True)
 
         with io.open(self._storage, "w", encoding="utf8") as f:
             json.dump(self._devices, f, ensure_ascii=False, indent=2)
