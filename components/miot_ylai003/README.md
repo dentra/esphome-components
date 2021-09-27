@@ -1,5 +1,7 @@
 # Yeelight Remote Control 1S (YLAI003)
 
+<img src="miot_ylai003.png" alt="YLAI003" width="200"/>
+
 > You colud automaticaly get bindkey from Xiaomi Cloud by configuring `xiaomi_account` property in [MIOT](../miot/) platform.
 
 Sample configuration:

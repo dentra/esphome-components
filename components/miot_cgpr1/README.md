@@ -1,5 +1,7 @@
 # Qingping Motion & Ambient Light Sensor (CGPR1)
 
+<img src="miot_cgpr1.png" alt="CGPR1" width="200"/>
+
 > You colud automaticaly get bindkey from Xiaomi Cloud by configuring `xiaomi_account` property in [MIOT](../miot/) platform.
 
 Sample configuration:

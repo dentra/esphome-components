@@ -1,5 +1,7 @@
 # Xiaomi Mi Temperature and Humidity Monitor 2 (LYWSD03MMC)
 
+<img src="miot_lywsd03mmc.png" alt="LYWSD03MMC" width="200"/>
+
 > You colud automaticaly get bindkey from Xiaomi Cloud by configuring `xiaomi_account` property in [MIOT](../miot/) platform.
 
 Sample configuration:

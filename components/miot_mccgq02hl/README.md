@@ -1,5 +1,7 @@
 # Xiaomi Mi Smart Home Door/Window Sensor 2 (MCCGQ02HL)
 
+<img src="miot_mccgq02hl.png" alt="MCCGQ02HL" width="200"/>
+
 > You colud automaticaly get bindkey from Xiaomi Cloud by configuring `xiaomi_account` property in [MIOT](../miot/) platform.
 
 Sample configuration:

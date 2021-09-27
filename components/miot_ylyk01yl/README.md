@@ -1,6 +1,8 @@
 # Yeelight Remote Control Smart LED Ceiling Light (YLYK01YL)
 
-> At this moment it is not supported Xiaomi Cloud key extraction for this device. So you need to get it yourself.
+<img src="miot_ylyk01yl.png" alt="YLYK01YL" width="200"/>
+
+> At this moment it is not supported Xiaomi Cloud key extraction for this device. But you could to get it with [miot_ylxx0xyl_pair](../miot_ylxx0xyl_pair).
 
 Sample configuration:
 ```yaml
