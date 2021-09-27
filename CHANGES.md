@@ -1,5 +1,8 @@
+# 2021-09-27
+* [+] new component `miot_mjyd02yla` Xiaomi Mijia Night Light 2 (MJYD02YL)
+
 # 2021-09-24
-* [+] new component `miot_ylai003`
+* [+] new component `miot_ylai003` Yeelight Remote Control 1S (YLAI003)
 
 # 2021-09-22
 * [+] new component `miot_ylxx0xyl_pair`: obtain beakonkey for Yeelight Remote (YLYK01YL), Dimmer (YLKG07YL/YLKG08YL), Bathroom Heater Remote (YLYB01YL-BHFRC), Fan Remote (YLYK01YL-VENFAN) and Ventilator Fan Remote (YLYK01YL-FANCL)
