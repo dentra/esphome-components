@@ -2,7 +2,7 @@
 
 The `zmai90v1` sensor platform allows you to use `ZMAi-90` energy meters sensors with `ESPHome`.
 
-> This page refers to version V1 (V9821) of the `ZMAi-90`, which has been out of stock for a while. For using the newer V2 (TYWE3S) see [zmai90.yaml](../../zmai90.yaml) or V3 (WB3S) please fill the request (I have solution).
+> This page refers to version V1 (V9821) of the `ZMAi-90`, which has been out of stock for a while. For using the newer V2 (TYWE3S) see [zmai90.yaml](../../zmai90.yaml) or for V3 (WB3S) look a solution [here](https://community.home-assistant.io/t/help-with-zmai-90-and-esphome-or-tasmota/308554/38?u=dentra) (use external_component source github://dentra/esphome@tuya-raw-fix-standalone) and please vote for [PR](https://github.com/esphome/esphome/pull/1812) to include patch to ESPHome.
 
 ```yaml
 # Example configuration entry
