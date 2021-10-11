@@ -35,8 +35,14 @@ enum MIID : uint16_t {
   // uint16_t object_id - Object ID to be paired, such as key event (0x1001)
   MIID_SIMPLE_PAIRING_EVENT = 0x0002,
 
-  // Close to event.
-  MIID_CLOSE_TO_EVENT = 0x0003,
+  // Motion/Close to event.
+  //
+  //! uint8_t has_motion
+  //!
+  //! Has motion:
+  //!   0x00 - no motion
+  //!   0x01 - has motion
+  MIID_MOTION_EVENT = 0x0003,
 
   // Away from/Stay away from event.
   MIID_AWAY_FROM_EVENT = 0x0004,
@@ -219,8 +225,8 @@ enum MIID : uint16_t {
   //
   // The unit of light intensity is Lux, the value range is 0-120000.
   //
-  // Note: This event is only for human sensors with both light sensors,
-  //       and separate human sensors can use MIID_CLOSE_TO_EVENT
+  // Note: This event is only for human sensors with lighting sensors at the same
+  //       time, and individual human sensors can use MIID_MOTION_EVENT
   MIID_MOTION_WITH_LIGHT_EVENT = 0x000F,
 
   // Toothbrush event.
@@ -293,10 +299,6 @@ enum MIID : uint16_t {
   // rssi: Signal strength value.
   MIID_RSSI = 0x1003,
 
-  //! Motion (not checked, borrowed from original xiaomi.cpp)
-  //! motion detection, 1 byte, 8-bit unsigned integer
-  MIID_MOTION = MIID_RSSI,
-
   // Temperature.
   //
   // int16_t temperature;
@@ -305,6 +307,9 @@ enum MIID : uint16_t {
   MIID_TEMPERATURE = 0x1004,
 
   //! Water boil.
+  //!
+  //! uint8_t power;
+  //! uint8_t temperature;
   MIID_WATER_BOIL = 0x1005,
 
   // Humidity.
