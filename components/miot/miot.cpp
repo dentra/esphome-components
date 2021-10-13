@@ -215,8 +215,8 @@ bool MiotComponent::process_default_(const miot::BLEObject &obj) {
 
 void MiotComponent::dump_config_(const char *TAG) const {
   ESP_LOGCONFIG(TAG, "Xiaomi %s", this->get_product_code());
-  const uint8_t *mac = reinterpret_cast<const uint8_t *>(&this->address_);
-  ESP_LOGCONFIG(TAG, "  MAC: %02X:%02X:%02X:%02X:%02X:%02X", mac[5], mac[4], mac[3], mac[2], mac[1], mac[0]);
+  const uint8_t *mac = mac_reverse(this->address_);
+  ESP_LOGCONFIG(TAG, "  MAC: " ESP_BD_ADDR_STR, mac[5], mac[4], mac[3], mac[2], mac[1], mac[0]);
   if (this->have_bindkey()) {
     ESP_LOGCONFIG(TAG, "  Bindkey: %s", hexencode(this->bindkey_, sizeof(bindkey_t)).c_str());
   }

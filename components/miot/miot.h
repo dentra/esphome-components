@@ -1,12 +1,16 @@
 #pragma once
 #ifdef ARDUINO_ARCH_ESP32
+
 #include <functional>
 #include <vector>
+
 #include "esphome/core/component.h"
 #include "esphome/components/esp32_ble_tracker/esp32_ble_tracker.h"
 #include "esphome/components/sensor/sensor.h"
+
 #include "miot_spec.h"
 #include "miot_object.h"
+#include "miot_utils.h"
 
 namespace esphome {
 namespace miot {
@@ -54,14 +58,11 @@ class MiotListener {
 
   const uint8_t *get_bindkey() const { return this->bindkey_; }
   void set_bindkey(const bindkey_t bindkey) { memcpy(this->bindkey_, bindkey, sizeof(bindkey_t)); }
+  bool have_bindkey() const;
 
   virtual uint16_t get_product_id() const = 0;
 
-  bool get_frame_counter() const;
-  void set_frame_counter(uint8_t frame_counter) { this->frame_counter_ = frame_counter; }
-
   virtual bool process_mibeacon(const MiBeacon &mib);
-  bool have_bindkey() const;
 
  protected:
   uint64_t address_ = {};

@@ -35,7 +35,7 @@ bool decrypt_mibeacon45(const MiotListener *listener, MiBeacon &mib) {
     uint16_t product_id;
     uint32_t random_number;
   } PACKED nonce;
-  memcpy(nonce.mac, &listener->get_address(), sizeof(esp_bd_addr_t));
+  memcpy(nonce.mac, mac_reverse(listener->get_address()), sizeof(esp_bd_addr_t));
   nonce.product_id = mib.product_id;
   nonce.random_number = mib.random_number;
 
@@ -52,8 +52,8 @@ bool decrypt_mibeacon45(const MiotListener *listener, MiBeacon &mib) {
   if (ret != 0) {
     ESP_LOGW(TAG, "%12" PRIX64 " [%04X] mbedtls_ccm_auth_decrypt failed: %d", listener->get_address(),
              listener->get_product_id(), ret);
-    ESP_LOGW(TAG, "   mac: %02X:%02X:%02X:%02X:%02X:%02X", nonce.mac[5], nonce.mac[4], nonce.mac[3], nonce.mac[2],
-             nonce.mac[1], nonce.mac[0]);
+    ESP_LOGW(TAG, "   mac: " ESP_BD_ADDR_STR, nonce.mac[5], nonce.mac[4], nonce.mac[3], nonce.mac[2], nonce.mac[1],
+             nonce.mac[0]);
     ESP_LOGW(TAG, "   key: %s", hexencode(listener->get_bindkey(), sizeof(bindkey_t)).c_str());
     ESP_LOGW(TAG, "    iv: %s", hexencode(iv, iv_len).c_str());
     ESP_LOGW(TAG, "   add: %s", hexencode(add, add_len).c_str());
