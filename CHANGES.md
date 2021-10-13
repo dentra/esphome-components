@@ -1,4 +1,5 @@
 # 2021-10-13
+* [-] remove ble_client include from `miot_explorer`
 * [+] new component `miot_client`
 * [*] `miot_ylxx0xyl_pair` switched to `miot_client`
 
