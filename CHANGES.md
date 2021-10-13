@@ -1,3 +1,7 @@
+# 2021-10-13
+* [+] new component `miot_client`
+* [*] `miot_ylxx0xyl_pair` switched to `miot_client`
+
 # 2021-09-27
 * [+] new component `miot_mjyd02yla` Xiaomi Mijia Night Light 2 (MJYD02YL)
 

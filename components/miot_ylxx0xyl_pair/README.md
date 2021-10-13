@@ -14,19 +14,18 @@ Sample configuration:
 external_components:
   - source: github://dentra/esphome-components
 
-# do not include ble_client if you already configure it for other purpose
 ble_client:
-  - mac_address: "00:00:00:00:00:00" # workaraund to include ble_client but not use them
+  - mac_address: "device-mac-address"
+    id: remote_ble_client_id
 
 text_sensor:
   - platform: miot_ylxx0xyl_pair
-    name: "miot_ylxx0xyl_pair Status"
-    # String (Required), device MAC-address.
-    mac_address: "device-mac-address"
-    # Sesnor (Optional), sensor do display bindkey.
-    beakonkey:
-      name: "miot_ylxx0xyl_pair Bindkey"
+    name: "miot_ylxx0xyl_pair Bindkey"
+    ble_client_id: remote_ble_client_id
     # Sesnor (Optional), sensor do display version.
     version:
       name: "miot_ylxx0xyl_pair Version"
+    # uint16 (Optional), product id to pair. defaults to 0, means auto for one of 0x0153, 0x03B6, 0x03BF, 0x04E6, 0x068E
+    #                    can be used to obtain beakonkey from unsupported devices.
+    #product_id: 0
 ```

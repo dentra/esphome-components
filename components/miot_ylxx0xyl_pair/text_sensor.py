@@ -1,55 +1,62 @@
-from esphome.const import CONF_BINDKEY, CONF_ID, CONF_NAME, CONF_VERSION
-from esphome.components import esp32_ble_tracker
-from esphome.components.esp32_ble_tracker import CONF_ESP32_BLE_ID
+from esphome.const import (
+    CONF_ID,
+    CONF_VERSION,
+)
+from esphome.cpp_types import Component
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import miot, text_sensor, ble_client
+from esphome.components import miot, miot_client, text_sensor, ble_client
 
 CODEOWNERS = ["@dentra"]
-AUTO_LOAD = ["miot", "text_sensor", "ble_client"]
+AUTO_LOAD = ["miot", "miot_client", "text_sensor", "ble_client"]
 
-CONF_TOKEN = "token"
-CONF_BEACONKEY = "beakonkey"
-miot_ylxx0xyl_pair_ns = cg.esphome_ns.namespace("miot_ylxx0xyl_pair")
-MiotYLxx0xYLPair = miot_ylxx0xyl_pair_ns.class_(
-    "MiotYLxx0xYLPair", miot.MiotComponent, text_sensor.TextSensor
+miot_ylxx0xyl_ns = cg.esphome_ns.namespace("miot_ylxx0xyl")
+MiotYLxx0xYLPair = miot_ylxx0xyl_ns.class_(
+    "MiotYLxx0xYLPair", Component, miot.MiotListener, text_sensor.TextSensor
+)
+MiotYLxx0xYLNode = miot_ylxx0xyl_ns.class_(
+    "MiotYLxx0xYLNode", miot_client.MiotClient, miot_client.AuthClientListener
 )
 
 CONFIG_SCHEMA = (
     text_sensor.TEXT_SENSOR_SCHEMA.extend(
         {
             cv.GenerateID(): cv.declare_id(MiotYLxx0xYLPair),
-            cv.Optional(CONF_BEACONKEY): text_sensor.TEXT_SENSOR_SCHEMA.extend(
-                {
-                    cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
-                }
-            ),
+            cv.GenerateID(miot.CONF_MIOT_ID): cv.use_id(miot.MiBeaconTracker),
             cv.Optional(CONF_VERSION): text_sensor.TEXT_SENSOR_SCHEMA.extend(
                 {
                     cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
                 }
             ),
+            cv.Optional(miot.CONF_PRODUCT_ID): cv.uint16_t,
         }
-    ).extend(miot.MIOT_BLE_DEVICE_SCHEMA)
-    # .extend(ble_client.BLE_CLIENT_SCHEMA)
+    )
+    .extend(ble_client.BLE_CLIENT_SCHEMA)
+    .extend(cv.COMPONENT_SCHEMA)
+    .extend(miot_client.legacy_auth_schema(MiotYLxx0xYLNode))
 )
 
 
 async def to_code(config):
-    var = await miot.new_text_sensor_device(config)
-    ble_tracker = await cg.get_variable(config[CONF_ESP32_BLE_ID])
-    cg.add(var.set_ble_tracker(ble_tracker))
-    # await esp32_ble_tracker.register_client(var, config)
+    # var = await miot.new_text_sensor_device(config)
+    var = cg.new_Pvariable(config[CONF_ID])
+    await cg.register_component(var, config)
+    await miot.register_miot_device(var, config)
+    await text_sensor.register_text_sensor(var, config)
 
-    # await ble_client.register_ble_node(var, config)
-    # cli = await cg.get_variable(config[ble_client.CONF_BLE_CLIENT_ID])
-    # cg.add(var.set_ble_client(cli))
+    auth = await miot_client.register_legacy_auth_client(config)
+    node = await miot_client.register_client(config, var)
+    cg.add(auth.add_auth_listener(node))
+    cg.add(node.set_auth_client(auth))
+    cg.add(var.set_auth_client(auth))
 
-    if CONF_BEACONKEY in config:
-        sens = cg.new_Pvariable(config[CONF_BEACONKEY][CONF_ID])
-        await text_sensor.register_text_sensor(sens, config[CONF_BEACONKEY])
-        cg.add(var.set_bindkey(sens))
+    blec = await cg.get_variable(config[ble_client.CONF_BLE_CLIENT_ID])
+    cg.add(var.set_address(blec.address))
+
     if CONF_VERSION in config:
         sens = cg.new_Pvariable(config[CONF_VERSION][CONF_ID])
         await text_sensor.register_text_sensor(sens, config[CONF_VERSION])
         cg.add(var.set_version(sens))
+
+    if miot.CONF_PRODUCT_ID in config:
+        cg.add(var.set_product_id(config[miot.CONF_PRODUCT_ID]))

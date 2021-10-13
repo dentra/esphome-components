@@ -1,23 +1,31 @@
 #include "esphome/core/log.h"
-
-#include "cipher.h"
+#include "../miot/miot_utils.h"
+#include "miot_legacy_auth_cipher.h"
 
 namespace esphome {
-namespace miot_ylxx0xyl_pair {
+namespace miot_client {
 namespace cipher {
 
-std::vector<uint8_t> mix_a(uint8_t *mac, uint16_t product_id) {
+std::vector<uint8_t> mix_a(const uint8_t *mac, const uint16_t product_id) {
   return {
       mac[0], mac[2], mac[5], static_cast<uint8_t>(product_id & 0xFF), static_cast<uint8_t>(product_id & 0xFF),
       mac[4], mac[5], mac[1],
   };
 }
 
-std::vector<uint8_t> mix_b(uint8_t *mac, uint16_t product_id) {
+std::vector<uint8_t> mix_a(const uint64_t &mac, const uint16_t product_id) {
+  return mix_a(miot::mac_reverse(mac), product_id);
+}
+
+std::vector<uint8_t> mix_b(const uint8_t *mac, const uint16_t product_id) {
   return {
       mac[0], mac[2], mac[5], static_cast<uint8_t>((product_id >> 8) & 0xFF),
       mac[4], mac[0], mac[5], static_cast<uint8_t>((product_id >> 0) & 0xFF),
   };
+}
+
+std::vector<uint8_t> mix_b(const uint64_t &mac, const uint16_t product_id) {
+  return mix_b(miot::mac_reverse(mac), product_id);
 }
 
 std::vector<uint8_t> cipher_init(const std::vector<uint8_t> &key) {
@@ -59,10 +67,6 @@ std::vector<uint8_t> cipher(const std::vector<uint8_t> &key, const uint8_t *inpu
   return output;
 }
 
-std::vector<uint8_t> cipher(const std::vector<uint8_t> &key, const std::vector<uint8_t> &input) {
-  return cipher(key, input.data(), input.size());
-}
-
 std::vector<uint8_t> generate_random_token() {
   std::vector<uint8_t> token;
   for (int i = 0; i < 12; i++) {
@@ -72,5 +76,5 @@ std::vector<uint8_t> generate_random_token() {
 }
 
 }  // namespace cipher
-}  // namespace miot_ylxx0xyl_pair
+}  // namespace miot_client
 }  // namespace esphome
