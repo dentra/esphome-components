@@ -106,7 +106,7 @@ CONFIG_SCHEMA = (
                         cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(
                             MiotAdvertiseTrigger
                         ),
-                        cv.Optional(CONF_PRODUCT_ID): cv.uint32_t,
+                        cv.Optional(CONF_PRODUCT_ID): cv.uint16_t,
                         cv.Optional(CONF_DEBUG): cv.boolean,
                         cv.Optional(
                             CONF_THEN, default={CONF_LAMBDA: Lambda("")}
