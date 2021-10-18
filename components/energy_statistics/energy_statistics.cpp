@@ -1,6 +1,10 @@
 #include "esphome/core/log.h"
 #include "energy_statistics.h"
 
+#ifndef isnan
+using std::isnan;
+#endif
+
 namespace esphome {
 namespace energy_statistics {
 

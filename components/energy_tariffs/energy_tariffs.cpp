@@ -2,6 +2,10 @@
 #include "esphome/components/time/real_time_clock.h"
 #include "energy_tariffs.h"
 
+#ifndef isnan
+using std::isnan;
+#endif
+
 namespace esphome {
 namespace energy_tariffs {
 
