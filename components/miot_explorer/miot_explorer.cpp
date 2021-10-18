@@ -31,7 +31,7 @@ bool MiotExplorer::process_object_(const miot::BLEObject &obj) {
     case miot::MIID_BATTERY:
       this->process_default_(obj);
       break;
-    case miot::MIID_SIMPLE_PAIRING_EVENT:
+    case miot::MIID_PAIRING_EVENT:
       this->process_any_(obj.id, "Pairing object", obj.get_pairing_object());
       break;
     case miot::MIID_DOOR_SENSOR:
