@@ -15,7 +15,7 @@ CODEOWNERS = ["@dentra"]
 AUTO_LOAD = ["miot"]
 
 miot_mhoc303_ns = cg.esphome_ns.namespace("miot_mhoc303")
-MiotmMHOC303 = miot_mhoc303_ns.class_("MiotmMHOC303", miot.MiotComponent, sensor.Sensor)
+MiotMHOC303 = miot_mhoc303_ns.class_("MiotMHOC303", miot.MiotComponent, sensor.Sensor)
 
 CONFIG_SCHEMA = (
     sensor.sensor_schema(
@@ -27,7 +27,7 @@ CONFIG_SCHEMA = (
     )
     .extend(
         {
-            cv.GenerateID(): cv.declare_id(MiotmMHOC303),
+            cv.GenerateID(): cv.declare_id(MiotMHOC303),
             cv.Optional(CONF_HUMIDITY): sensor.sensor_schema(
                 UNIT_PERCENT,
                 ICON_EMPTY,

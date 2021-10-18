@@ -8,7 +8,7 @@
 namespace esphome {
 namespace miot_mhoc303 {
 
-class MiotmMHOC303 : public miot::MiotComponent, public sensor::Sensor {
+class MiotMHOC303 : public miot::MiotComponent, public sensor::Sensor {
  public:
   void dump_config() override;
 
