@@ -1,3 +1,6 @@
+# 2021-1018
+* [+] new component `miot_mhoc303`
+
 # 2021-10-13
 * [-] remove ble_client include from `miot_explorer`
 * [+] new component `miot_client`

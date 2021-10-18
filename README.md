@@ -40,6 +40,7 @@ At this moment there are list of supported device:
  * [Xiaomi Mi Temperature and Humidity Monitor 2 (LYWSD03MMC)](components/miot_lywsd03mmc/)
  * [Yeelight Remote Control 1S (YLAI003)](components/miot_ylai003/)
  * [Xiaomi Mijia Night Light 2 (MJYD02YL)](components/miot_mjyd02yla/)
+ * [Xiaomi Miaomiaoce Smart Clock Temperature Fnd Humidity Meter E-Inc (MHO-C303)](components/miot_mhoc303/)
 
 And growing...
 
