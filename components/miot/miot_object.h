@@ -146,7 +146,7 @@ struct BLEObject {
   optional<float> get_illuminance() const;
 
   /**
-   * Value for MIID_SIMPLE_PAIRING_EVENT
+   * Value for MIID_PAIRING_EVENT
    * @return Object ID to be paired, such as key events (0x1001)
    */
   optional<MIID> get_pairing_object() const;

@@ -157,7 +157,7 @@ optional<float> BLEObject::get_illuminance() const {
 }
 
 optional<MIID> BLEObject::get_pairing_object() const {
-  CHECK_MIID(MIID_SIMPLE_PAIRING_EVENT);
+  CHECK_MIID(MIID_PAIRING_EVENT);
   const auto event = this->get_uint16();
   if (event.has_value()) {
     ESP_LOGD(TAG, "Paring object %04X", *event);

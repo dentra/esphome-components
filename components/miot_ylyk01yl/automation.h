@@ -29,7 +29,7 @@ class MiotYLYK01YLTrigger : public Trigger<>, public miot::MiotListener {
         }
         return false;
       }
-      case miot::MIID_SIMPLE_PAIRING_EVENT:
+      case miot::MIID_PAIRING_EVENT:
         // skip this event
         return false;
       default:

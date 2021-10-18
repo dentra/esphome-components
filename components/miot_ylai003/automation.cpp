@@ -22,7 +22,7 @@ bool MiotYLAI003Trigger::process_object_(const miot::BLEObject &obj) {
       }
       return false;
     }
-    case miot::MIID_SIMPLE_PAIRING_EVENT:
+    case miot::MIID_PAIRING_EVENT:
       // skip pairing event
       return false;
     default:

@@ -15,7 +15,7 @@ bool MiotYLYK01YL::process_object_(const miot::BLEObject &obj) {
     case miot::MIID_BUTTON_EVENT:
       // processed by automation
       return false;
-    case miot::MIID_SIMPLE_PAIRING_EVENT:
+    case miot::MIID_PAIRING_EVENT:
       // skip pairing event
       return false;
     default:

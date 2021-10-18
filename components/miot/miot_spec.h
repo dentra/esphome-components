@@ -33,7 +33,7 @@ enum MIID : uint16_t {
   // Simple pairing event.
   //
   // uint16_t object_id - Object ID to be paired, such as key event (0x1001)
-  MIID_SIMPLE_PAIRING_EVENT = 0x0002,
+  MIID_PAIRING_EVENT = 0x0002,
 
   // Motion/Close to event.
   //

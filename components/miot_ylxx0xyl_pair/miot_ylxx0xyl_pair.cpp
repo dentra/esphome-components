@@ -29,7 +29,7 @@ bool MiotYLxx0xYLPair::process_mibeacon(const miot::MiBeacon &mib) {
   if (this->product_id_ == 0 && is_ylxx0xyl(mib.product_id)) {
     this->product_id_ = mib.product_id;
   }
-  if (this->product_id_ == mib.product_id && mib.has_object() && mib.object.id == miot::MIID_SIMPLE_PAIRING_EVENT) {
+  if (this->product_id_ == mib.product_id && mib.has_object() && mib.object.id == miot::MIID_PAIRING_EVENT) {
     this->process_pairing_(mib.object);
     return true;
   }
