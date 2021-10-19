@@ -15,7 +15,7 @@ binary_sensor:
   - platform: miot_mjyd02yla
     # String (Required), device MAC-address.
     mac_address: "device-mac-address"
-    # String, (Optional), device bind key. Will use [xiaomi_account](../miot/) if absent.
+    # String, (Optional), device bind key. Will use [xiaomi_account](../miot/) if absent to automaticaly get the bindkey.
     bindkey: "device-bin-key"
     # String, (Optional), the name of binary sensor
     name: "MJYD02YL Motion"
