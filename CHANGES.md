@@ -1,5 +1,13 @@
-# 2021-1018
+# 2021-10-18
+* [+] new component `miot_thermogigro`
+* [*] deprecate `miot_cgg1`, now use `miot_thermogigro`
+* [*] deprecate `miot_lywsd03mmc`, now use `miot_thermogigro`
+* [*] deprecate `miot_mhoc303`, now use `miot_thermogigro`
+
+# 2021-10-18
 * [+] new component `miot_mhoc303`
+* [*] update to esphome 2021.9.3
+* [*] support esphome 2021.10 beta
 
 # 2021-10-13
 * [-] remove ble_client include from `miot_explorer`
