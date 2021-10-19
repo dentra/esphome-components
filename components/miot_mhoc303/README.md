@@ -1,5 +1,7 @@
 # Xiaomi Miaomiaoce Smart Clock Temperature Fnd Humidity Meter E-Inc (MHO-C303)
 
+> This component is deprecated now. Pleased use [Universal Xiaomi Thermometer Hygrometer](../miot_thermogigro/) component instead.
+
 <img src="miot_mhoc303.png" alt="MHO-C303" width="200"/>
 
 > You colud automaticaly get bindkey from Xiaomi Cloud by configuring `xiaomi_account` property in [MIOT](../miot/) platform.
