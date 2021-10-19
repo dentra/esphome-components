@@ -1,5 +1,7 @@
 # Xiaomi ClearGrass Bluetooth Hygrothermograph (CGG1)
 
+> This component is deprecated now. Pleased use [Universal Xiaomi Thermometer Hygrometer](../miot_thermogigro/) component instead.
+
 <img src="miot_cgg1.png" alt="CGG1" width="200"/>
 
 > You colud automaticaly get bindkey from Xiaomi Cloud by configuring `xiaomi_account` property in [MIOT](../miot/) platform.
