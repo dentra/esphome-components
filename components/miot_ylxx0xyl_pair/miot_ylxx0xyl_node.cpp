@@ -51,7 +51,7 @@ void MiotYLxx0xYLNode::on_read_ver_(const uint8_t *data, int size) {
 void MiotYLxx0xYLNode::on_read_key_(const uint8_t *data, int size) {
   this->publisher_->publish_bindkey(miot::hexstr(data, size));
 
-  this->node_state = esp32_ble_tracker::ClientState::Established;
+  this->node_state = esp32_ble_tracker::ClientState::ESTABLISHED;
   this->parent()->set_enabled(false);
 }
 

@@ -6,7 +6,7 @@ namespace esphome {
 namespace miot_client {
 
 /**
- * Provice auth throught BT_UUID_MI_LEGACY_AUTH.
+ * Provide auth throught BT_UUID_MI_LEGACY_AUTH.
  *
  * https://github.com/archaron/docs/blob/master/BLE/ylkg08y.md
  * 1. Send 0x90, 0xCA, 0x85, 0xDE bytes to authInitCharacteristic.

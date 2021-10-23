@@ -1,10 +1,10 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import ble_client
-from esphome.const import ESP_PLATFORM_ESP32
+# from esphome.const import ESP_PLATFORM_ESP32
 
 CODEOWNERS = ["@dentra"]
-ESP_PLATFORMS = [ESP_PLATFORM_ESP32]
+# ESP_PLATFORMS = [ESP_PLATFORM_ESP32]
 DEPENDENCIES = ["ble_client"]
 
 CONF_AUTH_CLIENT_ID = "auth_client_id"

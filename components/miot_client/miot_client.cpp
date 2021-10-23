@@ -58,7 +58,7 @@ void MiotClient::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t g
         break;
       }
       this->on_disconnect(param->disconnect);
-      this->node_state = esp32_ble_tracker::ClientState::Idle;
+      this->node_state = esp32_ble_tracker::ClientState::IDLE;
       break;
     }
     case ESP_GATTC_SEARCH_CMPL_EVT: {

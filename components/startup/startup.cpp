@@ -1,5 +1,6 @@
 #include "esphome/core/log.h"
 #include "esphome/core/helpers.h"
+#include "esphome/core/hal.h"
 
 #include "startup.h"
 

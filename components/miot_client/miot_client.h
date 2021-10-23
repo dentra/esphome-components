@@ -70,7 +70,7 @@ class MiotClient : public ble_client::BLEClientNode {
   // esp_ble_gattc_write_char
   bool write_char(uint16_t handle, const uint8_t *data, uint16_t size, bool need_response = false) const;
 
-  bool is_established() const { return this->node_state == esp32_ble_tracker::ClientState::Established; }
+  bool is_established() const { return this->node_state == esp32_ble_tracker::ClientState::ESTABLISHED; }
 
   esphome::ble_client::BLECharacteristic *get_characteristic(const uint16_t service, const uint16_t characteristic) {
     return this->parent()->get_characteristic(esp32_ble_tracker::ESPBTUUID::from_uint16(service),

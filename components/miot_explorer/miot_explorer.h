@@ -20,7 +20,7 @@ class MiotExplorer : public miot::MiotComponent, public text_sensor::TextSensor 
 
  protected:
   uint16_t product_id_;
-  std::map<miot::MIID, Nameable *> sensors_ = {};
+  std::map<miot::MIID, EntityBase *> sensors_ = {};
 
   bool process_object_(const miot::BLEObject &obj) override;
   void process_any_(miot::MIID miid, const std::string &name, const std::string &data);

@@ -6,7 +6,7 @@ namespace esphome {
 namespace miot_client {
 
 /**
- * Provice auth throught BT_UUID_MI_SECURE_AUTH.
+ * Provide auth throught BT_UUID_MI_SECURE_AUTH.
  */
 class MiotSecureAuthClient : public MiotClient, public AuthClient {
  public:

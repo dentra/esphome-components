@@ -31,7 +31,7 @@ void EnergyStatistics::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
 
   /*
-    this->pref_ = global_preferences.make_preference<energy_data_t>(this->get_object_id_hash(), false);
+    this->pref_ = global_preferences->make_preference<energy_data_t>(this->get_object_id_hash(), false);
 
     energy_data_t loaded{}
     if (this->pref_.load(&loaded)) {

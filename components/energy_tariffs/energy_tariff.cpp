@@ -20,7 +20,7 @@ void EnergyTariff::dump_config() {
 }
 
 void EnergyTariff::setup() {
-  this->rtc_ = global_preferences.make_preference<float>(this->get_object_id_hash());
+  this->rtc_ = global_preferences->make_preference<float>(this->get_object_id_hash());
 
   float loaded;
   if (this->rtc_.load(&loaded)) {

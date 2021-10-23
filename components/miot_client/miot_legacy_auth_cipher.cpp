@@ -1,4 +1,5 @@
 #include "esphome/core/log.h"
+#include "esphome/core/helpers.h"
 #include "../miot/miot_utils.h"
 #include "miot_legacy_auth_cipher.h"
 
@@ -70,7 +71,7 @@ std::vector<uint8_t> cipher(const std::vector<uint8_t> &key, const uint8_t *inpu
 std::vector<uint8_t> generate_random_token() {
   std::vector<uint8_t> token;
   for (int i = 0; i < 12; i++) {
-    token.push_back(random(0, 255));
+    token.push_back(fast_random_8());
   }
   return token;
 }

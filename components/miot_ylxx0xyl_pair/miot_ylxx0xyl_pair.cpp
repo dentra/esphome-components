@@ -38,7 +38,7 @@ bool MiotYLxx0xYLPair::process_mibeacon(const miot::MiBeacon &mib) {
 
 void MiotYLxx0xYLPair::process_pairing_(const miot::BLEObject &obj) {
   auto ble_client = this->auth_->parent();
-  if (ble_client->state() == esp32_ble_tracker::ClientState::Idle) {
+  if (ble_client->state() == esp32_ble_tracker::ClientState::IDLE) {
     this->auth_->set_product_id(this->product_id_);
     ble_client->set_enabled(true);
   }

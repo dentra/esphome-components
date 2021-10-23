@@ -68,7 +68,7 @@ void MiotLegacyAuthClient::on_read_char(const esp_ble_gattc_cb_param_t::gattc_re
   if (this->progress_ == STEP6 && param.handle == this->char_.ver) {
     ESP_LOGD(TAG, "Step %d complete: %s", this->progress_, YESNO(param.status == ESP_GATT_OK));
     this->progress_ = NONE;
-    this->node_state = esp32_ble_tracker::ClientState::Established;
+    this->node_state = esp32_ble_tracker::ClientState::ESTABLISHED;
     ESP_LOGD(TAG, "Bonding complete");
     this->fire_auth_complete_();
   }
@@ -140,7 +140,7 @@ void MiotLegacyAuthClient::step6_() {
 }
 
 bool MiotLegacyAuthClient::is_auth_complete() const {
-  return this->node_state == esp32_ble_tracker::ClientState::Established;
+  return this->node_state == esp32_ble_tracker::ClientState::ESTABLISHED;
 }
 
 std::vector<uint8_t> MiotLegacyAuthClient::decode(const uint8_t *data, const uint16_t size) const {

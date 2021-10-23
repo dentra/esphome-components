@@ -1,4 +1,5 @@
 #include "esphome/core/log.h"
+#include "esphome/core/hal.h"
 #include "energy_monitoring.h"
 
 #ifndef isnan

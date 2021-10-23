@@ -3,7 +3,7 @@
   "build": {
     "args": {
       // ESPHome version
-      "esphome_version": "2021.9.3",
+      "esphome_version": "2021.10.2",
       // additional APT dependicies
       "apt_deps": "bash-completion less"
     }
