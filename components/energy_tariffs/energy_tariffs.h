@@ -72,6 +72,7 @@ class EnergyTariffs : public Component
   // set time offset in seconds
   void set_time_offset_(float value);
 #endif
+
 };  // class EnergyTariffs
 
 }  // namespace energy_tariffs

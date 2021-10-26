@@ -38,6 +38,7 @@ void EnergyTariffs::setup() {
   }
 
 #ifdef USE_API
+  this->rtc_ = global_preferences->make_preference<float>(fnv1_hash(TAG));
   float loaded;
   if (this->rtc_.load(&loaded)) {
     this->set_time_offset(loaded);

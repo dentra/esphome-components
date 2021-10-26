@@ -24,6 +24,7 @@ CONF_TIME_OFFSET = "time_offset"
 CONF_TIME_OFFSET_SERVICE = "time_offset_service"
 CONF_ON_TARIFF = "on_tariff"
 CONF_ON_BEFORE_TARIFF = "on_before_tariff"
+CONF_SAVE_TO_FLASH_INTERVAL = "save_to_flash_interval"
 
 ICON_CURRENT_TARIFF = "mdi:theme-light-dark"
 ICON_TARIFF = ICON_CURRENT_TARIFF
@@ -122,6 +123,9 @@ CONFIG_SCHEMA = cv.All(
             cv.GenerateID(): cv.declare_id(EnergyTariffs),
             cv.GenerateID(CONF_TIME_ID): cv.use_id(time.RealTimeClock),
             cv.Required(CONF_TOTAL): cv.use_id(sensor.Sensor),
+            cv.Optional(
+                CONF_SAVE_TO_FLASH_INTERVAL
+            ): cv.positive_time_period_milliseconds,
             cv.Optional(CONF_TIME_OFFSET): cv.int_,
             cv.Optional(CONF_TIME_OFFSET_SERVICE): cv.valid_name,
             cv.Optional(CONF_TARIFFS): cv.All(
@@ -187,6 +191,8 @@ async def to_code(config):
         cg.add(var.add_tariff(sens))
         if CONF_SERVICE in conf:
             cg.add(sens.set_service(conf[CONF_SERVICE]))
+        if CONF_SAVE_TO_FLASH_INTERVAL in config:
+            cg.add(sens.set_save_to_flash_interval(config[CONF_SAVE_TO_FLASH_INTERVAL]))
 
     for conf in config.get(CONF_ON_TARIFF, []):
         trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)

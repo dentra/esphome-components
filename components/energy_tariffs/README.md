@@ -46,6 +46,8 @@ external_components:
 * **tariffs**: (**Required**, List): List of Tariff sensors. Minimum 1, maximum 4 (Let me know if you need more). See [Tariff Sensor](#Tariff_Sensor).
 * **on_tariff** (*Optional*, Action): An automation to perform when the tariff was changed. See [energy_tariffs.on_tariff](#energy_tariffs.on_tariff).
 * **on_before_tariff** (*Optional*, Action): An automation that will be performed one second ahead of the tariff change time. See [energy_tariffs.on_before_tariff](#energy_tariffs.on_before_tariff).
+* **save_to_flash_interval** (*Optional*, Time): The minimum time span between saving updated values to flash. This is to keep wearout of memory low.
+Defaults to `0s` and it means store values only in RTC memory not in flash. This option affect on every tariff sensor.
 
 ## Tariff Sensor
 Provide energy consumption for specified time period.
