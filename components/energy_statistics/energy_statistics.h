@@ -21,6 +21,10 @@ class EnergyStatistics : public Component {
   void set_time(time::RealTimeClock *time) { this->time_ = time; }
   void set_total(Sensor *sensor) { this->total_ = sensor; }
 
+  void set_save_to_flash_interval(uint32_t save_to_flash_interval) {
+    this->save_to_flash_interval_ = save_to_flash_interval;
+  }
+
   void set_energy_today(Sensor *sensor) { this->energy_today_ = sensor; }
   void set_energy_yesterday(Sensor *sensor) { this->energy_yesterday_ = sensor; }
   void set_energy_week(Sensor *sensor) { this->energy_week_ = sensor; }
@@ -45,7 +49,7 @@ class EnergyStatistics : public Component {
   int energy_month_start_day_{1};
 
   struct energy_data_t {
-    uint16_t current_day_of_year_{0};
+    uint16_t current_day_of_year{0};
     float start_today{NAN};
     float start_yesterday{NAN};
     float start_week{NAN};
@@ -53,6 +57,10 @@ class EnergyStatistics : public Component {
   } energy_;
 
   void process_(float total);
+  void save_();
+
+  uint32_t last_save_{0};
+  uint32_t save_to_flash_interval_{0};
 
 };  // class EnergyStatistics
 

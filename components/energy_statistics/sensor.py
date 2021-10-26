@@ -20,6 +20,8 @@ CONF_ENERGY_YESTERDAY = "energy_yesterday"
 CONF_ENERGY_WEEK = "energy_week"
 CONF_ENERGY_MONTH = "energy_month"
 
+CONF_SAVE_TO_FLASH_INTERVAL = "save_to_flash_interval"
+
 energy_statistics_ns = cg.esphome_ns.namespace("energy_statistics")
 
 EnergyStatistics = energy_statistics_ns.class_("EnergyStatistics", cg.Component)
@@ -29,6 +31,7 @@ CONFIG_SCHEMA = cv.Schema(
         cv.GenerateID(): cv.declare_id(EnergyStatistics),
         cv.GenerateID(CONF_TIME_ID): cv.use_id(time.RealTimeClock),
         cv.Required(CONF_TOTAL): cv.use_id(sensor.Sensor),
+        cv.Optional(CONF_SAVE_TO_FLASH_INTERVAL): cv.positive_time_period_milliseconds,
         cv.Optional(CONF_ENERGY_TODAY): sensor.sensor_schema(
             UNIT_KILOWATT_HOURS, ICON_FLASH, 2, DEVICE_CLASS_ENERGY
         ),
@@ -71,6 +74,9 @@ async def to_code(config):
     # input sensors
     await setup_input(config, CONF_POWER, var.set_power)
     await setup_input(config, CONF_TOTAL, var.set_total)
+
+    if CONF_SAVE_TO_FLASH_INTERVAL in config:
+        cg.add(var.set_save_to_flash_interval(config[CONF_SAVE_TO_FLASH_INTERVAL]))
 
     # exposed sensors
     await setup_sensor(config, CONF_ENERGY_TODAY, var.set_energy_today)

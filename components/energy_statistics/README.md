@@ -6,8 +6,6 @@ Gather statistics for:
 * week
 * month
 
-> All stats does not survive power loss, but if you need this please make a request and I will add it shortly.
-
 > You can take a look at sample of usage of Energy* components in configuartion for `ZMAi-90` energy meter based on `TYWE3S`: [zmai90.yaml](../zmai90.yaml)
 
 ```yaml
@@ -32,6 +30,8 @@ sensor:
 ## Configuration variables:
 * **id** (*Optional*, [ID](https://esphome.io/guides/configuration-types.html#config-id)): Manually specify the ID used for code generation.
 * **total** (**Required**, [ID](https://esphome.io/guides/configuration-types.html#config-id)): The ID of the total power sensor.
+* **save_to_flash_interval** (*Optional*, Time): The minimum time span between saving updated values to flash. This is to keep wearout of memory low.
+Defaults to `0s` and it means store values only in RTC memory not in flash.
 * **energy_today** (*Optional*, Sensor):
   * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
 * **energy_yesterday** (*Optional*, Sensor):
