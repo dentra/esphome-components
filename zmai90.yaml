@@ -175,6 +175,7 @@ sensor:
   - platform: "energy_statistics"
     id: stat
     total: total
+    save_to_flash_interval: 60s
     energy_today:
       id: today
       name: "$name Energy Today"
@@ -182,6 +183,7 @@ sensor:
   - platform: "energy_tariffs"
     id: tariffs
     total: total
+    save_to_flash_interval: 60s
     time_offset_service: time_offset_set
     tariffs:
       - name: "$name Peak Tariff"
