@@ -12,7 +12,9 @@ namespace miot {
 
 // Object returned by MIID_TEMPERATURE_HUMIDITY.
 struct TemperatureHumidity {
+  // temperature in °C.
   float temperature = {};
+  // humidity in %
   float humidity = {};
 };
 
@@ -28,6 +30,13 @@ struct ButtonEvent {
     TRIPLE_CLICK = 0x03,
     _UNINITIALIZED = 0xFF,
   } type = _UNINITIALIZED;
+} PACKED;
+
+// Object returned by MIID_WATER_BOIL.
+struct WaterBoil {
+  bool power = {};
+  // temperature in °C.
+  float temperature = {};
 } PACKED;
 
 struct BLEObject {
@@ -150,6 +159,12 @@ struct BLEObject {
    * @return Object ID to be paired, such as key events (0x1001)
    */
   optional<MIID> get_pairing_object() const;
+
+  /**
+   * Value for MIID_WATER_BOIL
+   * @return WaterBoil object.
+   */
+  optional<WaterBoil> get_water_boil() const;
 };
 
 }  // namespace miot

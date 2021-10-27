@@ -32,7 +32,7 @@ bool MiotExplorer::process_object_(const miot::BLEObject &obj) {
       this->process_default_(obj);
       break;
     case miot::MIID_PAIRING_EVENT:
-      this->process_any_(obj.id, "Pairing object", obj.get_pairing_object());
+      this->process_pairing_event_(obj.id, "Pairing object", obj.get_pairing_object());
       break;
     case miot::MIID_DOOR_SENSOR:
       this->process_any_(obj.id, "Opening", obj.get_door_sensor());
@@ -47,41 +47,44 @@ bool MiotExplorer::process_object_(const miot::BLEObject &obj) {
       this->process_any_(obj.id, "Motion with light", obj.get_motion_with_light_event());
       break;
     case miot::MIID_FLOODING:
-      this->process_any_(obj.id, "Flooding", obj.get_flooding());
+      this->process_bool_(obj.id, "Flooding", obj.get_flooding());
       break;
     case miot::MIID_LIGHT_INTENSITY:
-      this->process_any_(obj.id, "Light intensity", obj.get_light_intensity());
+      this->process_bool_(obj.id, "Light intensity", obj.get_light_intensity());
       break;
     case miot::MIID_TEMPERATURE:
-      this->process_any_(obj.id, "Temperature", obj.get_temperature());
+      this->process_float_(obj.id, "Temperature", obj.get_temperature());
       break;
     case miot::MIID_HUMIDITY:
-      this->process_any_(obj.id, "Humidity", obj.get_humidity());
+      this->process_float_(obj.id, "Humidity", obj.get_humidity());
       break;
     case miot::MIID_TEMPERATURE_HUMIDITY:
-      this->process_any_(obj.id, "Temperture/Humidity", obj.get_temperature_humidity());
+      this->process_temperature_humidity_(obj.id, "Temperture/Humidity", obj.get_temperature_humidity());
       break;
     case miot::MIID_BUTTON_EVENT:
-      this->process_any_(obj.id, "Button event", obj.get_button_event());
+      this->process_button_event_(obj.id, "Button event", obj.get_button_event());
       break;
     case miot::MIID_ILLUMINANCE:
-      this->process_any_(obj.id, "Illuminance", obj.get_illuminance());
+      this->process_float_(obj.id, "Illuminance", obj.get_illuminance());
+      break;
+    case miot::MIID_WATER_BOIL:
+      this->process_water_boil_(obj.id, "Water Boil", obj.get_water_boil());
       break;
     default:
-      this->process_any_(obj.id, "", hexencode(obj.data));
+      this->process_string_(obj.id, "", hexencode(obj.data));
       break;
   }
   return true;
 }
 
-void MiotExplorer::process_any_(miot::MIID miid, const std::string &name, const std::string &data) {
+void MiotExplorer::process_string_(miot::MIID miid, const std::string &name, const std::string &data) {
   auto it = this->sensors_.find(miid);
   TextSensor *sens;
   if (it != this->sensors_.end()) {
     sens = static_cast<TextSensor *>(it->second);
   } else {
     sens = new TextSensor();
-    char tmp[12] = {};
+    char tmp[16] = {};
     sprintf(tmp, " [%04X] ", miid);
     sens->set_name(this->get_name() + tmp + name);
     App.register_text_sensor(sens);
@@ -92,53 +95,53 @@ void MiotExplorer::process_any_(miot::MIID miid, const std::string &name, const 
 
 void MiotExplorer::process_any_(miot::MIID miid, const std::string &name, const optional<uint8_t> &value) {
   if (value.has_value()) {
-    this->process_any_(miid, name, to_string(*value));
+    this->process_string_(miid, name, to_string(*value));
   }
 }
 
 void MiotExplorer::process_any_(miot::MIID miid, const std::string &name, const optional<uint16_t> &value) {
   if (value.has_value()) {
-    this->process_any_(miid, name, to_string(*value));
+    this->process_string_(miid, name, to_string(*value));
   }
 }
 
-void MiotExplorer::process_any_(miot::MIID miid, const std::string &name, const optional<miot::MIID> &value) {
+void MiotExplorer::process_pairing_event_(miot::MIID miid, const std::string &name, const optional<miot::MIID> &value) {
   if (value.has_value()) {
-    this->process_any_(miid, name, to_string(*value));
+    this->process_string_(miid, name, to_string(*value));
   }
 }
 
 void MiotExplorer::process_any_(miot::MIID miid, const std::string &name, const optional<uint32_t> &value) {
   if (value.has_value()) {
-    this->process_any_(miid, name, to_string(*value));
+    this->process_string_(miid, name, to_string(*value));
   }
 }
 
-void MiotExplorer::process_any_(miot::MIID miid, const std::string &name, const optional<bool> &value) {
+void MiotExplorer::process_bool_(miot::MIID miid, const std::string &name, const optional<bool> &value) {
   if (value.has_value()) {
-    this->process_any_(miid, name, std::string(ONOFF(*value)));
+    this->process_string_(miid, name, std::string(ONOFF(*value)));
   }
 }
 
-void MiotExplorer::process_any_(miot::MIID miid, const std::string &name, const optional<float> &value) {
+void MiotExplorer::process_float_(miot::MIID miid, const std::string &name, const optional<float> &value) {
   if (value.has_value()) {
-    char tmp[8] = {};
+    char tmp[16] = {};
     sprintf(tmp, "%.1f", *value);
-    this->process_any_(miid, name, std::string(tmp));
+    this->process_string_(miid, name, std::string(tmp));
   }
 }
 
-void MiotExplorer::process_any_(miot::MIID miid, const std::string &name,
-                                const optional<const miot::TemperatureHumidity> &value) {
+void MiotExplorer::process_temperature_humidity_(miot::MIID miid, const std::string &name,
+                                                 const optional<const miot::TemperatureHumidity> &value) {
   if (value.has_value()) {
-    char tmp[8] = {};
+    char tmp[16] = {};
     sprintf(tmp, "%.1f / %.1f", (*value).temperature, (*value).humidity);
-    this->process_any_(miid, name, std::string(tmp));
+    this->process_string_(miid, name, std::string(tmp));
   }
 }
 
-void MiotExplorer::process_any_(miot::MIID miid, const std::string &name,
-                                const optional<const miot::ButtonEvent> &value) {
+void MiotExplorer::process_button_event_(miot::MIID miid, const std::string &name,
+                                         const optional<const miot::ButtonEvent> &value) {
   if (value.has_value()) {
     char tmp[32] = {};
     const auto &res = *value;
@@ -159,7 +162,16 @@ void MiotExplorer::process_any_(miot::MIID miid, const std::string &name,
         sprintf(tmp, "unknown event %02" PRIx8 ": %u", res.type, res.index);
         break;
     }
-    this->process_any_(miid, name, std::string(tmp));
+    this->process_string_(miid, name, std::string(tmp));
+  }
+}
+
+void MiotExplorer::process_water_boil_(miot::MIID miid, const std::string &name,
+                                       const optional<const miot::WaterBoil> &value) {
+  if (value.has_value()) {
+    char tmp[16] = {};
+    sprintf(tmp, "%s / %.1f", ONOFF(value->power), value->temperature);
+    this->process_string_(miid, name, std::string(tmp));
   }
 }
 

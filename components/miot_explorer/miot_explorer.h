@@ -23,15 +23,17 @@ class MiotExplorer : public miot::MiotComponent, public text_sensor::TextSensor 
   std::map<miot::MIID, EntityBase *> sensors_ = {};
 
   bool process_object_(const miot::BLEObject &obj) override;
-  void process_any_(miot::MIID miid, const std::string &name, const std::string &data);
+  void process_string_(miot::MIID miid, const std::string &name, const std::string &data);
   void process_any_(miot::MIID miid, const std::string &name, const optional<uint8_t> &value);
   void process_any_(miot::MIID miid, const std::string &name, const optional<uint16_t> &value);
-  void process_any_(miot::MIID miid, const std::string &name, const optional<miot::MIID> &value);
   void process_any_(miot::MIID miid, const std::string &name, const optional<uint32_t> &value);
-  void process_any_(miot::MIID miid, const std::string &name, const optional<bool> &value);
-  void process_any_(miot::MIID miid, const std::string &name, const optional<float> &value);
-  void process_any_(miot::MIID miid, const std::string &name, const optional<const miot::TemperatureHumidity> &value);
-  void process_any_(miot::MIID miid, const std::string &name, const optional<const miot::ButtonEvent> &value);
+  void process_pairing_event_(miot::MIID miid, const std::string &name, const optional<miot::MIID> &value);
+  void process_bool_(miot::MIID miid, const std::string &name, const optional<bool> &value);
+  void process_float_(miot::MIID miid, const std::string &name, const optional<float> &value);
+  void process_temperature_humidity_(miot::MIID miid, const std::string &name,
+                                     const optional<const miot::TemperatureHumidity> &value);
+  void process_button_event_(miot::MIID miid, const std::string &name, const optional<const miot::ButtonEvent> &value);
+  void process_water_boil_(miot::MIID miid, const std::string &name, const optional<const miot::WaterBoil> &value);
 };
 
 }  // namespace miot_explorer

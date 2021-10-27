@@ -1,3 +1,10 @@
+# 2021-10-27
+* [+] new component `miot_kettle`
+
+# 2021-10-26
+* [*] `energy_tariffs`: new save_to_flash_interval parameter
+* [*] `energy_statistics`: new save_to_flash_interval parameter
+
 # 2021-10-18
 * [+] new component `miot_thermogigro`
 * [*] deprecate `miot_cgg1`, now use `miot_thermogigro`

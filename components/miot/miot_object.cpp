@@ -166,6 +166,24 @@ optional<MIID> BLEObject::get_pairing_object() const {
   return static_cast<MIID>(*event);
 }
 
+optional<WaterBoil> BLEObject::get_water_boil() const {
+  CHECK_MIID(MIID_WATER_BOIL);
+  struct _WaterBoil {
+    uint8_t power;
+    uint8_t temperature;
+  };
+  const auto typed = this->get_typed<_WaterBoil>();
+  if (!typed.has_value()) {
+    return {};
+  }
+  WaterBoil res;
+  res.power = (*typed)->power != 0;
+  ESP_LOGD(TAG, "Water Boil Power %s", ONOFF(res.power));
+  res.temperature = (*typed)->temperature;
+  ESP_LOGD(TAG, "Water Boil Temperature %.1f °C", res.temperature);
+  return res;
+}
+
 }  // namespace miot
 }  // namespace esphome
 #endif
