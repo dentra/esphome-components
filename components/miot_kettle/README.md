@@ -20,8 +20,8 @@ binary_sensor:
     # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
     bindkey: "$device_bindkey"
     # String, (Optional), the name of binary sensor
-    name: "Kettle Water Leak"
+    name: "Kettle Water Boil Power"
     # Sensor (Optional), Temperature, °C
     temperature:
-      name: "Kettle Temperature"
+      name: "Kettle Water Boil Temperature"
 ```
