@@ -1,5 +1,6 @@
 # 2021-10-27
 * [+] new component `miot_kettle`
+* [+] new component `miot_xmmfo1jqd`
 
 # 2021-10-26
 * [*] `energy_tariffs`: new save_to_flash_interval parameter
