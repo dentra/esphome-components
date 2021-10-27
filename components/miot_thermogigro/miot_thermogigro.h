@@ -12,7 +12,7 @@ class MiotThermoGigro : public miot::MiotComponent, public sensor::Sensor {
  public:
   void dump_config() override;
 
-  uint16_t get_product_id() const override { return product_id_; }
+  uint16_t get_product_id() const override { return this->product_id_; }
   const char *get_product_code() const override { return "universal thermo gigro"; }
 
   void set_humidity(sensor::Sensor *humidity) { this->humidity_ = humidity; }

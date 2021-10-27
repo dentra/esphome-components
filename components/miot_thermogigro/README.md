@@ -1,6 +1,6 @@
 # Universal Xiaomi Thermometer Hygrometer
 
-This component possibly should work with any Xiaomi or sub-brands (Mijia, Yeelight, Qingping, MiaoMiaoce etc...) devices wich can measure temperature and/or humidity.
+This component possibly should work with any Xiaomi or sub-brands (Mijia, Yeelight, Qingping, MiaoMiaoce etc...) devices which can measure temperature and/or humidity.
 
 * ClearGrass Bluetooth Hygrothermograph (CGG1)
 * Xiaomi Mi Temperature and Humidity Monitor 2 (LYWSD03MMC)
