@@ -43,7 +43,7 @@ At this moment there are list of supported device:
  * [Xiaomi MiaoMiaoce Smart Clock Temperature Fnd Humidity Meter E-Inc (MHO-C303)](components/miot_mhoc303/)
  * [Universal Xiaomi Thermometer Hygrometer](components/miot_thermogigro/)
  * [Universal Xiaomi Kettle](components/miot_kettle/)
- * [Xiaomi Mijia bluetooth Smart Rubik's Cube (XMMFO1JQD)][components/miot_xmmfo1jqd/]
+ * [Xiaomi Mijia bluetooth Smart Rubik's Cube (XMMFO1JQD)](components/miot_xmmfo1jqd/)
 And growing...
 
 > Now with automatic bindkey extraction from Xiaomi Cloud.
