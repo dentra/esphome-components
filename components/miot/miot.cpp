@@ -181,12 +181,6 @@ bool MiotListener::process_mibeacon(const MiBeacon &mib) {
   return this->process_object_(mib.object);
 }
 
-bool MiotListener::process_unhandled_(const miot::BLEObject &obj) {
-  ESP_LOGW(TAG, "%12" PRIX64 " [%04X] Unhandled object attribute: %04X, value: %s", this->address_,
-           this->get_product_id(), obj.id, hexencode(obj.data).c_str());
-  return false;
-}
-
 bool MiotListener::have_bindkey() const {
   for (uint8_t b : this->bindkey_) {
     if (b != 0) {
@@ -196,11 +190,26 @@ bool MiotListener::have_bindkey() const {
   return false;
 }
 
+bool MiotListener::process_unhandled_(const miot::BLEObject &obj) {
+  ESP_LOGW(TAG, "%12" PRIX64 " [%04X] Unhandled object attribute: %04X, value: %s", this->address_,
+           this->get_product_id(), obj.id, hexencode(obj.data).c_str());
+  return false;
+}
+
 bool MiotComponent::process_default_(const miot::BLEObject &obj) {
   switch (obj.id) {
     case MIID_BATTERY: {
       if (this->battery_level_) {
         auto battery_level = obj.get_battery_level();
+        if (battery_level.has_value()) {
+          this->battery_level_->publish_state(*battery_level);
+        }
+      }
+      break;
+    }
+    case MIID_MIAOMIAOCE_BATTERY: {
+      if (this->battery_level_) {
+        auto battery_level = obj.get_miaomiaoce_battery_level();
         if (battery_level.has_value()) {
           this->battery_level_->publish_state(*battery_level);
         }

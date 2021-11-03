@@ -46,11 +46,12 @@ struct BLEObject {
   BLEObject(RawBLEObject *obj) : id(obj->id), data(obj->data, obj->data + obj->data_len) {}
 
   MIID id;
-  // holds encrypted data when id==MIID_UNINITIALIZED
+  // sensor data or whole encrypted data when id==MIID_UNINITIALIZED
   std::vector<uint8_t> data;
 
   // get 8 bit value as boolean.
   optional<bool> get_bool() const { return get_uint8(); }
+
   // get 8 bit unsigned value.
   optional<uint8_t> get_uint8() const {
     if (data.size() == sizeof(uint8_t)) {
@@ -58,6 +59,7 @@ struct BLEObject {
     }
     return {};
   }
+
   // get 16 bit signed value.
   optional<int16_t> get_int16() const {
     if (data.size() == sizeof(int16_t)) {
@@ -65,6 +67,7 @@ struct BLEObject {
     }
     return {};
   }
+
   // get 16 bit unsigned value.
   optional<uint16_t> get_uint16() const {
     if (data.size() == sizeof(uint16_t)) {
@@ -72,20 +75,23 @@ struct BLEObject {
     }
     return {};
   }
-  // get 24 bit unsigned values.
+
+  // get 24 bit unsigned value.
   optional<uint32_t> get_uint24() const {
     if (data.size() == sizeof(uint32_t) - 1) {
       return (*reinterpret_cast<const uint32_t *>(data.data())) & 0x00FFFFFF;
     }
     return {};
   }
-  // get 32 or 24 bit unsigned values.
+
+  // get 32 or 24 bit unsigned value.
   optional<uint32_t> get_uint32() const {
     if (data.size() == sizeof(uint32_t)) {
       return *reinterpret_cast<const uint32_t *>(data.data());
     }
     return {};
   }
+
   // get typed value. example: obj.get_typed<MyData>();
   template<typename T> optional<const T *> get_typed() const {
     if (data.size() == sizeof(T)) {
@@ -93,29 +99,38 @@ struct BLEObject {
     }
     return {};
   }
+
+  // get float value.
+  optional<float> get_float() const {
+    if (data.size() == sizeof(float)) {
+      return *reinterpret_cast<const float *>(data.data());
+    }
+    return {};
+  }
+
   /**
    * Value for MIID_BATTERY.
-   * @return battery level in %.
+   * @return battery level in %
    */
   optional<uint8_t> get_battery_level() const;
   /**
    * Value for MIID_DOOR_SENSOR.
-   * @return See MIID_DOOR_SENSOR for detailed description for returning value.
+   * @return See MIID_DOOR_SENSOR for detailed description for returning value
    */
   optional<uint8_t> get_door_sensor() const;
   /**
    * Value for MIID_IDLE_TIME.
-   * @return idle time in seconds.
+   * @return idle time in seconds
    */
   optional<uint32_t> get_idle_time() const;
   /**
    * Value for MIID_TIMEOUT.
-   * @return timeout in seconds.
+   * @return timeout in seconds
    */
   optional<uint32_t> get_timeout() const;
   /**
    * Value for MIID_MOTION_WITH_LIGHT_EVENT.
-   * @return illuminance in lux.
+   * @return illuminance in lux
    */
   optional<uint32_t> get_motion_with_light_event() const;
   /**
@@ -125,46 +140,64 @@ struct BLEObject {
   optional<bool> get_flooding() const;
   /**
    * Value for MIID_LIGHT_INTENSITY.
-   * @return true for a strong and false for a weak light.
+   * @return true for a strong and false for a weak light
    */
   optional<bool> get_light_intensity() const;
   /**
    * Value for MIID_TEMPERATURE.
-   * @return temperature in °C.
+   * @return temperature in °C
    */
   optional<float> get_temperature() const;
   /**
    * Value for MIID_HUMIDITY.
-   * @return humidity in %.
+   * @return humidity in %
    */
   optional<float> get_humidity() const;
   /**
    * Value for MIID_TEMPERATURE_HUMIDITY.
-   * @return TemperatureHumidity object.
+   * @return TemperatureHumidity object
    */
   optional<const TemperatureHumidity> get_temperature_humidity() const;
   /**
    * Value for MIID_BUTTON_EVENT.
-   * @return ButtonEvent object.
+   * @return ButtonEvent object
    */
   optional<const ButtonEvent> get_button_event() const;
   /**
-   * Value for MIID_ILLUMINANCE.
-   * @return illuminance in lux, range 0-120000.
+   * Value for MIID_ILLUMINANCE
+   * @return illuminance in lux, range 0-120000
    */
   optional<float> get_illuminance() const;
 
   /**
-   * Value for MIID_PAIRING_EVENT
+   * Value for MIID_PAIRING_EVENT.
    * @return Object ID to be paired, such as key events (0x1001)
    */
   optional<MIID> get_pairing_object() const;
 
   /**
-   * Value for MIID_WATER_BOIL
-   * @return WaterBoil object.
+   * Value for MIID_WATER_BOIL.
+   * @return WaterBoil object
    */
   optional<WaterBoil> get_water_boil() const;
+
+  /**
+   * Value for MIID_MIAOMIAOCE_BATTERY.
+   * @return battery level in %
+   */
+  optional<uint8_t> get_miaomiaoce_battery_level() const;
+
+  /**
+   * Value for MIID_MIAOMIAOCE_TEMPERATURE.
+   * @return temperature.
+   */
+  optional<float> get_miaomiaoce_temperature() const;
+
+  /**
+   * Value for MIID_MIAOMIAOCE_HUMIDITY.
+   * @return humidity percentage, %
+   */
+  optional<float> get_miaomiaoce_humidity() const;
 };
 
 }  // namespace miot

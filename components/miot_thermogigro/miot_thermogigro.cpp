@@ -40,6 +40,22 @@ void MiotThermoGigro::process_temperature_humidity_(const miot::BLEObject &obj) 
   }
 }
 
+void MiotThermoGigro::process_miaomiaoce_temperature_(const miot::BLEObject &obj) {
+  const auto temperature = obj.get_miaomiaoce_temperature();
+  if (temperature.has_value()) {
+    this->publish_state(*temperature);
+  }
+}
+
+void MiotThermoGigro::process_miaomiaoce_humidity_(const miot::BLEObject &obj) {
+  if (this->humidity_ != nullptr) {
+    const auto humidity = obj.get_miaomiaoce_humidity();
+    if (humidity.has_value()) {
+      this->humidity_->publish_state(*humidity);
+    }
+  }
+}
+
 bool MiotThermoGigro::process_mibeacon(const miot::MiBeacon &mib) {
   if (this->product_id_ == 0) {
     this->product_id_ = mib.product_id;
@@ -59,6 +75,14 @@ bool MiotThermoGigro::process_object_(const miot::BLEObject &obj) {
 
     case miot::MIID_TEMPERATURE_HUMIDITY:
       this->process_temperature_humidity_(obj);
+      break;
+
+    case miot::MIID_MIAOMIAOCE_TEMPERATURE:
+      this->process_miaomiaoce_temperature_(obj);
+      break;
+
+    case miot::MIID_MIAOMIAOCE_HUMIDITY:
+      this->process_miaomiaoce_humidity_(obj);
       break;
 
     default:

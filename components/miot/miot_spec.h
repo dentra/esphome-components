@@ -602,7 +602,34 @@ enum MIID : uint16_t {
   //  1: End of brushing
   // Timestamp: UTC time
   // Score (optional): This parameter can be added to the end of brushing event: the score of this brushing, 0~100
-  MIID_XIAOBEI_TOOTHBRUSH_EVENT = 0x3003
+  MIID_XIAOBEI_TOOTHBRUSH_EVENT = 0x3003,
+
+  // MiaoMiaoce Battery.
+  //
+  // uint8_t level;
+  //
+  // Battery: range [0,100], accuracy 1, %
+  //
+  // https://miot-spec.org/miot-spec-v2/spec/property?type=urn:miot-spec-v2:property:battery-level:00000014
+  MIID_MIAOMIAOCE_BATTERY = 0x4803,
+
+  // MiaoMiaoce Temperature.
+  //
+  // float temperature;
+  //
+  // Temperature, range [-30, 100], accuracy 0.1, C
+  //
+  // https://miot-spec.org/miot-spec-v2/spec/property?type=urn:miot-spec-v2:property:temperature:00000020
+  MIID_MIAOMIAOCE_TEMPERATURE = 0x4C01,
+
+  // MiaoMiaoce Humidity.
+  //
+  // float humidity;
+  //
+  // Relative Humidity, range [0, 100], accuracy 0.1, %
+  //
+  // https://miot-spec.org/miot-spec-v2/spec/property?type=urn:miot-spec-v2:property:relative-humidity:0000000C
+  MIID_MIAOMIAOCE_HUMIDITY = 0x4C08,
 };
 
 // Frame Control.

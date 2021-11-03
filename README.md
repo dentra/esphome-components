@@ -44,6 +44,9 @@ At this moment there are list of supported device:
  * [Universal Xiaomi Thermometer Hygrometer](components/miot_thermogigro/)
  * [Universal Xiaomi Kettle](components/miot_kettle/)
  * [Xiaomi Mijia bluetooth Smart Rubik's Cube (XMMFO1JQD)](components/miot_xmmfo1jqd/)
+ * [Xiaomi Mijia Temperature And Humidity Electronic Watch (LYWSD02MMC)](components/miot_thermogigro/)
+ * [Xiaomi MiaoMiaoce Digital Bluetooth Thermometer Hygrometer (MHO-C401)](components/miot_thermogigro/)
+ * [Xiaomi MiaoMiaoce Digital Temperature and Humidity Monitor (XMWSDJ04MMC)](components/miot_thermogigro/)
 
 And growing...
 

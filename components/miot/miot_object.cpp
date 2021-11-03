@@ -184,6 +184,37 @@ optional<WaterBoil> BLEObject::get_water_boil() const {
   return res;
 }
 
+optional<uint8_t> BLEObject::get_miaomiaoce_battery_level() const {
+  CHECK_MIID(MIID_MIAOMIAOCE_BATTERY);
+  auto battery_level = this->get_uint8();
+  if (battery_level.has_value()) {
+    ESP_LOGD(TAG, "Battery level: %" PRIu8 " %%", *battery_level);
+  }
+  return battery_level;
+}
+
+optional<float> BLEObject::get_miaomiaoce_temperature() const {
+  CHECK_MIID(MIID_MIAOMIAOCE_TEMPERATURE);
+  const auto temperature = this->get_float();
+  if (!temperature.has_value()) {
+    return temperature;
+  }
+  const float res = *temperature;
+  ESP_LOGD(TAG, "Temperature %.1f °C", res);
+  return res;
+}
+
+optional<float> BLEObject::get_miaomiaoce_humidity() const {
+  CHECK_MIID(MIID_MIAOMIAOCE_HUMIDITY);
+  const auto humidity = this->get_float();
+  if (!humidity.has_value()) {
+    return humidity;
+  }
+  const float res = *humidity;
+  ESP_LOGD(TAG, "Humidity %.1f %%", res);
+  return res;
+}
+
 }  // namespace miot
 }  // namespace esphome
 #endif

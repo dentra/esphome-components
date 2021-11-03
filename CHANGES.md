@@ -1,3 +1,6 @@
+# 2021-11-03
+* [+] `miot_thermogigro`: add support `XMWSDJ04MMC`
+
 # 2021-10-27
 * [+] new component `miot_kettle`
 * [+] new component `miot_xmmfo1jqd`
