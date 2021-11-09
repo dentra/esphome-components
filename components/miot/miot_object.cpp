@@ -139,9 +139,9 @@ optional<const ButtonEvent> BLEObject::get_button_event() const {
       if (res.value == 0) {
         ESP_LOGD(TAG, "Button triple click: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
       } else if (res.index == 0) {
-        ESP_LOGD(TAG, "Button short press knob, dimmer: %" PRIi8, res.value);
+        ESP_LOGD(TAG, "Button short press knob, value: %" PRIi8, res.value);
       } else if (res.index == 1) {
-        ESP_LOGD(TAG, "Button long press knob, dimmer: %" PRIi8, res.value);
+        ESP_LOGD(TAG, "Button long press knob, value: %" PRIi8, res.value);
       } else {
         ESP_LOGD(TAG, "Button press knob: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
       }
@@ -152,11 +152,11 @@ optional<const ButtonEvent> BLEObject::get_button_event() const {
       break;
     case ButtonEvent::ROTATE: {
       if (res.index == 0) {
-        ESP_LOGD(TAG, "Button rotate %s knob, dimmer: %" PRIi8, res.value < 0 ? "left" : "right", res.value);
+        ESP_LOGD(TAG, "Button rotate %s knob, value: %" PRIi8, res.value < 0 ? "left" : "right", res.value);
       } else {
         int8_t dimmer = res.index;
-        ESP_LOGD(TAG, "Button rotate %s (pressed) knob, dimmer: %" PRIi8 ", value: %" PRIi8,
-                 dimmer < 0 ? "left" : "right", dimmer, res.value);
+        ESP_LOGD(TAG, "Button rotate %s (pressed) knob: %" PRIi8 ", value: %" PRIi8, dimmer < 0 ? "left" : "right",
+                 dimmer, res.value);
       }
       break;
     }
