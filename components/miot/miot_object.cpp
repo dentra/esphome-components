@@ -130,19 +130,38 @@ optional<const ButtonEvent> BLEObject::get_button_event() const {
   const auto &res = *(*button_event);
   switch (res.type) {
     case ButtonEvent::CLICK:
-      ESP_LOGD(TAG, "Button click: %u", res.index);
+      ESP_LOGD(TAG, "Button click: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
       break;
     case ButtonEvent::DOUBLE_CLICK:
-      ESP_LOGD(TAG, "Button double click: %u", res.index);
+      ESP_LOGD(TAG, "Button double click: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
       break;
-    case ButtonEvent::TRIPLE_CLICK:
-      ESP_LOGD(TAG, "Button triple click: %u", res.index);
+    case ButtonEvent::TRIPLE_CLICK_OR_ROTATE_KNOB: {
+      if (res.value == 0) {
+        ESP_LOGD(TAG, "Button triple click: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
+      } else if (res.index == 0) {
+        ESP_LOGD(TAG, "Button short press knob, dimmer: %" PRIi8, res.value);
+      } else if (res.index == 1) {
+        ESP_LOGD(TAG, "Button long press knob, dimmer: %" PRIi8, res.value);
+      } else {
+        ESP_LOGD(TAG, "Button press knob: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
+      }
       break;
+    }
     case ButtonEvent::LONG_PRESS:
-      ESP_LOGD(TAG, "Button long press: %u", res.index);
+      ESP_LOGD(TAG, "Button long press: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
       break;
+    case ButtonEvent::ROTATE: {
+      if (res.index == 0) {
+        ESP_LOGD(TAG, "Button rotate %s knob, dimmer: %" PRIi8, res.value < 0 ? "left" : "right", res.value);
+      } else {
+        int8_t dimmer = res.index;
+        ESP_LOGD(TAG, "Button rotate %s (pressed) knob, dimmer: %" PRIi8 ", value: " PRIi8,
+                 dimmer < 0 ? "left" : "right", dimmer, res.value);
+      }
+      break;
+    }
     default:
-      ESP_LOGD(TAG, "Button unknown event %02" PRIx8 ": %u", res.type, res.index);
+      ESP_LOGD(TAG, "Button unknown event %02" PRIx8 ": %" PRIu8 ", value: %" PRIi8, res.type, res.index, res.value);
       break;
   }
   return res;

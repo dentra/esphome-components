@@ -269,16 +269,20 @@ enum MIID : uint16_t {
 
   // Button event.
   //
-  // uint16_t index;
+  // uint8_t index;
+  // int8_t value;
   // uint8_t type;
   //
   // Index: Button number, value range 0~9
+  // Value: Dimmer value
   // Type:
   //   0x00: click
   //   0x01: double-click
   //   0x02: long press
   //   0x03: triple click / knob rotation
   //   0x04: click the key to release
+  //   0x05: short press
+  //   0x06: long press
   MIID_BUTTON_EVENT = 0x1001,
 
   /// General attributes.

@@ -143,23 +143,42 @@ void MiotExplorer::process_temperature_humidity_(miot::MIID miid, const std::str
 void MiotExplorer::process_button_event_(miot::MIID miid, const std::string &name,
                                          const optional<const miot::ButtonEvent> &value) {
   if (value.has_value()) {
-    char tmp[32] = {};
+    char tmp[64] = {};
     const auto &res = *value;
     switch (res.type) {
       case miot::ButtonEvent::CLICK:
-        sprintf(tmp, "click: %u", res.index);
+        sprintf(tmp, "click: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
         break;
       case miot::ButtonEvent::DOUBLE_CLICK:
-        sprintf(tmp, "double click: %u", res.index);
+        sprintf(tmp, "double click: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
         break;
-      case miot::ButtonEvent::TRIPLE_CLICK:
-        sprintf(tmp, "triple click: %u", res.index);
+      case miot::ButtonEvent::TRIPLE_CLICK_OR_ROTATE_KNOB: {
+        if (res.value == 0) {
+          sprintf(tmp, "Button triple click: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
+        } else if (res.index == 0) {
+          sprintf(tmp, "Button short press knob, dimmer: %" PRIi8, res.value);
+        } else if (res.index == 1) {
+          sprintf(tmp, "Button long press knob, dimmer: %" PRIi8, res.value);
+        } else {
+          sprintf(tmp, "Button press knob: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
+        }
         break;
+      }
       case miot::ButtonEvent::LONG_PRESS:
-        sprintf(tmp, "long press: %u", res.index);
+        sprintf(tmp, "long press: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
         break;
+      case miot::ButtonEvent::ROTATE: {
+        if (res.index == 0) {
+          sprintf(tmp, "Button rotate %s knob, dimmer: %" PRIi8, res.value < 0 ? "left" : "right", res.value);
+        } else {
+          int8_t dimmer = res.index;
+          sprintf(tmp, "Button rotate %s (pressed) knob, dimmer: %" PRIi8 ", value: " PRIi8,
+                  dimmer < 0 ? "left" : "right", dimmer, res.value);
+        }
+        break;
+      }
       default:
-        sprintf(tmp, "unknown event %02" PRIx8 ": %u", res.type, res.index);
+        sprintf(tmp, "Button unknown event %02" PRIx8 ": %" PRIu8 ", value: %" PRIi8, res.type, res.index, res.value);
         break;
     }
     this->process_string_(miid, name, std::string(tmp));
