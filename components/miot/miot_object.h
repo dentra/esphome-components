@@ -21,9 +21,9 @@ struct TemperatureHumidity {
 // Object returned by MIID_BUTTON_EVENT.
 struct ButtonEvent {
   // Button number, value range 0~9.
-  uint8_t index = 0xFFFF;
+  uint8_t index = 0xFF;
   // Dimmer value.
-  int8_t value;
+  int8_t value = 0;
   // Type of event.
   enum Type : uint8_t {
     CLICK = 0x00,

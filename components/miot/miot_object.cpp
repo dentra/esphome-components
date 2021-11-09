@@ -155,7 +155,7 @@ optional<const ButtonEvent> BLEObject::get_button_event() const {
         ESP_LOGD(TAG, "Button rotate %s knob, dimmer: %" PRIi8, res.value < 0 ? "left" : "right", res.value);
       } else {
         int8_t dimmer = res.index;
-        ESP_LOGD(TAG, "Button rotate %s (pressed) knob, dimmer: %" PRIi8 ", value: " PRIi8,
+        ESP_LOGD(TAG, "Button rotate %s (pressed) knob, dimmer: %" PRIi8 ", value: %" PRIi8,
                  dimmer < 0 ? "left" : "right", dimmer, res.value);
       }
       break;

@@ -172,7 +172,7 @@ void MiotExplorer::process_button_event_(miot::MIID miid, const std::string &nam
           sprintf(tmp, "Button rotate %s knob, dimmer: %" PRIi8, res.value < 0 ? "left" : "right", res.value);
         } else {
           int8_t dimmer = res.index;
-          sprintf(tmp, "Button rotate %s (pressed) knob, dimmer: %" PRIi8 ", value: " PRIi8,
+          sprintf(tmp, "Button rotate %s (pressed) knob, dimmer: %" PRIi8 ", value: %" PRIi8,
                   dimmer < 0 ? "left" : "right", dimmer, res.value);
         }
         break;
