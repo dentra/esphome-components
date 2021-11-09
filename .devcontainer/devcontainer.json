@@ -54,6 +54,7 @@
     "ms-vscode.cpptools",
     // python
     "ms-python.python",
+    "ms-python.vscode-pylance",
     "visualstudioexptteam.vscodeintellicode",
     // yaml
     "redhat.vscode-yaml",
