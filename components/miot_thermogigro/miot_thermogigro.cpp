@@ -8,6 +8,8 @@ namespace miot_thermogigro {
 
 static const char *const TAG = "miot_thermogigro";
 
+constexpr uint16_t PRODUCT_ID_XMWSDJ04MMC = 0x1203;
+
 void MiotThermoGigro::dump_config() {
   this->dump_config_(TAG);
   LOG_SENSOR("  ", "Temperature", this);
@@ -31,6 +33,9 @@ void MiotThermoGigro::process_humidity_(const miot::BLEObject &obj) {
 }
 
 void MiotThermoGigro::process_temperature_humidity_(const miot::BLEObject &obj) {
+  if (this->product_id_ != PRODUCT_ID_XMWSDJ04MMC) {
+    return;
+  }
   const auto temperature_humidity = obj.get_temperature_humidity();
   if (temperature_humidity.has_value()) {
     this->publish_state(temperature_humidity->temperature);
@@ -41,6 +46,9 @@ void MiotThermoGigro::process_temperature_humidity_(const miot::BLEObject &obj) 
 }
 
 void MiotThermoGigro::process_miaomiaoce_temperature_(const miot::BLEObject &obj) {
+  if (this->product_id_ != PRODUCT_ID_XMWSDJ04MMC) {
+    return;
+  }
   const auto temperature = obj.get_miaomiaoce_temperature();
   if (temperature.has_value()) {
     this->publish_state(*temperature);
@@ -48,6 +56,9 @@ void MiotThermoGigro::process_miaomiaoce_temperature_(const miot::BLEObject &obj
 }
 
 void MiotThermoGigro::process_miaomiaoce_humidity_(const miot::BLEObject &obj) {
+  if (this->product_id_ != PRODUCT_ID_XMWSDJ04MMC) {
+    return;
+  }
   if (this->humidity_ != nullptr) {
     const auto humidity = obj.get_miaomiaoce_humidity();
     if (humidity.has_value()) {

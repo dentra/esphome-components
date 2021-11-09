@@ -613,6 +613,9 @@ enum MIID : uint16_t {
   // https://miot-spec.org/miot-spec-v2/spec/property?type=urn:miot-spec-v2:property:battery-level:00000014
   MIID_MIAOMIAOCE_BATTERY = 0x4803,
 
+  // MiaoMiaoce Low Battery.
+  MIID_MIAOMIAOCE_LOW_BATTERY = 0x4A01,
+
   // MiaoMiaoce Temperature.
   //
   // float temperature;
