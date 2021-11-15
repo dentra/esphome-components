@@ -28,7 +28,7 @@ class MiotYLKG0XYLTrigger : public Trigger<uint8_t>, public miot::MiotListener {
   MiotYLKG0XYLEvent event_;
 
   bool process_object_(const miot::BLEObject &obj) override;
-  bool process_button_event_(const miot::ButtonEvent &button_event);
+  uint8_t process_button_event_(const miot::ButtonEvent &button_event);
 };
 
 }  // namespace miot_ylkg0xyl
