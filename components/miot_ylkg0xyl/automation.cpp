@@ -25,7 +25,7 @@ bool MiotYLKG0XYLTrigger::process_object_(const miot::BLEObject &obj) {
   return false;
 }
 
-bool MiotYLKG0XYLTrigger::process_button_event_(const miot::ButtonEvent &button_event) {
+uint8_t MiotYLKG0XYLTrigger::process_button_event_(const miot::ButtonEvent &button_event) {
   switch (this->event_) {
     case ON_SHORT_PRESS: {
       if (button_event.type == miot::ButtonEvent::KNOB) {
