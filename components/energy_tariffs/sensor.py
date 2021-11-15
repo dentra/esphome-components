@@ -10,6 +10,7 @@ from esphome.const import (
     CONF_TRIGGER_ID,
     CONF_SERVICE,
     DEVICE_CLASS_ENERGY,
+    STATE_CLASS_TOTAL_INCREASING,
     UNIT_KILOWATT_HOURS,
 )
 
@@ -106,7 +107,11 @@ def validate_tariffs(config):
 
 
 TARIFF_SCHEMA = sensor.sensor_schema(
-    UNIT_KILOWATT_HOURS, ICON_TARIFF, 2, DEVICE_CLASS_ENERGY
+    unit_of_measurement=UNIT_KILOWATT_HOURS,
+    accuracy_decimals=2,
+    device_class=DEVICE_CLASS_ENERGY,
+    icon=ICON_TARIFF,
+    state_class=STATE_CLASS_TOTAL_INCREASING,
 ).extend(
     {
         cv.GenerateID(): cv.declare_id(EnergyTariff),
