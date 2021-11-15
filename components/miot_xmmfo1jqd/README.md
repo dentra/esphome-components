@@ -26,7 +26,10 @@ sensor:
           - logger.log: twisted counterclockwise
     # Sensor (Optional), Battey Level, % (not 100% sure that is working, please let me know it so)
     battery_level:
-      name: "Battery Level"
+      name: "$name Battery Level"
+    # Sensor (Optional), Battey Voltage, V (not 100% sure that is working, please let me know it so)
+    battery_voltage:
+      name: "$name Battery Voltage"
 ```
 
 thanks to [@xrust83](https://github.com/xrust83)

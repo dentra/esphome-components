@@ -1,3 +1,8 @@
+# 2021-11-15
+* [+] new component `miot_ylkg0xyl`
+* [+] add battery voltage to all supported miot components
+* [-] remove dupliate log messages from miot button events
+
 # 2021-11-03
 * [+] `miot_thermogigro`: add support `XMWSDJ04MMC`
 

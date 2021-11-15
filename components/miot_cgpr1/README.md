@@ -16,19 +16,22 @@ binary_sensor:
     # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
     bindkey: "device-bin-key"
     # String, (Optional), the name of binary sensor
-    name: "CGPR1 Motion"
+    name: "$name Motion"
     # Sensor (Optional), Illuminance, lux
     illuminance:
-      name: "CGPR1 Illuminance"
+      name: "$name Illuminance"
     # Sensor (Optional), Time in seconds of inactivity
     idle_time:
-      name: "CGPR1 Idle Time"
+      name: "$name Idle Time"
     # BinarySensor (Optional), Light intensivity: on - strong light, off - weak light
     light:
-      name: "CGPR1 Light"
+      name: "$name Light"
     # Sensor (Optional), Battey Level, %
     battery_level:
-      name: "CGPR1 Battery Level"
+      name: "$name Battery Level"
+    # Sensor (Optional), Battey Voltage, V
+    battery_voltage:
+      name: "$name Battery Voltage"
 ```
 
 Now signal strength of a BLE device (RSSI) is not a part of this component, but you could easily add it:
@@ -36,7 +39,7 @@ Now signal strength of a BLE device (RSSI) is not a part of this component, but 
 sensor:
   - platform: ble_rssi
     mac_address: "device-mac-address"
-    name: "CGPR1 RSSI"
+    name: "$name RSSI"
 ```
 
 thanks to @xrays72

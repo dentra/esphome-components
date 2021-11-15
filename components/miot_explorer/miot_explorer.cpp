@@ -35,16 +35,16 @@ bool MiotExplorer::process_object_(const miot::BLEObject &obj) {
       this->process_pairing_event_(obj.id, "Pairing object", obj.get_pairing_object());
       break;
     case miot::MIID_DOOR_SENSOR:
-      this->process_any_(obj.id, "Opening", obj.get_door_sensor());
+      this->process_uint8_(obj.id, "Opening", obj.get_door_sensor());
       break;
     case miot::MIID_IDLE_TIME:
-      this->process_any_(obj.id, "Idle time", obj.get_idle_time());
+      this->process_uint32_(obj.id, "Idle time", obj.get_idle_time());
       break;
     case miot::MIID_TIMEOUT:
-      this->process_any_(obj.id, "Timeout", obj.get_timeout());
+      this->process_uint32_(obj.id, "Timeout", obj.get_timeout());
       break;
     case miot::MIID_MOTION_WITH_LIGHT_EVENT:
-      this->process_any_(obj.id, "Motion with light", obj.get_motion_with_light_event());
+      this->process_uint32_(obj.id, "Motion with light", obj.get_motion_with_light_event());
       break;
     case miot::MIID_FLOODING:
       this->process_bool_(obj.id, "Flooding", obj.get_flooding());
@@ -93,13 +93,13 @@ void MiotExplorer::process_string_(miot::MIID miid, const std::string &name, con
   sens->publish_state(data);
 }
 
-void MiotExplorer::process_any_(miot::MIID miid, const std::string &name, const optional<uint8_t> &value) {
+void MiotExplorer::process_uint8_(miot::MIID miid, const std::string &name, const optional<uint8_t> &value) {
   if (value.has_value()) {
     this->process_string_(miid, name, to_string(*value));
   }
 }
 
-void MiotExplorer::process_any_(miot::MIID miid, const std::string &name, const optional<uint16_t> &value) {
+void MiotExplorer::process_uint16_(miot::MIID miid, const std::string &name, const optional<uint16_t> &value) {
   if (value.has_value()) {
     this->process_string_(miid, name, to_string(*value));
   }
@@ -111,7 +111,7 @@ void MiotExplorer::process_pairing_event_(miot::MIID miid, const std::string &na
   }
 }
 
-void MiotExplorer::process_any_(miot::MIID miid, const std::string &name, const optional<uint32_t> &value) {
+void MiotExplorer::process_uint32_(miot::MIID miid, const std::string &name, const optional<uint32_t> &value) {
   if (value.has_value()) {
     this->process_string_(miid, name, to_string(*value));
   }
@@ -132,64 +132,27 @@ void MiotExplorer::process_float_(miot::MIID miid, const std::string &name, cons
 }
 
 void MiotExplorer::process_temperature_humidity_(miot::MIID miid, const std::string &name,
-                                                 const optional<const miot::TemperatureHumidity> &value) {
-  if (value.has_value()) {
+                                                 const miot::TemperatureHumidity *th) {
+  if (th != nullptr) {
     char tmp[16] = {};
-    sprintf(tmp, "%.1f / %.1f", (*value).temperature, (*value).humidity);
+    sprintf(tmp, "%.1f / %.1f", th->get_temperature(), th->get_humidity());
     this->process_string_(miid, name, std::string(tmp));
   }
 }
 
 void MiotExplorer::process_button_event_(miot::MIID miid, const std::string &name,
-                                         const optional<const miot::ButtonEvent> &value) {
-  if (value.has_value()) {
+                                         const miot::ButtonEvent *button_event) {
+  if (button_event != nullptr) {
     char tmp[64] = {};
-    const auto &res = *value;
-    switch (res.type) {
-      case miot::ButtonEvent::CLICK:
-        sprintf(tmp, "click: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
-        break;
-      case miot::ButtonEvent::DOUBLE_CLICK:
-        sprintf(tmp, "double click: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
-        break;
-      case miot::ButtonEvent::TRIPLE_CLICK_OR_ROTATE_KNOB: {
-        if (res.value == 0) {
-          sprintf(tmp, "Button triple click: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
-        } else if (res.index == 0) {
-          sprintf(tmp, "Button short press knob, dimmer: %" PRIi8, res.value);
-        } else if (res.index == 1) {
-          sprintf(tmp, "Button long press knob, dimmer: %" PRIi8, res.value);
-        } else {
-          sprintf(tmp, "Button press knob: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
-        }
-        break;
-      }
-      case miot::ButtonEvent::LONG_PRESS:
-        sprintf(tmp, "long press: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
-        break;
-      case miot::ButtonEvent::ROTATE: {
-        if (res.index == 0) {
-          sprintf(tmp, "Button rotate %s knob, dimmer: %" PRIi8, res.value < 0 ? "left" : "right", res.value);
-        } else {
-          int8_t dimmer = res.index;
-          sprintf(tmp, "Button rotate %s (pressed) knob, dimmer: %" PRIi8 ", value: %" PRIi8,
-                  dimmer < 0 ? "left" : "right", dimmer, res.value);
-        }
-        break;
-      }
-      default:
-        sprintf(tmp, "Button unknown event %02" PRIx8 ": %" PRIu8 ", value: %" PRIi8, res.type, res.index, res.value);
-        break;
-    }
+    miot::ButtonEvent::str(tmp, *button_event);
     this->process_string_(miid, name, std::string(tmp));
   }
 }
 
-void MiotExplorer::process_water_boil_(miot::MIID miid, const std::string &name,
-                                       const optional<const miot::WaterBoil> &value) {
-  if (value.has_value()) {
+void MiotExplorer::process_water_boil_(miot::MIID miid, const std::string &name, const miot::WaterBoil *water_boil) {
+  if (water_boil != nullptr) {
     char tmp[16] = {};
-    sprintf(tmp, "%s / %.1f", ONOFF(value->power), value->temperature);
+    sprintf(tmp, "%s / %.1f", ONOFF(water_boil->get_power()), water_boil->get_temperature());
     this->process_string_(miid, name, std::string(tmp));
   }
 }

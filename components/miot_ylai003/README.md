@@ -15,9 +15,12 @@ sensor:
     mac_address: "device-mac-address"
     # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
     bindkey: "device-bin-key"
-    # Sensor (Optional), Battey Level, %
+    # Sensor (Optional), Battey Level, % (not 100% sure that is working, please let me know it so)
     battery_level:
-      name: "YLAI003 Battery Level"
+      name: "$name Battery Level"
+    # Sensor (Optional), Battey Voltage, V (not 100% sure that is working, please let me know it so)
+    battery_voltage:
+      name: "$name Battery Voltage"
     # List, Automation (Optional), The automation activated when you click the button
     on_click:
       then:

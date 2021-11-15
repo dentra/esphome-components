@@ -32,10 +32,10 @@ void MiotCGG1::process_humidity_(const miot::BLEObject &obj) {
 
 void MiotCGG1::process_temperature_humidity_(const miot::BLEObject &obj) {
   const auto temperature_humidity = obj.get_temperature_humidity();
-  if (temperature_humidity.has_value()) {
-    this->publish_state(temperature_humidity->temperature);
+  if (temperature_humidity != nullptr) {
+    this->publish_state(temperature_humidity->get_temperature());
     if (this->humidity_ != nullptr) {
-      this->humidity_->publish_state(temperature_humidity->humidity);
+      this->humidity_->publish_state(temperature_humidity->get_humidity());
     }
   }
 }

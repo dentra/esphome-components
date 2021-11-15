@@ -79,9 +79,11 @@ class MiotComponent : public Component, public MiotListener {
 
   virtual const char *get_product_code() const = 0;
   void set_battery_level(sensor::Sensor *battery_level) { this->battery_level_ = battery_level; }
+  void set_battery_voltage(sensor::Sensor *battery_voltage) { this->battery_voltage_ = battery_voltage; }
 
  protected:
-  sensor::Sensor *battery_level_{nullptr};
+  sensor::Sensor *battery_level_{};
+  sensor::Sensor *battery_voltage_{};
 
   void dump_config_(const char *TAG) const;
 

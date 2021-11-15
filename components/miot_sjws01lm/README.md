@@ -16,10 +16,13 @@ binary_sensor:
     # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
     bindkey: "device-bin-key"
     # String, (Optional), the name of binary sensor
-    name: "SJWS01LM Water Leak"
+    name: "$name Water Leak"
     # Sensor (Optional), Battey Level, %
     battery_level:
-      name: "SJWS01LM Battery Level"
+      name: "$name Battery Level"
+    # Sensor (Optional), Battey Voltage, V
+    battery_voltage:
+      name: "$name Battery Voltage"
 ```
 
 Now signal strength of a BLE device (RSSI) is not a part of this component, but you could easily add it:

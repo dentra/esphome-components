@@ -14,7 +14,7 @@ CODEOWNERS = ["@dentra"]
 AUTO_LOAD = ["miot"]
 
 miot_ylyk01yl_ns = cg.esphome_ns.namespace("miot_ylyk01yl")
-MiotYLYK01YL = miot_ylyk01yl_ns.class_("MiotYLYK01YL", miot.MiotComponent)
+# MiotYLYK01YL = miot_ylyk01yl_ns.class_("MiotYLYK01YL", miot.MiotComponent)
 MiotYLYK01YLTrigger = miot_ylyk01yl_ns.class_(
     "MiotYLYK01YLTrigger", automation.Trigger.template(), miot.MiotListener
 )
@@ -36,7 +36,7 @@ BUTTON_NAMES = {
 
 CONFIG_SCHEMA = cv.Schema(
     {
-        cv.GenerateID(): cv.declare_id(MiotYLYK01YL),
+        # cv.GenerateID(): cv.declare_id(MiotYLYK01YL),
         cv.Optional(CONF_ON_CLICK): automation.validate_automation(
             cv.Schema(
                 {
@@ -57,22 +57,24 @@ CONFIG_SCHEMA = cv.Schema(
 ).extend(miot.MIOT_BLE_DEVICE_SCHEMA)
 
 
+async def configure_event_trigger_(config, param, enum):
+    for conf in config.get(param, []):
+        trigger = cg.new_Pvariable(
+            conf[CONF_TRIGGER_ID], enum, BUTTON_NAMES[conf[CONF_BUTTON]]
+        )
+        await miot.register_miot_device(trigger, config)
+        await miot.setup_device_core_(trigger, config)
+        await automation.build_automation(trigger, [], conf)
+
+
 async def to_code(config):
-    for conf in config.get(CONF_ON_CLICK, []):
-        trigger = cg.new_Pvariable(
-            conf[CONF_TRIGGER_ID],
-            ButtonEventType.CLICK,
-            BUTTON_NAMES[conf[CONF_BUTTON]],
-        )
-        await miot.register_miot_device(trigger, config)
-        await miot.setup_device_core_(trigger, config)
-        await automation.build_automation(trigger, [], conf)
-    for conf in config.get(CONF_ON_LONG_PRESS, []):
-        trigger = cg.new_Pvariable(
-            conf[CONF_TRIGGER_ID],
-            ButtonEventType.LONG_PRESS,
-            BUTTON_NAMES[conf[CONF_BUTTON]],
-        )
-        await miot.register_miot_device(trigger, config)
-        await miot.setup_device_core_(trigger, config)
-        await automation.build_automation(trigger, [], conf)
+    await configure_event_trigger_(
+        config,
+        CONF_ON_CLICK,
+        ButtonEventType.BUTTON_CLICK,
+    )
+    await configure_event_trigger_(
+        config,
+        CONF_ON_LONG_PRESS,
+        ButtonEventType.BUTTON_LONG_PRESS,
+    )

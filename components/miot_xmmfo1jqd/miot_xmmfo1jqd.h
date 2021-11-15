@@ -6,11 +6,11 @@
 namespace esphome {
 namespace miot_xmmfo1jqd {
 
-constexpr uint16_t PRODUCT_ID = 0x04E1;
+#define PRODUCT_ID_XMMFO1JQD 0x04E1
 
 class MiotXMMFO1JQD : public miot::MiotComponent {
  public:
-  uint16_t get_product_id() const override { return PRODUCT_ID; }
+  uint16_t get_product_id() const override { return PRODUCT_ID_XMMFO1JQD; }
   const char *get_product_code() const override { return "XMMFO1JQD"; }
 
   void dump_config() override;

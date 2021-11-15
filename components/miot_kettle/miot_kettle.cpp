@@ -23,10 +23,10 @@ bool MiotKettle::process_mibeacon(const miot::MiBeacon &mib) {
 
 void MiotKettle::process_water_boil_(const miot::BLEObject &obj) {
   const auto water_boil = obj.get_water_boil();
-  if (water_boil.has_value()) {
-    this->publish_state(water_boil->power);
+  if (water_boil != nullptr) {
+    this->publish_state(water_boil->get_power());
     if (this->temperature_ != nullptr) {
-      this->temperature_->publish_state(water_boil->temperature);
+      this->temperature_->publish_state(water_boil->get_temperature());
     }
   }
 }

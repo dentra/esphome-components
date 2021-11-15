@@ -18,14 +18,17 @@ binary_sensor:
     # String, (Optional), device bind key. Will use [xiaomi_account](../miot/) if absent to automaticaly get the bindkey.
     bindkey: "device-bin-key"
     # String, (Optional), the name of binary sensor
-    name: "MJYD02YL Motion"
+    name: "$name Motion"
     # BinarySensor (Optional), Light intensivity: on - strong light, off - weak light
     light:
-      name: "MJYD02YL Light"
+      name: "$name Light"
     # Sensor (Optional), Time in seconds of inactivity
     idle_time:
-      name: "MJYD02YL Idle Time"
+      name: "$name Idle Time"
     # Sensor (Optional), Battey Level, %
     battery_level:
-      name: "MJYD02YL Battery Level"
+      name: "$name Battery Level"
+    # Sensor (Optional), Battey Voltage, V
+    battery_voltage:
+      name: "$name Battery Voltage"
 ```

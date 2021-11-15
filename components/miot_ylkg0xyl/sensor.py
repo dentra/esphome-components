@@ -25,7 +25,7 @@ MiotYLKG0XYLEvent = miot_ylkg0xyl_ns.enum("MiotYLKG0XYLEvent")
 
 CONFIG_SCHEMA = cv.Schema(
     {
-        cv.GenerateID(): cv.declare_id(MiotYLKG0XYL),
+        # cv.GenerateID(): cv.declare_id(MiotYLKG0XYL),
         cv.Optional(CONF_ON_SHORT_PRESS): automation.validate_automation(
             cv.Schema(
                 {cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(MiotYLKG0XYLTrigger)}

@@ -16,16 +16,19 @@ binary_sensor:
     # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
     bindkey: "device-bin-key"
      # String, (Optional), the name of binary sensor
-    name: "MCCGQ02HL Door/Window Sensor"
+    name: "$name Door/Window Sensor"
     # BinarySensor (Optional), Light intensivity: on - strong light, off - weak light
     light:
-      name: "MCCGQ02HL Light"
+      name: "$name Light"
     # BinarySensor (Optional), Alert enabled when door/window has opened a long (device configured) time
     alert:
-      name: "MCCGQ02HL Alert"
+      name: "$name Alert"
     # Sensor (Optional), Battey Level, %
     battery_level:
-      name: "MCCGQ02HL Battery Level"
+      name: "$name Battery Level"
+    # Sensor (Optional), Battey Voltage, V
+    battery_voltage:
+      name: "$name Battery Voltage"
 ```
 
 Now signal strength of a BLE device (RSSI) is not a part of this component, but you could easily add it:
@@ -33,5 +36,5 @@ Now signal strength of a BLE device (RSSI) is not a part of this component, but 
 sensor:
   - platform: ble_rssi
     mac_address: "device-mac-address"
-    name: "MCCGQ02HL RSSI"
+    name: "$name RSSI"
 ```

@@ -103,68 +103,88 @@ optional<float> BLEObject::get_humidity() const {
   return res;
 }
 
-optional<const TemperatureHumidity> BLEObject::get_temperature_humidity() const {
+const TemperatureHumidity *BLEObject::get_temperature_humidity() const {
   CHECK_MIID(MIID_TEMPERATURE_HUMIDITY);
-  struct _TemperatureHumidity {
-    uint16_t temperature;
-    uint16_t humidity;
-  };
-  const auto typed = this->get_typed<_TemperatureHumidity>();
-  if (!typed.has_value()) {
-    return {};
+  const auto th = this->get_typed<TemperatureHumidity>();
+  if (th != nullptr) {
+    ESP_LOGD(TAG, "Temperature %.1f °C", th->get_temperature());
+    ESP_LOGD(TAG, "Humidity %.1f %%", th->get_humidity());
   }
-  TemperatureHumidity res;
-  res.temperature = (*typed)->temperature * 0.1f;
-  ESP_LOGD(TAG, "Temperature %.1f °C", res.temperature);
-  res.humidity = (*typed)->humidity * 0.1f;
-  ESP_LOGD(TAG, "Humidity %.1f %%", res.humidity);
-  return res;
+  return th;
 }
 
-optional<const ButtonEvent> BLEObject::get_button_event() const {
-  CHECK_MIID(MIID_BUTTON_EVENT);
-  const auto button_event = this->get_typed<ButtonEvent>();
-  if (!button_event.has_value()) {
-    return {};
-  }
-  const auto &res = *(*button_event);
-  switch (res.type) {
-    case ButtonEvent::CLICK:
-      ESP_LOGD(TAG, "Button click: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
+void ButtonEvent::str(char *tmp, const ButtonEvent &button_event) {
+  switch (button_event.type) {
+    case ButtonEvent::BUTTON_CLICK:
+      sprintf(tmp, "Button click: %u", button_event.button.index);
       break;
-    case ButtonEvent::DOUBLE_CLICK:
-      ESP_LOGD(TAG, "Button double click: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
+    case ButtonEvent::BUTTON_DOUBLE_CLICK:
+      sprintf(tmp, "Button double click: %u", button_event.button.index);
       break;
-    case ButtonEvent::TRIPLE_CLICK_OR_ROTATE_KNOB: {
-      if (res.value == 0) {
-        ESP_LOGD(TAG, "Button triple click: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
-      } else if (res.index == 0) {
-        ESP_LOGD(TAG, "Button short press knob, value: %" PRIi8, res.value);
-      } else if (res.index == 1) {
-        ESP_LOGD(TAG, "Button long press knob, value: %" PRIi8, res.value);
-      } else {
-        ESP_LOGD(TAG, "Button press knob: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
+    case ButtonEvent::BUTTON_LONG_PRESS:
+      sprintf(tmp, "Button long press: %u", button_event.button.index);
+      break;
+    case ButtonEvent::KNOB: {
+      uint8_t value = button_event.knob.short_press();
+      if (value != 0) {
+        sprintf(tmp, "Rotating knob short press, value: %" PRIi8, value);
+        break;
       }
+      value = button_event.knob.long_press();
+      if (value != 0) {
+        sprintf(tmp, "Rotating knob long press, value: %" PRIi8, value);
+        break;
+      }
+      sprintf(tmp, "Rotating knob unknown event: index=%" PRIu8 ", value:=%" PRIi8, button_event.knob.index,
+              button_event.knob.value);
       break;
     }
-    case ButtonEvent::LONG_PRESS:
-      ESP_LOGD(TAG, "Button long press: %" PRIu8 ", value: %" PRIi8, res.index, res.value);
-      break;
-    case ButtonEvent::ROTATE: {
-      if (res.index == 0) {
-        ESP_LOGD(TAG, "Button rotate %s knob, value: %" PRIi8, res.value < 0 ? "left" : "right", res.value);
-      } else {
-        int8_t dimmer = res.index;
-        ESP_LOGD(TAG, "Button rotate %s (pressed) knob: %" PRIi8 ", value: %" PRIi8, dimmer < 0 ? "left" : "right",
-                 dimmer, res.value);
+    case ButtonEvent::DIMMER: {
+      uint8_t value = button_event.dimmer.left();
+      if (value != 0) {
+        sprintf(tmp, "Dimmer rotate left value: %" PRIi8, value);
+        break;
       }
+      value = button_event.dimmer.right();
+      if (value != 0) {
+        sprintf(tmp, "Dimmer rotate right value: %" PRIi8, value);
+        break;
+      }
+      value = button_event.dimmer.left_pressed();
+      if (value != 0) {
+        sprintf(tmp, "Dimmer rotate left (pressed) value: %" PRIi8, value);
+        break;
+      }
+      value = button_event.dimmer.right_pressed();
+      if (value != 0) {
+        sprintf(tmp, "Dimmer rotate right (pressed) value: %" PRIi8, value);
+        break;
+      }
+      sprintf(tmp, "Dimmer unknown event: index=%" PRIi8 ", value:=%" PRIi8, button_event.dimmer.index,
+              button_event.dimmer.value);
       break;
     }
     default:
-      ESP_LOGD(TAG, "Button unknown event %02" PRIx8 ": %" PRIu8 ", value: %" PRIi8, res.type, res.index, res.value);
+      sprintf(tmp, "Button unknown event %02" PRIx8 ": %04X", button_event.type, button_event.button.index);
       break;
   }
-  return res;
+}
+
+void ButtonEvent::dump(const char *TAG, const ButtonEvent &button_event) {
+#if ESPHOME_LOG_LEVEL >= ESPHOME_LOG_LEVEL_DEBUG
+  char tmp[64];
+  ButtonEvent::str(tmp, button_event);
+  ESP_LOGD(TAG, tmp);
+#endif
+}
+
+const ButtonEvent *BLEObject::get_button_event() const {
+  CHECK_MIID(MIID_BUTTON_EVENT);
+  const auto button_event = this->get_typed<ButtonEvent>();
+  if (button_event != nullptr) {
+    ButtonEvent::dump(TAG, *button_event);
+  }
+  return button_event;
 }
 
 optional<float> BLEObject::get_illuminance() const {
@@ -185,22 +205,14 @@ optional<MIID> BLEObject::get_pairing_object() const {
   return static_cast<MIID>(*event);
 }
 
-optional<WaterBoil> BLEObject::get_water_boil() const {
+const WaterBoil *BLEObject::get_water_boil() const {
   CHECK_MIID(MIID_WATER_BOIL);
-  struct _WaterBoil {
-    uint8_t power;
-    uint8_t temperature;
-  };
-  const auto typed = this->get_typed<_WaterBoil>();
-  if (!typed.has_value()) {
-    return {};
+  const auto water_boil = this->get_typed<WaterBoil>();
+  if (water_boil != nullptr) {
+    ESP_LOGD(TAG, "Water Boil Power %s", ONOFF(water_boil->get_power()));
+    ESP_LOGD(TAG, "Water Boil Temperature %.1f °C", water_boil->get_temperature());
   }
-  WaterBoil res;
-  res.power = (*typed)->power != 0;
-  ESP_LOGD(TAG, "Water Boil Power %s", ONOFF(res.power));
-  res.temperature = (*typed)->temperature;
-  ESP_LOGD(TAG, "Water Boil Temperature %.1f °C", res.temperature);
-  return res;
+  return water_boil;
 }
 
 optional<uint8_t> BLEObject::get_miaomiaoce_battery_level() const {

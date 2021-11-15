@@ -1,21 +1,16 @@
-#ifdef ARDUINO_ARCH_ESP32
 #include "esphome/core/log.h"
 #include "automation.h"
-
 namespace esphome {
-namespace miot_ylai003 {
+namespace miot_ylyk01yl {
 
-static const char *const TAG = "miot_ylai003.automation";
+static const char *const TAG = "miot_ylyk01yl.automation";
 
-bool MiotYLAI003Trigger::process_object_(const miot::BLEObject &obj) {
+bool MiotYLYK01YLTrigger::process_object_(const miot::BLEObject &obj) {
   switch (obj.id) {
     case miot::MIID_BUTTON_EVENT: {
       const auto button_event = obj.get_typed<miot::ButtonEvent>();
       if (button_event != nullptr) {
-        if (button_event->button.index != 0) {
-          ESP_LOGW(TAG, "Unknown button index detected: %u", button_event->button.index);
-        }
-        if (this->type_ == button_event->type) {
+        if (this->type_ == button_event->type && this->index_ == button_event->button.index) {
           miot::ButtonEvent::dump(TAG, *button_event);
           this->trigger();
           return true;
@@ -24,15 +19,12 @@ bool MiotYLAI003Trigger::process_object_(const miot::BLEObject &obj) {
       return false;
     }
     case miot::MIID_PAIRING_EVENT:
-      // skip pairing event
+      // skip this event
       return false;
     default:
       return this->process_unhandled_(obj);
   }
   return false;
 }
-
-}  // namespace miot_ylai003
+}  // namespace miot_ylyk01yl
 }  // namespace esphome
-
-#endif

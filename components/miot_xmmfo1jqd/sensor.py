@@ -43,7 +43,7 @@ async def to_code(config):
     for conf in config.get(CONF_ON_TWIST, []):
         trigger = cg.new_Pvariable(
             conf[CONF_TRIGGER_ID],
-            ButtonEventType.CLICK,
+            ButtonEventType.BUTTON_CLICK,
             BUTTON_NAMES[conf[CONF_BUTTON]],
         )
         await miot.register_miot_device(trigger, config)

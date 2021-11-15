@@ -6,11 +6,11 @@
 namespace esphome {
 namespace miot_ylai003 {
 
-constexpr uint16_t PRODUCT_ID = 0x07BF;
+#define PRODUCT_ID_YLAI003 0x07BF
 
 class MiotYLAI003 : public miot::MiotComponent {
  public:
-  uint16_t get_product_id() const override { return PRODUCT_ID; }
+  uint16_t get_product_id() const override { return PRODUCT_ID_YLAI003; }
   const char *get_product_code() const override { return "YLAI003"; }
 
   void dump_config() override;

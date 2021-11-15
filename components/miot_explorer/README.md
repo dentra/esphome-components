@@ -18,8 +18,11 @@ text_sensor:
     # String, (Optional), device bind key
     bindkey: "device-bin-key"
     # String, (Required), the name of sensor
-    name: "MyDevice"
+    name: "$name"
     # Sensor (Optional), Humidity, %
     battery_level:
-      name: "MyDevice Battery Level"
+      name: "$name Battery Level"
+    # Sensor (Optional), Battey Voltage, V
+    battery_voltage:
+      name: "$name Battery Voltage"
 ```

@@ -12,7 +12,7 @@ class MiotYLAI003Trigger : public Trigger<>, public miot::MiotListener {
  public:
   explicit MiotYLAI003Trigger(miot::ButtonEvent::Type type) : type_(type) {}
 
-  uint16_t get_product_id() const override { return PRODUCT_ID; }
+  uint16_t get_product_id() const override { return PRODUCT_ID_YLAI003; }
 
  protected:
   miot::ButtonEvent::Type type_;

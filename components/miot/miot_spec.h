@@ -280,7 +280,7 @@ enum MIID : uint16_t {
   //   0x01: double-click
   //   0x02: long press
   //   0x03: triple click / knob rotation
-  //   0x04: click the key to release
+  //   0x04: click the key to release / rotate dimmer
   //   0x05: short press
   //   0x06: long press
   MIID_BUTTON_EVENT = 0x1001,

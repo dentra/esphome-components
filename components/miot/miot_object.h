@@ -12,36 +12,75 @@ namespace miot {
 
 // Object returned by MIID_TEMPERATURE_HUMIDITY.
 struct TemperatureHumidity {
-  // temperature in °C.
-  float temperature = {};
-  // humidity in %
-  float humidity = {};
+  uint16_t temperature;
+  uint16_t humidity;
+
+  // temperature in °C with 1 accuracy decimals
+  float get_temperature() const { return temperature * .1f; }
+  // humidity in % with 1 accuracy decimals
+  float get_humidity() const { return humidity * .1f; }
 };
 
 // Object returned by MIID_BUTTON_EVENT.
 struct ButtonEvent {
   // Button number, value range 0~9.
-  uint8_t index = 0xFF;
-  // Dimmer value.
-  int8_t value = 0;
+  union {
+    struct {
+      uint16_t index;
+    } button;
+    struct {
+      uint8_t index;
+      uint8_t value;
+      uint8_t short_press() const { return index == 0 ? value : 0; }
+      uint8_t long_press() const { return index != 0 ? index : 0; }
+    } knob;
+    struct {
+      int8_t index;
+      int8_t value;
+      // get rotate position if rotated left or 0 otherwise
+      uint8_t left() const { return index == 0 && value < 0 ? -value : 0; }
+      // get rotate position if rotated right or 0 otherwise
+      uint8_t right() const { return index == 0 && value > 0 ? value : 0; }
+      // get rotate position if rotated left with or 0 otherwise
+      uint8_t left_pressed() const { return index != 0 && index < 0 ? -index : 0; }
+      // get rotate position if rotated right with or 0 otherwise
+      uint8_t right_pressed() const { return index != 0 && index > 0 ? index : 0; }
+    } dimmer;
+  };
   // Type of event.
   enum Type : uint8_t {
-    CLICK = 0x00,
-    DOUBLE_CLICK = 0x01,
-    LONG_PRESS = 0x02,
-    TRIPLE_CLICK_OR_ROTATE_KNOB = 0x03,
-    ROTATE = 0x04,
+    BUTTON_CLICK = 0x00,
+    BUTTON_DOUBLE_CLICK = 0x01,
+    BUTTON_LONG_PRESS = 0x02,
+    BUTTON_TRIPLE_CLICK = 0x03,
+    KNOB = 0x03,
+    DIMMER = 0x04,
     // SHORT_PRESS = 0x05,
     // LONG_PRESS = 0x06,
     _UNINITIALIZED = 0xFF,
   } type = _UNINITIALIZED;
+
+  /**
+   * Helper method for debugging purpose.
+   * @param buf output buffer
+   * @param button_event button event object
+   */
+  static void str(char *buf, const ButtonEvent &button_event);
+  /**
+   * Helper method for logging purpose.
+   */
+  static void dump(const char *TAG, const ButtonEvent &button_event);
 } PACKED;
 
 // Object returned by MIID_WATER_BOIL.
 struct WaterBoil {
-  bool power = {};
-  // temperature in °C.
-  float temperature = {};
+  uint8_t power;
+  uint8_t temperature;
+
+  // power, 0 - off, 1 - on
+  bool get_power() const { return power; }
+  // temperature in °C with 0 accuracy decimals
+  float get_temperature() const { return temperature; };
 } PACKED;
 
 struct BLEObject {
@@ -97,12 +136,12 @@ struct BLEObject {
     return {};
   }
 
-  // get typed value. example: obj.get_typed<MyData>();
-  template<typename T> optional<const T *> get_typed() const {
+  // get typed struct value. example: obj.get_typed<MyData>();
+  template<typename T> const T *get_typed() const {
     if (data.size() == sizeof(T)) {
       return reinterpret_cast<const T *>(data.data());
     }
-    return {};
+    return nullptr;
   }
 
   // get float value.
@@ -162,12 +201,13 @@ struct BLEObject {
    * Value for MIID_TEMPERATURE_HUMIDITY.
    * @return TemperatureHumidity object
    */
-  optional<const TemperatureHumidity> get_temperature_humidity() const;
+  const TemperatureHumidity *get_temperature_humidity() const;
   /**
    * Value for MIID_BUTTON_EVENT.
    * @return ButtonEvent object
    */
-  optional<const ButtonEvent> get_button_event() const;
+  const ButtonEvent *get_button_event() const;
+
   /**
    * Value for MIID_ILLUMINANCE
    * @return illuminance in lux, range 0-120000
@@ -184,7 +224,7 @@ struct BLEObject {
    * Value for MIID_WATER_BOIL.
    * @return WaterBoil object
    */
-  optional<WaterBoil> get_water_boil() const;
+  const WaterBoil *get_water_boil() const;
 
   /**
    * Value for MIID_MIAOMIAOCE_BATTERY.

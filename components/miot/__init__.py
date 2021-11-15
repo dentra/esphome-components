@@ -7,6 +7,7 @@ import esphome.config_validation as cv
 from esphome.components import binary_sensor, esp32_ble_tracker, sensor, text_sensor
 from esphome.const import (
     CONF_BATTERY_LEVEL,
+    CONF_BATTERY_VOLTAGE,
     CONF_BINDKEY,
     CONF_ID,
     CONF_LAMBDA,
@@ -19,10 +20,10 @@ from esphome.const import (
     CONF_UPDATE_INTERVAL,
     CONF_USERNAME,
     DEVICE_CLASS_BATTERY,
-    # ESP_PLATFORM_ESP32,
-    ICON_BATTERY,
+    DEVICE_CLASS_VOLTAGE,
     STATE_CLASS_MEASUREMENT,
     UNIT_PERCENT,
+    UNIT_VOLT,
 )
 from .xiaomi_beaconkeys import XiaomiBeaconkeys
 
@@ -124,11 +125,18 @@ MIOT_BLE_DEVICE_SCHEMA = cv.Schema(
     {
         cv.GenerateID(CONF_MIOT_ID): cv.use_id(MiBeaconTracker),
         cv.Optional(CONF_BATTERY_LEVEL): sensor.sensor_schema(
-            UNIT_PERCENT,
-            ICON_BATTERY,
-            0,
-            DEVICE_CLASS_BATTERY,
-            STATE_CLASS_MEASUREMENT,
+            unit_of_measurement=UNIT_PERCENT,
+            accuracy_decimals=0,
+            device_class=DEVICE_CLASS_BATTERY,
+            state_class=STATE_CLASS_MEASUREMENT,
+            # entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        ),
+        cv.Optional(CONF_BATTERY_VOLTAGE): sensor.sensor_schema(
+            unit_of_measurement=UNIT_VOLT,
+            accuracy_decimals=3,
+            device_class=DEVICE_CLASS_VOLTAGE,
+            state_class=STATE_CLASS_MEASUREMENT,
+            # entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         ),
     }
 ).extend(MIOT_BLE_DEVICE_CORE_SCHEMA)
@@ -161,10 +169,12 @@ async def setup_device_core_(var, config):
                 storage_path=CORE.build_path,
                 update_interval=conf[CONF_UPDATE_INTERVAL].total_seconds,
             )
-            bindkey = xbk.get(config[CONF_MAC_ADDRESS])
+            bindkey = xbk.get_beaconkey(config[CONF_MAC_ADDRESS])
             if bindkey:
                 _LOGGER.info(
-                    f"Got bindkey for {config[CONF_MAC_ADDRESS]} {config.get(CONF_NAME, '')}"
+                    "Got bindkey for %s %s",
+                    config[CONF_MAC_ADDRESS],
+                    config.get(CONF_NAME, ""),
                 )
                 cg.add(var.set_bindkey(as_bindkey(bindkey)))
 
@@ -176,8 +186,13 @@ async def new_device(config):
 
     await setup_device_core_(var, config)
     if CONF_BATTERY_LEVEL in config:
-        sens = await sensor.new_sensor(config[CONF_BATTERY_LEVEL])
+        conf = config[CONF_BATTERY_LEVEL]
+        sens = await sensor.new_sensor(conf)
         cg.add(var.set_battery_level(sens))
+    if CONF_BATTERY_VOLTAGE in config:
+        conf = config[CONF_BATTERY_VOLTAGE]
+        sens = await sensor.new_sensor(conf)
+        cg.add(var.set_battery_voltage(sens))
 
     return var
 

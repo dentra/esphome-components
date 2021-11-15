@@ -16,19 +16,22 @@ binary_sensor:
     # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
     bindkey: "device-bin-key"
     # String, (Optional), the name of binary sensor
-    name: "RTCGQ02LM Motion Sensor 2"
+    name: "$name Motion Sensor 2"
     # BinarySensor (Optional), device configured timeout
     timeout:
-      name: "RTCGQ02LM Timeout"
+      name: "$name Timeout"
     # Sensor (Optional), Time in seconds of inactivity
     idle_time:
-      name: "RTCGQ02LM Idle Time"
+      name: "$name Idle Time"
     # BinarySensor (Optional), Light intensivity: on - strong light, off - weak light
     light:
-      name: "RTCGQ02LM Light"
+      name: "$name Light"
     # Sensor (Optional), Battey Level, %
     battery_level:
-      name: "RTCGQ02LM Battery Level"
+      name: "$name Battery Level"
+    # Sensor (Optional), Battey Voltage, V
+    battery_voltage:
+      name: "$name Battery Voltage"
 ```
 
 In opposite to the main sensor which can report their state immediately the `timeout` fires only when no motion is detected as configured timeout in Mi Home app.
@@ -40,5 +43,5 @@ Now signal strength of a BLE device (RSSI) is not a part of this component, but 
 sensor:
   - platform: ble_rssi
     mac_address: "device-mac-address"
-    name: "RTCGQ02LM RSSI"
+    name: "$name RSSI"
 ```

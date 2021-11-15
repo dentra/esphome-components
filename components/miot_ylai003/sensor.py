@@ -59,6 +59,8 @@ async def new_trigger_(config, field, button_type):
 
 async def to_code(config):
     await miot.new_device(config)
-    await new_trigger_(config, CONF_ON_CLICK, ButtonEventType.CLICK)
-    await new_trigger_(config, CONF_ON_DOUBLE_CLICK, ButtonEventType.DOUBLE_CLICK)
-    await new_trigger_(config, CONF_ON_LONG_PRESS, ButtonEventType.LONG_PRESS)
+    await new_trigger_(config, CONF_ON_CLICK, ButtonEventType.BUTTON_CLICK)
+    await new_trigger_(
+        config, CONF_ON_DOUBLE_CLICK, ButtonEventType.BUTTON_DOUBLE_CLICK
+    )
+    await new_trigger_(config, CONF_ON_LONG_PRESS, ButtonEventType.BUTTON_LONG_PRESS)

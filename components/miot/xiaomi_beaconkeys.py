@@ -90,10 +90,20 @@ class XiaomiBeaconkeys:
             self.read_()
         return self._devices
 
-    def get(self, mac: str):
+    def _get(self, mac: str, key: str):
         self.get_devices()
         mac = str(mac).upper()
         for device in self._devices:
             if device["mac"] == mac:
-                return device["beaconkey"]
+                return device[key]
         return None
+
+    # DEPRECATED
+    def get(self, mac: str):
+        return self.get_beaconkey(mac)
+
+    def get_beaconkey(self, mac: str):
+        return self._get(mac, "beaconkey")
+
+    def get_token(self, mac: str):
+        return self._get(mac, "token")

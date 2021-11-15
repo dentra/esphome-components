@@ -40,13 +40,14 @@ At this moment there are list of supported device:
  * [Xiaomi Mi Temperature and Humidity Monitor 2 (LYWSD03MMC)](components/miot_lywsd03mmc/)
  * [Yeelight Remote Control 1S (YLAI003)](components/miot_ylai003/)
  * [Xiaomi Mijia Night Light 2 (MJYD02YL)](components/miot_mjyd02yla/)
- * [Xiaomi MiaoMiaoce Smart Clock Temperature Fnd Humidity Meter E-Inc (MHO-C303)](components/miot_mhoc303/)
+ * [Xiaomi MiaoMiaoce Smart Clock Temperature And Humidity Meter E-Inc (MHO-C303)](components/miot_mhoc303/)
  * [Universal Xiaomi Thermometer Hygrometer](components/miot_thermogigro/)
  * [Universal Xiaomi Kettle](components/miot_kettle/)
  * [Xiaomi Mijia bluetooth Smart Rubik's Cube (XMMFO1JQD)](components/miot_xmmfo1jqd/)
  * [Xiaomi Mijia Temperature And Humidity Electronic Watch (LYWSD02MMC)](components/miot_thermogigro/)
  * [Xiaomi MiaoMiaoce Digital Bluetooth Thermometer Hygrometer (MHO-C401)](components/miot_thermogigro/)
  * [Xiaomi MiaoMiaoce Digital Temperature and Humidity Monitor (XMWSDJ04MMC)](components/miot_thermogigro/)
+ * [Yeelight Smart Bluetooth Wireless Dimmer Wall Light Switch Remote Control (YLKG08YL/YLKG07YL)](components/miot_ylkg0xyl/)
 
 And growing...
 

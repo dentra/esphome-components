@@ -18,13 +18,16 @@ sensor:
     # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
     bindkey: "device-bin-key"
     # String, (Optional), the name of sensor
-    name: "MHO-C303 Temperature"
+    name: "$name Temperature"
     # Sensor (Optional), Humidity, %
     humidity:
-      name: "MHO-C303 Humidity"
+      name: "$name Humidity"
     # Sensor (Optional), Battey Level, %
     battery_level:
-      name: "MHO-C303 Battery Level"
+      name: "$name Battery Level"
+    # Sensor (Optional), Battey Voltage, V
+    battery_voltage:
+      name: "$name Battery Voltage"
 ```
 
 Now signal strength of a BLE device (RSSI) is not a part of this component, but you could easily add it:
@@ -32,7 +35,7 @@ Now signal strength of a BLE device (RSSI) is not a part of this component, but 
 sensor:
   - platform: ble_rssi
     mac_address: "device-mac-address"
-    name: "MHO-C303 RSSI"
+    name: "$name RSSI"
 ```
 
 thanks to @Ujimych

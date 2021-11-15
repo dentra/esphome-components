@@ -11,11 +11,13 @@ sensor:
     mac_address: "$device_mac_address"
     # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
     bindkey: "$device_bindkey"
-    # List, Automation (Optional), The automation activated when you clicked specified button
+    # List, Automation (Optional), The automation activated when you make specified action
     on_short_press:
       # List, Any automation
       - then:
-          - logger.log: knob was short pressed
+          - logger.log:
+              format: knob was short pressed %u times
+              args: ["x"]
     on_long_press:
       - then:
           - logger.log: knob was long pressed
