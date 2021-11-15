@@ -123,6 +123,7 @@ sensor:
     device_class: "energy"
     # i am not interesting in total but tariffs, so you can comment or set it to false if you want internal total sensor
     internal: true
+    state_class: total_increasing
 
   # active power
   - platform: "tuya"
@@ -135,6 +136,7 @@ sensor:
     unit_of_measurement: "W"
     icon: "mdi:flash"
     device_class: "power"
+    state_class: measurement
 
   # current
   - platform: "tuya"
@@ -147,6 +149,7 @@ sensor:
     unit_of_measurement: "A"
     icon: "mdi:current-ac"
     device_class: "current"
+    state_class: measurement
 
   # voltage
   - platform: "tuya"
@@ -159,6 +162,7 @@ sensor:
     unit_of_measurement: "V"
     icon: "mdi:sine-wave"
     device_class: "voltage"
+    state_class: measurement
 
   - platform: "energy_monitoring"
     id: mon
