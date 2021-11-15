@@ -6,6 +6,7 @@ from esphome.const import (
     CONF_LIGHT,
     DEVICE_CLASS_LIGHT,
     DEVICE_CLASS_OPENING,
+    DEVICE_CLASS_PROBLEM,
 )
 
 CODEOWNERS = ["@dentra"]
@@ -33,9 +34,9 @@ CONFIG_SCHEMA = binary_sensor.BINARY_SENSOR_SCHEMA.extend(
         ),
         cv.Optional(CONF_ALERT): binary_sensor.BINARY_SENSOR_SCHEMA.extend(
             {
-                # cv.Optional(
-                #     CONF_DEVICE_CLASS, default=DEVICE_CLASS_EMPTY
-                # ): binary_sensor.device_class,
+                cv.Optional(
+                    CONF_DEVICE_CLASS, default=DEVICE_CLASS_PROBLEM
+                ): binary_sensor.device_class,
             }
         ),
     }

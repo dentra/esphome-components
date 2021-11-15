@@ -7,7 +7,7 @@ from esphome.const import (
     CONF_POWER,
     CONF_TOTAL,
     DEVICE_CLASS_ENERGY,
-    ICON_FLASH,
+    STATE_CLASS_TOTAL_INCREASING,
     UNIT_KILOWATT_HOURS,
 )
 
@@ -33,16 +33,28 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Required(CONF_TOTAL): cv.use_id(sensor.Sensor),
         cv.Optional(CONF_SAVE_TO_FLASH_INTERVAL): cv.positive_time_period_milliseconds,
         cv.Optional(CONF_ENERGY_TODAY): sensor.sensor_schema(
-            UNIT_KILOWATT_HOURS, ICON_FLASH, 2, DEVICE_CLASS_ENERGY
+            unit_of_measurement=UNIT_KILOWATT_HOURS,
+            accuracy_decimals=2,
+            device_class=DEVICE_CLASS_ENERGY,
+            state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_ENERGY_YESTERDAY): sensor.sensor_schema(
-            UNIT_KILOWATT_HOURS, ICON_FLASH, 2, DEVICE_CLASS_ENERGY
+            unit_of_measurement=UNIT_KILOWATT_HOURS,
+            accuracy_decimals=2,
+            device_class=DEVICE_CLASS_ENERGY,
+            state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_ENERGY_WEEK): sensor.sensor_schema(
-            UNIT_KILOWATT_HOURS, ICON_FLASH, 2, DEVICE_CLASS_ENERGY
+            unit_of_measurement=UNIT_KILOWATT_HOURS,
+            accuracy_decimals=2,
+            device_class=DEVICE_CLASS_ENERGY,
+            state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_ENERGY_MONTH): sensor.sensor_schema(
-            UNIT_KILOWATT_HOURS, ICON_FLASH, 2, DEVICE_CLASS_ENERGY
+            unit_of_measurement=UNIT_KILOWATT_HOURS,
+            accuracy_decimals=2,
+            device_class=DEVICE_CLASS_ENERGY,
+            state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
     }
 ).extend(cv.COMPONENT_SCHEMA)

@@ -8,7 +8,6 @@ from esphome.const import (
     DEVICE_CLASS_TEMPERATURE,
     UNIT_CELSIUS,
     STATE_CLASS_MEASUREMENT,
-    ICON_EMPTY,
 )
 
 
@@ -27,11 +26,10 @@ CONFIG_SCHEMA = binary_sensor.BINARY_SENSOR_SCHEMA.extend(
             CONF_DEVICE_CLASS, default=DEVICE_CLASS_POWER
         ): binary_sensor.device_class,
         cv.Optional(CONF_TEMPERATURE): sensor.sensor_schema(
-            UNIT_CELSIUS,
-            ICON_EMPTY,
-            1,
-            DEVICE_CLASS_TEMPERATURE,
-            STATE_CLASS_MEASUREMENT,
+            unit_of_measurement=UNIT_CELSIUS,
+            accuracy_decimals=1,
+            device_class=DEVICE_CLASS_TEMPERATURE,
+            state_class=STATE_CLASS_MEASUREMENT,
         ),
     },
 ).extend(miot.MIOT_BLE_DEVICE_SCHEMA)

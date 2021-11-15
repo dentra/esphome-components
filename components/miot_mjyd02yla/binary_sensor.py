@@ -5,7 +5,6 @@ from esphome.const import (
     CONF_DEVICE_CLASS,
     CONF_IDLE_TIME,
     CONF_LIGHT,
-    CONF_TIMEOUT,
     DEVICE_CLASS_EMPTY,
     DEVICE_CLASS_LIGHT,
     DEVICE_CLASS_MOTION,
@@ -35,7 +34,11 @@ CONFIG_SCHEMA = binary_sensor.BINARY_SENSOR_SCHEMA.extend(
             }
         ),
         cv.Optional(CONF_IDLE_TIME): sensor.sensor_schema(
-            UNIT_SECOND, ICON_TIMELAPSE, 0, DEVICE_CLASS_EMPTY
+            unit_of_measurement=UNIT_SECOND,
+            icon=ICON_TIMELAPSE,
+            accuracy_decimals=0,
+            device_class=DEVICE_CLASS_EMPTY,
+            # entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         ),
     },
 ).extend(miot.MIOT_BLE_DEVICE_SCHEMA)

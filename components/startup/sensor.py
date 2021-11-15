@@ -18,7 +18,13 @@ startup_ns = cg.esphome_ns.namespace("startup")
 StartupSensor = startup_ns.class_("StartupSensor", sensor.Sensor, cg.PollingComponent)
 
 CONFIG_SCHEMA = (
-    sensor.sensor_schema(UNIT_EMPTY, ICON_CLOCK_START, 0, DEVICE_CLASS_TIMESTAMP)
+    sensor.sensor_schema(
+        unit_of_measurement=UNIT_EMPTY,
+        icon=ICON_CLOCK_START,
+        accuracy_decimals=0,
+        device_class=DEVICE_CLASS_TIMESTAMP,
+        # entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+    )
     .extend(
         {
             cv.GenerateID(): cv.declare_id(StartupSensor),
