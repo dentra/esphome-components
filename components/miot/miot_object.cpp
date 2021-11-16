@@ -127,37 +127,37 @@ void ButtonEvent::str(char *tmp, const ButtonEvent &button_event) {
     case ButtonEvent::KNOB: {
       uint8_t value = button_event.knob.short_press();
       if (value != 0) {
-        sprintf(tmp, "Rotating knob short press, value: %" PRIi8, value);
+        sprintf(tmp, "Rotating knob short press, value: %" PRIu8, value);
         break;
       }
       value = button_event.knob.long_press();
       if (value != 0) {
-        sprintf(tmp, "Rotating knob long press, value: %" PRIi8, value);
+        sprintf(tmp, "Rotating knob long press, value: %" PRIu8, value);
         break;
       }
-      sprintf(tmp, "Rotating knob unknown event: index=%" PRIu8 ", value:=%" PRIi8, button_event.knob.index,
+      sprintf(tmp, "Rotating knob unknown event: index=%" PRIu8 ", value:=%" PRIu8, button_event.knob.index,
               button_event.knob.value);
       break;
     }
     case ButtonEvent::DIMMER: {
       uint8_t value = button_event.dimmer.left();
       if (value != 0) {
-        sprintf(tmp, "Dimmer rotate left value: %" PRIi8, value);
+        sprintf(tmp, "Dimmer rotate left value: %" PRIu8, value);
         break;
       }
       value = button_event.dimmer.right();
       if (value != 0) {
-        sprintf(tmp, "Dimmer rotate right value: %" PRIi8, value);
+        sprintf(tmp, "Dimmer rotate right value: %" PRIu8, value);
         break;
       }
       value = button_event.dimmer.left_pressed();
       if (value != 0) {
-        sprintf(tmp, "Dimmer rotate left (pressed) value: %" PRIi8, value);
+        sprintf(tmp, "Dimmer rotate left (pressed) value: %" PRIu8, value);
         break;
       }
       value = button_event.dimmer.right_pressed();
       if (value != 0) {
-        sprintf(tmp, "Dimmer rotate right (pressed) value: %" PRIi8, value);
+        sprintf(tmp, "Dimmer rotate right (pressed) value: %" PRIu8, value);
         break;
       }
       sprintf(tmp, "Dimmer unknown event: index=%" PRIi8 ", value:=%" PRIi8, button_event.dimmer.index,
