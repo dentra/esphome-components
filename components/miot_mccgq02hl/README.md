@@ -20,7 +20,7 @@ binary_sensor:
     # BinarySensor (Optional), Light intensivity: on - strong light, off - weak light
     light:
       name: "$name Light"
-    # BinarySensor (Optional), Alert enabled when door/window has opened a long (device configured) time
+    # BinarySensor (Optional), Alert enabled when door/window has opened for a long (device configured) time
     alert:
       name: "$name Alert"
     # Sensor (Optional), Battey Level, %
