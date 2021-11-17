@@ -21,6 +21,7 @@ from esphome.const import (
     CONF_USERNAME,
     DEVICE_CLASS_BATTERY,
     DEVICE_CLASS_VOLTAGE,
+    ENTITY_CATEGORY_DIAGNOSTIC,
     PLATFORM_ESP32,
     STATE_CLASS_MEASUREMENT,
     UNIT_PERCENT,
@@ -130,14 +131,14 @@ MIOT_BLE_DEVICE_SCHEMA = cv.Schema(
             accuracy_decimals=0,
             device_class=DEVICE_CLASS_BATTERY,
             state_class=STATE_CLASS_MEASUREMENT,
-            # entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+            entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         ),
         cv.Optional(CONF_BATTERY_VOLTAGE): sensor.sensor_schema(
             unit_of_measurement=UNIT_VOLT,
             accuracy_decimals=3,
             device_class=DEVICE_CLASS_VOLTAGE,
             state_class=STATE_CLASS_MEASUREMENT,
-            # entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+            entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         ),
     }
 ).extend(MIOT_BLE_DEVICE_CORE_SCHEMA)
