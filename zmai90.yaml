@@ -107,6 +107,8 @@ text_sensor:
     id: current_tariff
     name: "$name Current Tariff"
     icon: "mdi:theme-light-dark"
+    # entity_category: system
+    entity_category: diagnostic
 
 # Create sensors
 sensor:
@@ -218,10 +220,13 @@ sensor:
     unit_of_measurement: "s"
     lambda: |-
       return id(tariffs).get_time_offset();
+    entity_category: config
 
   - platform: startup
     id: uptime
     name: "$name Uptime"
+    entity_category: diagnostic
 
   - platform: wifi_signal
     name: "$name WiFi Signal"
+    entity_category: diagnostic
