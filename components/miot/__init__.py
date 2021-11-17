@@ -21,6 +21,7 @@ from esphome.const import (
     CONF_USERNAME,
     DEVICE_CLASS_BATTERY,
     DEVICE_CLASS_VOLTAGE,
+    PLATFORM_ESP32,
     STATE_CLASS_MEASUREMENT,
     UNIT_PERCENT,
     UNIT_VOLT,
@@ -28,7 +29,7 @@ from esphome.const import (
 from .xiaomi_beaconkeys import XiaomiBeaconkeys
 
 CODEOWNERS = ["@dentra"]
-# ESP_PLATFORMS = [ESP_PLATFORM_ESP32]
+ESP_PLATFORMS = [PLATFORM_ESP32]
 AUTO_LOAD = ["esp32_ble_tracker", "sensor"]
 
 CONF_MIOT_ID = "miot_id"
