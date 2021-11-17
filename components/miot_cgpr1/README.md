@@ -17,6 +17,8 @@ binary_sensor:
     bindkey: "device-bin-key"
     # String, (Optional), the name of binary sensor
     name: "$name Motion"
+    # Boolean, (Optional), detect no motion as soon as possible (Usually when idle_time = 0). Default is false
+    detect_no_motion_asap: false
     # Sensor (Optional), Illuminance, lux
     illuminance:
       name: "$name Illuminance"

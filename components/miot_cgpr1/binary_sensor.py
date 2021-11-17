@@ -19,6 +19,8 @@ from esphome.const import (
 CODEOWNERS = ["@dentra"]
 AUTO_LOAD = ["miot"]
 
+CONF_DETECT_NO_MOTION_ASAP = "detect_no_motion_asap"
+
 miot_cgpr1_ns = cg.esphome_ns.namespace("miot_cgpr1")
 MiotCGPR1 = miot_cgpr1_ns.class_(
     "MiotCGPR1", miot.MiotComponent, binary_sensor.BinarySensor
@@ -30,6 +32,7 @@ CONFIG_SCHEMA = binary_sensor.BINARY_SENSOR_SCHEMA.extend(
         cv.Optional(
             CONF_DEVICE_CLASS, default=DEVICE_CLASS_MOTION
         ): binary_sensor.device_class,
+        cv.Optional(CONF_DETECT_NO_MOTION_ASAP): cv.boolean,
         cv.Optional(CONF_LIGHT): binary_sensor.BINARY_SENSOR_SCHEMA.extend(
             {
                 cv.Optional(
@@ -65,3 +68,6 @@ async def to_code(config):
     if CONF_ILLUMINANCE in config:
         sens = await sensor.new_sensor(config[CONF_ILLUMINANCE])
         cg.add(var.set_illuminance(sens))
+    if CONF_DETECT_NO_MOTION_ASAP in config:
+        if config[CONF_DETECT_NO_MOTION_ASAP]:
+            cg.add(var.set_detect_no_motion_asap(True))

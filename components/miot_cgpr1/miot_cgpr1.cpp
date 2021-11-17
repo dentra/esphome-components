@@ -19,7 +19,7 @@ void MiotCGPR1::dump_config() {
 void MiotCGPR1::process_idle_time_(const miot::BLEObject &obj) {
   const auto idle_time = obj.get_idle_time();
   if (idle_time.has_value()) {
-    this->publish_state(*idle_time == 0);
+    this->publish_state(this->detect_no_motion_asap_ ? false : *idle_time == 0);
     if (this->idle_time_ != nullptr) {
       this->idle_time_->publish_state(*idle_time);
     }

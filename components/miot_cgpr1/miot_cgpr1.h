@@ -20,11 +20,13 @@ class MiotCGPR1 : public miot::MiotComponent, public binary_sensor::BinarySensor
   void set_light(binary_sensor::BinarySensor *light) { this->light_ = light; }
   void set_idle_time(sensor::Sensor *idle_time) { this->idle_time_ = idle_time; }
   void set_illuminance(sensor::Sensor *illuminance) { this->illuminance_ = illuminance; }
+  void set_detect_no_motion_asap(bool detect_no_motion_asap) { this->detect_no_motion_asap_ = detect_no_motion_asap; }
 
  protected:
   binary_sensor::BinarySensor *light_{nullptr};
   sensor::Sensor *idle_time_{nullptr};
   sensor::Sensor *illuminance_{nullptr};
+  bool detect_no_motion_asap_ = {};
 
   bool process_object_(const miot::BLEObject &obj) override;
 
