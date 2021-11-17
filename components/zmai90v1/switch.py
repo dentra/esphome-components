@@ -9,6 +9,7 @@ from esphome.components import binary_sensor, sensor, uart, switch
 from esphome.const import (
     CONF_ACTIVE_POWER,
     CONF_APPARENT_POWER,
+    CONF_BAUD_RATE,
     CONF_CURRENT,
     CONF_DEVICE_CLASS,
     CONF_FREQUENCY,
@@ -16,6 +17,8 @@ from esphome.const import (
     CONF_NUMBER,
     CONF_POWER_FACTOR,
     CONF_REACTIVE_POWER,
+    CONF_RX_PIN,
+    CONF_TX_PIN,
     CONF_VOLTAGE,
     CONF_ENERGY,
     DEVICE_CLASS_CURRENT,
@@ -24,10 +27,11 @@ from esphome.const import (
     DEVICE_CLASS_POWER,
     DEVICE_CLASS_POWER_FACTOR,
     DEVICE_CLASS_VOLTAGE,
-    ESP_PLATFORM_ESP8266,
+    PLATFORM_ESP8266,
     ICON_CURRENT_AC,
     ICON_EMPTY,
     STATE_CLASS_MEASUREMENT,
+    STATE_CLASS_TOTAL_INCREASING,
     UNIT_EMPTY,
     UNIT_HERTZ,
     UNIT_KILOWATT_HOURS,
@@ -38,7 +42,7 @@ from esphome.const import (
     UNIT_WATT,
 )
 
-ESP_PLATFORMS = [ESP_PLATFORM_ESP8266]
+ESP_PLATFORMS = [PLATFORM_ESP8266]
 
 CODEOWNERS = ["@dentra"]
 
@@ -94,52 +98,49 @@ CONFIG_SCHEMA = (
                 }
             ),
             cv.Optional(CONF_ENERGY): sensor.sensor_schema(
-                UNIT_KILOWATT_HOURS,
-                ICON_EMPTY,
-                2,
-                DEVICE_CLASS_ENERGY,
-                STATE_CLASS_MEASUREMENT,
+                unit_of_measurement=UNIT_KILOWATT_HOURS,
+                accuracy_decimals=2,
+                device_class=DEVICE_CLASS_ENERGY,
+                state_class=STATE_CLASS_TOTAL_INCREASING,
             ),
             cv.Optional(CONF_VOLTAGE): sensor.sensor_schema(
-                UNIT_VOLT, ICON_EMPTY, 2, DEVICE_CLASS_VOLTAGE
+                unit_of_measurement=UNIT_VOLT,
+                accuracy_decimals=2,
+                device_class=DEVICE_CLASS_VOLTAGE,
+                state_class=STATE_CLASS_MEASUREMENT,
             ),
             cv.Optional(CONF_CURRENT): sensor.sensor_schema(
-                UNIT_AMPERE,
-                ICON_EMPTY,
-                3,
-                DEVICE_CLASS_CURRENT,
-                STATE_CLASS_MEASUREMENT,
+                unit_of_measurement=UNIT_AMPERE,
+                accuracy_decimals=3,
+                device_class=DEVICE_CLASS_CURRENT,
+                state_class=STATE_CLASS_MEASUREMENT,
             ),
             cv.Optional(CONF_ACTIVE_POWER): sensor.sensor_schema(
-                UNIT_WATT, ICON_EMPTY, 2, DEVICE_CLASS_POWER, STATE_CLASS_MEASUREMENT
+                unit_of_measurement=UNIT_WATT,
+                accuracy_decimals=2,
+                device_class=DEVICE_CLASS_POWER,
+                state_class=STATE_CLASS_MEASUREMENT,
             ),
             cv.Optional(CONF_APPARENT_POWER): sensor.sensor_schema(
-                UNIT_VOLT_AMPS,
-                ICON_EMPTY,
-                2,
-                DEVICE_CLASS_POWER,
-                STATE_CLASS_MEASUREMENT,
+                unit_of_measurement=UNIT_VOLT_AMPS,
+                accuracy_decimals=2,
+                state_class=STATE_CLASS_MEASUREMENT,
             ),
             cv.Optional(CONF_REACTIVE_POWER): sensor.sensor_schema(
-                UNIT_VOLT_AMPS_REACTIVE,
-                ICON_EMPTY,
-                2,
-                DEVICE_CLASS_POWER,
-                STATE_CLASS_MEASUREMENT,
+                unit_of_measurement=UNIT_VOLT_AMPS_REACTIVE,
+                accuracy_decimals=2,
+                state_class=STATE_CLASS_MEASUREMENT,
             ),
             cv.Optional(CONF_FREQUENCY): sensor.sensor_schema(
-                UNIT_HERTZ,
-                ICON_CURRENT_AC,
-                2,
-                DEVICE_CLASS_EMPTY,
-                STATE_CLASS_MEASUREMENT,
+                unit_of_measurement=UNIT_HERTZ,
+                icon=ICON_CURRENT_AC,
+                accuracy_decimals=2,
+                state_class=STATE_CLASS_MEASUREMENT,
             ),
             cv.Optional(CONF_POWER_FACTOR): sensor.sensor_schema(
-                UNIT_EMPTY,
-                ICON_EMPTY,
-                1,
-                DEVICE_CLASS_POWER_FACTOR,
-                STATE_CLASS_MEASUREMENT,
+                accuracy_decimals=1,
+                device_class=DEVICE_CLASS_POWER_FACTOR,
+                state_class=STATE_CLASS_MEASUREMENT,
             ),
         }
     )
@@ -150,17 +151,17 @@ CONFIG_SCHEMA = (
 
 def valid_uart(conf):
     baud_rate = 9600
-    if conf[uart.CONF_BAUD_RATE] != baud_rate:
+    if conf[CONF_BAUD_RATE] != baud_rate:
         raise cv.Invalid(
             f"Component {component_name} required baud_rate {baud_rate} for the uart bus"
         )
     rx_pin = 3
-    if conf[uart.CONF_RX_PIN] != rx_pin:
+    if conf[CONF_RX_PIN][CONF_NUMBER] != rx_pin:
         raise cv.Invalid(
             f"Component {component_name} required rx_pin GPIO0{rx_pin} for the uart bus"
         )
     tx_pin = 1
-    if conf[uart.CONF_TX_PIN] != tx_pin:
+    if conf[CONF_TX_PIN][CONF_NUMBER] != tx_pin:
         raise cv.Invalid(
             f"Component {component_name} required tx_pin GPIO0{tx_pin} for the uart bus"
         )
