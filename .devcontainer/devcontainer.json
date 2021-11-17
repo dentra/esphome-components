@@ -73,4 +73,9 @@
   ],
   // Comment out this line to run as root instead.
   "remoteUser": "vscode",
+  "mounts": [
+    "source=esphome-components,target=${containerWorkspaceFolder}/.esphome,type=volume",
+    "source=esphome-components-lib,target=${containerWorkspaceFolder}/lib/.esphome,type=volume",
+    "source=esphome-components-lib-miot,target=${containerWorkspaceFolder}/lib/miot/.esphome,type=volume",
+  ]
 }

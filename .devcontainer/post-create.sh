@@ -17,3 +17,6 @@ else
     echo "  pio init --ide vscode -e livingroom32"
 fi
 
+sudo chown vscode .esphome
+sudo chown vscode lib/.esphome
+sudo chown vscode lib/miot/.esphome
