@@ -1,6 +1,13 @@
 # `ESPHome` components
 
-[![Open in Visual Studio Code](https://open.vscode.dev/badges/open-in-vscode.svg)](https://open.vscode.dev/dentra/esphome-components)
+[![Open in Visual Studio Code][open-in-vscode-shield]][open-in-vscode]
+[![PayPal.Me][paypal-me-shield]][paypal-me]
+
+[open-in-vscode-shield]: https://open.vscode.dev/badges/open-in-vscode.svg
+[open-in-vscode]: https://open.vscode.dev/dentra/esphome-components
+
+[paypal-me-shield]: https://img.shields.io/static/v1.svg?label=%20&message=PayPal.Me&logo=paypal
+[paypal-me]: https://paypal.me/dentra0
 
 A collection of my ESPHome components.
 
@@ -58,3 +65,7 @@ MIOT Platform based component to explore new BLE devices from Xiaomi ecosystem.
 
 ## [MIOT Yeelight Remote pair](components/miot_ylxx0xyl_pair/)
 Obtain beakonkey for Yeelight Remote (YLYK01YL), Dimmer (YLKG07YL/YLKG08YL), Bathroom Heater Remote (YLYB01YL-BHFRC), Fan Remote (YLYK01YL-VENFAN) and Ventilator Fan Remote (YLYK01YL-FANCL).
+
+
+### Your thanks
+If this project was useful to you, you can [buy me](https://paypal.me/dentra0) a Cup of coffee :)

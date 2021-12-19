@@ -1,4 +1,4 @@
-FROM esphome/esphome-lint:1.1
+FROM esphome/esphome-lint:dev
 
 ARG esphome_version
 ARG apt_deps
@@ -9,7 +9,8 @@ RUN export DEBIAN_FRONTEND=noninteractive \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
-RUN pip3 --disable-pip-version-check --no-cache-dir install esphome==$esphome_version  \
+# pyparsing needed to fix https://github.com/esphome/issues/issues/2540
+RUN pip3 --disable-pip-version-check --no-cache-dir install esphome==$esphome_version pyparsing==2.2.0 \
  && rm -rf /tmp/pip-tmp
 
 RUN echo "alias ll='ls -l'" >> /etc/bash.bashrc \
@@ -20,5 +21,5 @@ RUN useradd -m -s /bin/bash -G sudo vscode \
  && echo "vscode ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/vscode \
  && chmod 0440 /etc/sudoers.d/vscode
 
-RUN mv /root/.platformio /home/vscode && chown -R vscode:vscode /home/vscode/.platformio
+RUN mv /root/.platformio /home/vscode && chown -R vscode:vscode /home/vscode/.platformio /esphome /piolibs
 

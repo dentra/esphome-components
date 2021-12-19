@@ -3,7 +3,7 @@
   "build": {
     "args": {
       // ESPHome version
-      "esphome_version": "2021.11.1",
+      "esphome_version": "2021.12.1",
       // additional APT dependicies
       "apt_deps": "bash-completion less"
     }
@@ -74,8 +74,9 @@
   // Comment out this line to run as root instead.
   "remoteUser": "vscode",
   "mounts": [
-    "source=esphome-components,target=${containerWorkspaceFolder}/.esphome,type=volume",
-    "source=esphome-components-lib,target=${containerWorkspaceFolder}/lib/.esphome,type=volume",
-    "source=esphome-components-lib-miot,target=${containerWorkspaceFolder}/lib/miot/.esphome,type=volume",
+    "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/.esphome,type=volume",
+    "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/.pio,type=volume",
+    "source=vscode-${containerWorkspaceFolderBasename}-lib,target=${containerWorkspaceFolder}/lib/.esphome,type=volume",
+    "source=vscode-${containerWorkspaceFolderBasename}-lib-miot,target=${containerWorkspaceFolder}/lib/miot/.esphome,type=volume",
   ]
 }
