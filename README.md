@@ -66,6 +66,8 @@ MIOT Platform based component to explore new BLE devices from Xiaomi ecosystem.
 ## [MIOT Yeelight Remote pair](components/miot_ylxx0xyl_pair/)
 Obtain beakonkey for Yeelight Remote (YLYK01YL), Dimmer (YLKG07YL/YLKG08YL), Bathroom Heater Remote (YLYB01YL-BHFRC), Fan Remote (YLYK01YL-VENFAN) and Ventilator Fan Remote (YLYK01YL-FANCL).
 
+## [Electrolux Water Heater](https://github.com/dentra/esphome-ewh)
+Control Electrolux Water Heater and possibly other boilers (Ballu, Zanussi) using uart protocol.
 
 ### Your thanks
 If this project was useful to you, you can [buy me](https://paypal.me/dentra0) a Cup of coffee :)
