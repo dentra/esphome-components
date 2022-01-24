@@ -20,6 +20,13 @@ switch:
   # All the options of zmai90v1 platform are optional
   - platform: zmai90v1
     name: Switch
+    # Restore mode, enum (Optional): Control how the switch attempts to restore state on bootup.
+    # For restoring on ESP8266s, also see esp8266_restore_from_flash in the esphome section.
+    #  * ALWAYS_ON (Default)- Always initialize as ON on bootup.
+    #  * ALWAYS_OFF - Always initialize as OFF on bootup.
+    #  * RESTORE_DEFAULT_ON - Attempt to restore state and default to ON.
+    #  * RESTORE_DEFAULT_OFF - Attempt to restore state and default to OFF if not possible to restore.
+    restore_mode: ALWAYS_ON
     # main switch pin, GPIOPin, default: GPIO12
     switch_pin: GPIO12
     # button pin, GPIOPin, default: GPIO13

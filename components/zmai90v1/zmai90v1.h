@@ -22,12 +22,21 @@ struct zmai90_data_t {
   uint8_t checksum;
 } PACKED;
 
+enum ZMAi90v1RestoreMode {
+  RESTORE_MODE_ALWAYS_ON,
+  RESTORE_MODE_ALWAYS_OFF,
+  RESTORE_MODE_RESTORE_DEFAULT_ON,
+  RESTORE_MODE_RESTORE_DEFAULT_OFF,
+};
+
 class ZMAi90v1 : public PollingComponent, public switch_::Switch, public uart::UARTDevice {
  public:
   void dump_config() override;
   void setup() override;
   void loop() override;
   void update() override;
+
+  void set_restore_mode(ZMAi90v1RestoreMode restore_mode) { this->restore_mode_ = restore_mode; }
 
   void set_switch_pin(GPIOPin *pin) { switch_pin_ = pin; }
   void set_button_pin(GPIOPin *pin) { button_pin_ = pin; }
@@ -43,6 +52,7 @@ class ZMAi90v1 : public PollingComponent, public switch_::Switch, public uart::U
   void set_power_factor(sensor::Sensor *value) { this->power_factor_ = value; }
 
  protected:
+  ZMAi90v1RestoreMode restore_mode_{RESTORE_MODE_ALWAYS_ON};
   GPIOPin *switch_pin_ = {};
   GPIOPin *button_pin_ = {};
   binary_sensor::BinarySensor *button_ = {};

@@ -25,10 +25,32 @@ void ZMAi90v1::dump_config() {
 }
 
 void ZMAi90v1::setup() {
+  bool initial_state = true;
+  switch (this->restore_mode_) {
+    case RESTORE_MODE_ALWAYS_ON:
+      initial_state = true;
+      break;
+    case RESTORE_MODE_ALWAYS_OFF:
+      initial_state = false;
+      break;
+    case RESTORE_MODE_RESTORE_DEFAULT_ON:
+      initial_state = this->get_initial_state().value_or(true);
+      break;
+    case RESTORE_MODE_RESTORE_DEFAULT_OFF:
+      initial_state = this->get_initial_state().value_or(false);
+      break;
+  }
+
+  if (initial_state) {
+    this->turn_on();
+  } else {
+    this->turn_off();
+  }
   this->switch_pin_->setup();
-  auto switch_state = this->get_initial_state();
-  if (switch_state.has_value()) {
-    write_state(*switch_state);
+  if (initial_state) {
+    this->turn_on();
+  } else {
+    this->turn_off();
   }
 
   if (this->button_ != nullptr) {

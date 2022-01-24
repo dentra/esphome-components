@@ -17,6 +17,7 @@ from esphome.const import (
     CONF_NUMBER,
     CONF_POWER_FACTOR,
     CONF_REACTIVE_POWER,
+    CONF_RESTORE_MODE,
     CONF_RX_PIN,
     CONF_TX_PIN,
     CONF_VOLTAGE,
@@ -29,10 +30,8 @@ from esphome.const import (
     DEVICE_CLASS_VOLTAGE,
     PLATFORM_ESP8266,
     ICON_CURRENT_AC,
-    ICON_EMPTY,
     STATE_CLASS_MEASUREMENT,
     STATE_CLASS_TOTAL_INCREASING,
-    UNIT_EMPTY,
     UNIT_HERTZ,
     UNIT_KILOWATT_HOURS,
     UNIT_VOLT,
@@ -65,6 +64,14 @@ zmai90v1_ns = cg.esphome_ns.namespace(component_name)
 ZMAi90v1 = zmai90v1_ns.class_(
     "ZMAi90v1", cg.PollingComponent, switch.Switch, uart.UARTDevice
 )
+ZMAi90v1RestoreMode = zmai90v1_ns.enum("ZMAi90v1RestoreMode")
+
+RESTORE_MODES = {
+    "ALWAYS_ON": ZMAi90v1RestoreMode.RESTORE_MODE_ALWAYS_ON,
+    "ALWAYS_OFF": ZMAi90v1RestoreMode.RESTORE_MODE_ALWAYS_OFF,
+    "RESTORE_DEFAULT_ON": ZMAi90v1RestoreMode.RESTORE_MODE_RESTORE_DEFAULT_ON,
+    "RESTORE_DEFAULT_OFF": ZMAi90v1RestoreMode.RESTORE_MODE_RESTORE_DEFAULT_OFF,
+}
 
 
 def valid_switch_pin(value):
@@ -142,6 +149,9 @@ CONFIG_SCHEMA = (
                 device_class=DEVICE_CLASS_POWER_FACTOR,
                 state_class=STATE_CLASS_MEASUREMENT,
             ),
+            cv.Optional(CONF_RESTORE_MODE, default="ALWAYS_ON"): cv.enum(
+                RESTORE_MODES, upper=True, space="_"
+            ),
         }
     )
     .extend(cv.polling_component_schema("60s"))
@@ -216,6 +226,8 @@ async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
     await uart.register_uart_device(var, config)
+
+    cg.add(var.set_restore_mode(config[CONF_RESTORE_MODE]))
 
     switch_pin = await cg.gpio_pin_expression(config[CONF_SWITCH_PIN])
     cg.add(var.set_switch_pin(switch_pin))
