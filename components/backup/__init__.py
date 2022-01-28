@@ -15,6 +15,7 @@ from esphome.const import (
     CONF_FORCE_UPDATE,
     CONF_ID,
     CONF_PASSWORD,
+    CONF_RAW_DATA_ID,
     CONF_USERNAME,
 )
 
