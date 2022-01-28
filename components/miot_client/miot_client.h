@@ -2,7 +2,7 @@
 #include <esp_gattc_api.h>
 #include <set>
 #include "esphome/components/ble_client/ble_client.h"
-#include "miot_client_descr.h"
+#include "miot_client_services.h"
 
 namespace esphome {
 namespace miot_client {
@@ -14,8 +14,8 @@ class AuthClientListener {
 
 class AuthClient {
  public:
-  virtual std::vector<uint8_t> decode(const uint8_t *data, const uint16_t size) const = 0;
-  virtual std::vector<uint8_t> encode(const uint8_t *data, const uint16_t size) const = 0;
+  virtual optional<std::vector<uint8_t>> decode(const uint8_t *data, const uint16_t size) const = 0;
+  virtual optional<std::vector<uint8_t>> encode(const uint8_t *data, const uint16_t size) = 0;
   virtual bool is_auth_complete() const = 0;
   void add_auth_listener(AuthClientListener *listener) { this->auth_listeners_.push_back(listener); }
   void add_auth_char(uint16_t handle) {
@@ -64,42 +64,55 @@ class MiotClient : public ble_client::BLEClientNode {
   // esp_ble_gattc_read_char
   bool read_char(uint16_t handle) const;
   // esp_ble_gattc_write_char
-  template<typename T> bool write_char(uint16_t handle, const T &data, bool need_response = false) const {
+  template<size_t N>
+  bool write_char(uint16_t handle, const std::array<uint8_t, N> &data, bool need_response = false) const {
     return write_char(handle, data.data(), data.size(), need_response);
+  }
+  // esp_ble_gattc_write_char
+  bool write_char(uint16_t handle, const std::vector<uint8_t> &data, bool need_response = false) const {
+    return write_char(handle, data.data(), data.size(), need_response);
+  }
+  // esp_ble_gattc_write_char
+  bool write_char(uint16_t handle, const uint32_t data, bool need_response = false) const {
+    return write_char(handle, &data, sizeof(data), need_response);
+  }
+  // esp_ble_gattc_write_char
+  bool write_char(uint16_t handle, const void *data, uint16_t size, bool need_response = false) const {
+    return this->write_char(handle, reinterpret_cast<const uint8_t *>(data), size, need_response);
   }
   // esp_ble_gattc_write_char
   bool write_char(uint16_t handle, const uint8_t *data, uint16_t size, bool need_response = false) const;
 
   bool is_established() const { return this->node_state == esp32_ble_tracker::ClientState::ESTABLISHED; }
 
-  esphome::ble_client::BLECharacteristic *get_characteristic(const uint16_t service, const uint16_t characteristic) {
-    return this->parent()->get_characteristic(esp32_ble_tracker::ESPBTUUID::from_uint16(service),
-                                              esp32_ble_tracker::ESPBTUUID::from_uint16(characteristic));
+  esphome::ble_client::BLECharacteristic *get_char(const esp32_ble_tracker::ESPBTUUID &srv,
+                                                   const esp32_ble_tracker::ESPBTUUID &chr, bool log_not_found = true);
+  esphome::ble_client::BLECharacteristic *get_char(const uint16_t service, const uint16_t characteristic,
+                                                   bool log_not_found = true) {
+    return this->get_char(esp32_ble_tracker::ESPBTUUID::from_uint16(service),
+                          esp32_ble_tracker::ESPBTUUID::from_uint16(characteristic), log_not_found);
   }
-
-  esphome::ble_client::BLECharacteristic *get_characteristic(const esp_bt_uuid_t &service, uint16_t characteristic) {
-    return this->parent()->get_characteristic(esp32_ble_tracker::ESPBTUUID::from_uuid(service),
-                                              esp32_ble_tracker::ESPBTUUID::from_uint16(characteristic));
+  esphome::ble_client::BLECharacteristic *get_char(const esp_bt_uuid_t &service, uint16_t characteristic,
+                                                   bool log_not_found = true) {
+    return this->get_char(esp32_ble_tracker::ESPBTUUID::from_uuid(service),
+                          esp32_ble_tracker::ESPBTUUID::from_uint16(characteristic), log_not_found);
   }
-
-  esphome::ble_client::BLECharacteristic *get_characteristic(const esp_bt_uuid_t &service,
-                                                             const esp_bt_uuid_t &characteristic) {
-    return this->parent()->get_characteristic(esp32_ble_tracker::ESPBTUUID::from_uuid(service),
-                                              esp32_ble_tracker::ESPBTUUID::from_uuid(characteristic));
+  esphome::ble_client::BLECharacteristic *get_char(const esp_bt_uuid_t &service, const esp_bt_uuid_t &characteristic,
+                                                   bool log_not_found = true) {
+    return this->get_char(esp32_ble_tracker::ESPBTUUID::from_uuid(service),
+                          esp32_ble_tracker::ESPBTUUID::from_uuid(characteristic), log_not_found);
   }
-
-  uint16_t get_characteristic_handle(const uint16_t service, const uint16_t characteristic) {
-    auto chr = this->get_characteristic(service, characteristic);
+  uint16_t get_char_handle(const uint16_t service, const uint16_t characteristic, bool log_not_found = true) {
+    auto chr = this->get_char(service, characteristic, log_not_found);
     return chr != nullptr ? chr->handle : ESP_GATT_ILLEGAL_HANDLE;
   }
-
-  uint16_t get_characteristic_handle(const esp_bt_uuid_t &service, uint16_t characteristic) {
-    auto chr = this->get_characteristic(service, characteristic);
+  uint16_t get_char_handle(const esp_bt_uuid_t &service, uint16_t characteristic, bool log_not_found = true) {
+    auto chr = this->get_char(service, characteristic, log_not_found);
     return chr != nullptr ? chr->handle : ESP_GATT_ILLEGAL_HANDLE;
   }
-
-  uint16_t get_characteristic_handle(const esp_bt_uuid_t &service, const esp_bt_uuid_t &characteristic) {
-    auto chr = this->get_characteristic(service, characteristic);
+  uint16_t get_char_handle(const esp_bt_uuid_t &service, const esp_bt_uuid_t &characteristic,
+                           bool log_not_found = true) {
+    auto chr = this->get_char(service, characteristic, log_not_found);
     return chr != nullptr ? chr->handle : ESP_GATT_ILLEGAL_HANDLE;
   }
 

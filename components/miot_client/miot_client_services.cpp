@@ -1,6 +1,4 @@
-#pragma once
-
-#include <esp_bt_defs.h>
+#include "miot_client_services.h"
 
 namespace esphome {
 namespace miot_client {
@@ -33,8 +31,8 @@ constexpr int chr2bin(int ch) {
  *
  * Warning: use only with constexpr, do not use at runtime, it slow!
  */
-constexpr esp_bt_uuid_t bt_uuid_t(const uint32_t data1, const uint16_t data2, const uint16_t data3,
-                                  const uint16_t data4, const uint64_t node) {
+esp_bt_uuid_t bt_uuid_t(const uint32_t data1, const uint16_t data2, const uint16_t data3, const uint16_t data4,
+                        const uint64_t node) {
   return esp_bt_uuid_t{.len = ESP_UUID_LEN_128,
                        .uuid = {.uuid128 = {
                                     uint8_t((node & 0x0000000000FF) >> 0),
@@ -64,7 +62,7 @@ constexpr esp_bt_uuid_t bt_uuid_t(const uint32_t data1, const uint16_t data2, co
  *
  * Warning: use only with constexpr, do not use at runtime, it slow!
  */
-constexpr esp_bt_uuid_t bt_uuid_t(const char *const uuid) {
+esp_bt_uuid_t bt_uuid_t(const char *const uuid) {
   return esp_bt_uuid_t{.len = ESP_UUID_LEN_128,
                        .uuid = {.uuid128 = {
                                     uint8_t((internal::chr2bin(uuid[34]) << 4) | internal::chr2bin(uuid[35])),
@@ -95,14 +93,14 @@ constexpr esp_bt_uuid_t bt_uuid_t(const char *const uuid) {
  * Service UUID
  * The 128-bit vendor-specific service UUID is 6E400001-B5A3-F393-E0A9-E50E24DCCA9E (16-bit offset: 0x0001).
  * */
-constexpr auto BT_UUID_NUS_SERVICE = bt_uuid_t("6E400001-B5A3-F393-E0A9-E50E24DCCA9E");
+esp_bt_uuid_t BLE_UUID_NUS_SERVICE = bt_uuid_t("6E400001-B5A3-F393-E0A9-E50E24DCCA9E");
 
 /**
  * RX Characteristic (6E400002-B5A3-F393-E0A9-E50E24DCCA9E)
  *  - Write or Write Without Response
  * Write data to the RX Characteristic to send it on to the UART interface.
  */
-constexpr auto BT_UUID_NUS_RX = bt_uuid_t("6E400002-B5A3-F393-E0A9-E50E24DCCA9E");
+esp_bt_uuid_t BLE_UUID_NUS_RX = bt_uuid_t("6E400002-B5A3-F393-E0A9-E50E24DCCA9E");
 
 /**
  * TX Characteristic (6E400003-B5A3-F393-E0A9-E50E24DCCA9E)
@@ -110,43 +108,82 @@ constexpr auto BT_UUID_NUS_RX = bt_uuid_t("6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
  * Enable notifications for the TX Characteristic to receive data from the application. The application transmits all
  * data that is received over UART as notifications.
  */
-constexpr auto BT_UUID_NUS_TX = bt_uuid_t("6E400003-B5A3-F393-E0A9-E50E24DCCA9E");
+esp_bt_uuid_t BLE_UUID_NUS_TX = bt_uuid_t("6E400003-B5A3-F393-E0A9-E50E24DCCA9E");
 
 /**
  * Mi Sevice
  * See https://github.com/MiEcosystem/mijia_ble_secure/blob/silabs/gatt.xml
  */
-constexpr uint16_t BT_UUID_MI_SERVICE = 0xFE95;
+uint16_t BLE_UUID_MI_SERVICE = 0xFE95;
 
 /**
- * Mi Legacy Auth Characteristic
+ * Mi Service Legacy Auth Characteristic
  * Notify, Write No Response
- * Length=
+ * Length=0..12
  */
-constexpr uint16_t BT_UUID_MI_LEGACY_AUTH = 0x0001;
+uint16_t BLE_UUID_MI_LEGACY_AUTH = 0x0001;
+
+/**
+ * Mi Service PID Characteristic
+ * Read
+ * Length=0..2
+ * Source:
+ * https://github.com/doufan/bswifi/blob/master/i-bswifi-silicon/mijia_ble_2/demos/Silabs/mible_std_authen/gatt.xml
+ */
+uint16_t BLE_UUID_MI_PID = 0x0002;
 
 /**
  * Mi Service Version Characteristic
  * Read
- * Length=0..20
+ * Length=20
  * Source: https://github.com/MiEcosystem/mijia_ble_standard/blob/silabs_BG22/gatt.xml
  */
-constexpr uint16_t BT_UUID_MI_VERSION = 0x0004;
+uint16_t BLE_UUID_MI_VERSION = 0x0004;
 
 /**
- * Auth Control Point Characteristic
+ * Mi Service WiFiCfg (Wifi AP SSID/Wifi Status) Characteristic
+ * Notify
+ * Length=20
+ * Source:
+ * https://github.com/doufan/bswifi/blob/master/i-bswifi-silicon/mijia_ble_2/demos/Silabs/mible_std_authen/gatt.xml
+ */
+uint16_t BLE_UUID_MI_WIFI_CFG = 0x0005;
+
+/**
+ * Mi Service Wifi AP Password Characteristic
+ * Source: https://github.com/freenetwork/ble-in-xiaomi/blob/master/doc/auth_protocol.md
+ */
+uint16_t BLE_UUID_MI_WIFI_PWD = 0x0006;
+
+/**
+ * Mi Service Auth Control Point Characteristic
  * Notify
  * Length=4
  * Source: https://github.com/MiEcosystem/mijia_ble_standard/blob/silabs_BG22/gatt.xml
  */
-constexpr uint16_t BT_UUID_MI_CONTROL_POINT = 0x0010;
+uint16_t BLE_UUID_MI_CONTROL_POINT = 0x0010;
 
 /**
- * Beaconkey Characteristic
+ * Mi Service Wifi UID Password Characteristic
+ * Source: https://github.com/freenetwork/ble-in-xiaomi/blob/master/doc/auth_protocol.md
+ */
+uint16_t BLE_UUID_MI_WIFI_UID = 0x0011;
+
+/**
+ * Mi Service Device ID (serial number) Characteristic
+ * Read
+ * Length=20
+ * Source:
+ * https://github.com/doufan/bswifi/blob/master/i-bswifi-silicon/mijia_ble_2/demos/Silabs/mible_std_authen/gatt.xml
+ */
+uint16_t BLE_UUID_MI_DEVICE_ID = 0x0013;
+
+/**
+ * Mi Service Beaconkey Characteristic
  * Read
  * Length=12
  */
-constexpr uint16_t BT_UUID_MI_BEACONKEY = 0x0014;
+uint16_t BLE_UUID_MI_BEACONKEY = 0x0014;
 
 /**
  * Secure Auth Characteristic
@@ -154,7 +191,7 @@ constexpr uint16_t BT_UUID_MI_BEACONKEY = 0x0014;
  * Length=0..20
  * Source: https://github.com/scooterhacking/mijia_ble_libs/blob/master/mijia_profiles/mi_service_server.c#L64
  */
-constexpr uint16_t BT_UUID_MI_SECURE_AUTH = 0x0016;
+uint16_t BLE_UUID_MI_SECURE_AUTH = 0x0016;
 
 /**
  * OTA Control Point Characteristic
@@ -162,7 +199,7 @@ constexpr uint16_t BT_UUID_MI_SECURE_AUTH = 0x0016;
  * Length=0..20
  * Source: https://github.com/MiEcosystem/mijia_ble_standard/blob/silabs_BG22/gatt.xml
  */
-constexpr uint16_t BT_UUID_MI_OTA_CONTROL_POINT = 0x0017;
+uint16_t BLE_UUID_MI_OTA_CONTROL_POINT = 0x0017;
 
 /**
  * OTA Data Characteristic
@@ -170,7 +207,7 @@ constexpr uint16_t BT_UUID_MI_OTA_CONTROL_POINT = 0x0017;
  * Length=0..20
  * Source: https://github.com/MiEcosystem/mijia_ble_standard/blob/silabs_BG22/gatt.xml
  */
-constexpr uint16_t BT_UUID_MI_OTA_DATA = 0x0018;
+uint16_t BLE_UUID_MI_OTA_DATA = 0x0018;
 
 /**
  * Standard Auth Characteristic
@@ -178,7 +215,7 @@ constexpr uint16_t BT_UUID_MI_OTA_DATA = 0x0018;
  * Length=0..20,244?
  * Source: https://github.com/MiEcosystem/mijia_ble_standard/blob/silabs_BG22/gatt.xml
  */
-constexpr uint16_t BT_UUID_MI_STANDARD_AUTH = 0x0019;
+uint16_t BLE_UUID_MI_STANDARD_AUTH = 0x0019;
 
 /**
  * SPEC RX Characteristic
@@ -186,7 +223,7 @@ constexpr uint16_t BT_UUID_MI_STANDARD_AUTH = 0x0019;
  * Length=244?
  * Source: https://github.com/MiEcosystem/mijia_ble_standard/blob/silabs_BG22/gatt.xml
  */
-constexpr uint16_t BT_UUID_MI_SPEC_RX = 0x001A;
+uint16_t BLE_UUID_MI_SPEC_RX = 0x001A;
 
 /**
  * SPEC TX Characteristic
@@ -194,50 +231,75 @@ constexpr uint16_t BT_UUID_MI_SPEC_RX = 0x001A;
  * Length=0..244?
  * Source: https://github.com/MiEcosystem/mijia_ble_standard/blob/silabs_BG22/gatt.xml
  */
-constexpr uint16_t BT_UUID_MI_SPEC_TX = 0x001B;
+uint16_t BLE_UUID_MI_SPEC_TX = 0x001B;
+
+/**
+ * Bswifi Service
+ * Source:
+ * https://github.com/doufan/bswifi/blob/master/i-bswifi-silicon/mijia_ble_2/demos/Silabs/mible_std_authen/gatt.xml
+ **/
+uint16_t BLE_UUID_BSWIFI_SERVICE = 0xFF13;
+
+/**
+ * Bswifi Service Send Characteristic
+ * Notify, notify_requirement="mandatory"
+ * Length: 0..20
+ * Source:
+ * https://github.com/doufan/bswifi/blob/master/i-bswifi-silicon/mijia_ble_2/demos/Silabs/mible_std_authen/gatt.xml
+ **/
+uint16_t BLE_UUID_BSWIFI_SEND = 0xFF11;
+
+/**
+ * Bswifi Service Recv Characteristic
+ * Write No Response, write_no_response_requirement="mandatory"
+ * Length=0..3
+ * Source:
+ * https://github.com/doufan/bswifi/blob/master/i-bswifi-silicon/mijia_ble_2/demos/Silabs/mible_std_authen/gatt.xml
+ **/
+uint16_t BLE_UUID_BSWIFI_RECV = 0xFF12;
 
 /**
  * Mijia lock service
  */
-constexpr auto BT_UUID_MIJIA_LOCK_SERVICE = bt_uuid_t("00001000-0065-6c62-2e74-6f696d2e696d");
+esp_bt_uuid_t BLE_UUID_MIJIA_LOCK_SERVICE = bt_uuid_t("00001000-0065-6c62-2e74-6f696d2e696d");
 
 /**
  * Lock Operation
  * Write
  * Length=7
  */
-constexpr auto BT_UUID_MIJIA_LOCK_OPS = bt_uuid_t("00001001-0065-6c62-2e74-6f696d2e696d");
+esp_bt_uuid_t BLE_UUID_MIJIA_LOCK_OPS = bt_uuid_t("00001001-0065-6c62-2e74-6f696d2e696d");
 
 /**
  * Lock State
  * Notify, Read
  * Length=7
  */
-constexpr auto BT_UUID_MIJIA_LOCK_STAT = bt_uuid_t("00001002-0065-6c62-2e74-6f696d2e696d");
+esp_bt_uuid_t BLE_UUID_MIJIA_LOCK_STAT = bt_uuid_t("00001002-0065-6c62-2e74-6f696d2e696d");
 
 /**
  * Lock logs
  * Notify, Read
  * Length=0..20
  */
-constexpr auto BT_UUID_MIJIA_LOCK_LOGS = bt_uuid_t("00001003-0065-6c62-2e74-6f696d2e696d");
+esp_bt_uuid_t BLE_UUID_MIJIA_LOCK_LOGS = bt_uuid_t("00001003-0065-6c62-2e74-6f696d2e696d");
 
 /**
  * Mi Stdio Service (00000100-0065-6C62-2E74-6F696D2E696D)
  */
-constexpr auto BT_UUID_MI_STDIO_SERVICE = bt_uuid_t("00000100-0065-6C62-2E74-6F696D2E696D");
+esp_bt_uuid_t BLE_UUID_MI_STDIO_SERVICE = bt_uuid_t("00000100-0065-6C62-2E74-6F696D2E696D");
 
 /**
  * MI STDIO RX (00000101-0065-6C62-2E74-6F696D2E696D)
  *  - Write without response
  */
-constexpr auto BT_UUID_MI_STDIO_RX = bt_uuid_t("00000101-0065-6C62-2E74-6F696D2E696D");
+esp_bt_uuid_t BLE_UUID_MI_STDIO_RX = bt_uuid_t("00000101-0065-6C62-2E74-6F696D2E696D");
 
 /**
  * MI STDIO TX (00000102-0065-6C62-2E74-6F696D2E696D)
  *  - Notify
  */
-constexpr auto BT_UUID_MI_STDIO_TX = bt_uuid_t("00000102-0065-6C62-2E74-6F696D2E696D");
+esp_bt_uuid_t BLE_UUID_MI_STDIO_TX = bt_uuid_t("00000102-0065-6C62-2E74-6F696D2E696D");
 
 }  // namespace miot_client
 }  // namespace esphome

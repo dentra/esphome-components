@@ -9,7 +9,7 @@ static const char *const TAG = "miot_client";
 
 inline void GATTC_LOG(bool debug, const char *event, const char *param, int value) {
   if (debug) {
-    ESP_LOGD(TAG, "%s %s, %s=0x%x", "Got gattc event", event, param, value);
+    ESP_LOGD(TAG, "%s %s, %s=0x%X", "Got gattc event", event, param, value);
   }
 }
 
@@ -18,7 +18,7 @@ inline void GATC_ERR(const char *param, esp_gatt_status_t status) {
 }
 
 inline void GATC_ERR(const char *param, uint16_t handle, esp_gatt_status_t status) {
-  ESP_LOGW(TAG, "Error %s at handle 0x%x, status=0x%02X", param, handle, status);
+  ESP_LOGW(TAG, "Error %s at handle 0x%X, status=0x%02X", param, handle, status);
 }
 
 inline void GATC_ERR(const char *param, const esp_bd_addr_t &addr) {
@@ -93,16 +93,20 @@ void MiotClient::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t g
       }
       const auto is_encrypted = this->is_encrypted_(param->read.handle);
       if (this->debug_) {
-        ESP_LOGD(TAG, "Got %s%s for 0x%x, data: %s", "read_char", is_encrypted ? " (encrypted)" : "",
+        ESP_LOGD(TAG, "Got %s%s for 0x%X, data: %s", "read_char", is_encrypted ? " (encrypted)" : "",
                  param->read.handle, hexencode(param->read.value, param->read.value_len).c_str());
       }
       if (is_encrypted) {
         esp_ble_gattc_cb_param_t::gattc_read_char_evt_param copy;
         memcpy(&copy, &param->read, sizeof(esp_ble_gattc_cb_param_t::gattc_read_char_evt_param));
         auto value = this->auth_->decode(param->read.value, param->read.value_len);
-        copy.value = value.data();
-        copy.value_len = value.size();
-        this->on_read_char(copy);
+        if (value.has_value()) {
+          copy.value = value->data();
+          copy.value_len = value->size();
+          this->on_read_char(copy);
+        } else {
+          ESP_LOGW(TAG, "Decryption failed: %s", hexencode(param->read.value, param->read.value_len).c_str());
+        }
       } else {
         this->on_read_char(param->read);
       }
@@ -119,16 +123,20 @@ void MiotClient::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t g
       }
       const auto is_encrypted = this->is_encrypted_(param->read.handle);
       if (this->debug_) {
-        ESP_LOGD(TAG, "Got %s%s for 0x%x, data: %s", "notify", is_encrypted ? " (encrypted)" : "", param->notify.handle,
+        ESP_LOGD(TAG, "Got %s%s for 0x%X, data: %s", "notify", is_encrypted ? " (encrypted)" : "", param->notify.handle,
                  hexencode(param->notify.value, param->notify.value_len).c_str());
       }
       if (this->is_encrypted_(param->notify.handle)) {
         esp_ble_gattc_cb_param_t::gattc_notify_evt_param copy;
         memcpy(&copy, &param->notify, sizeof(esp_ble_gattc_cb_param_t::gattc_notify_evt_param));
         auto value = this->auth_->decode(param->notify.value, param->notify.value_len);
-        copy.value = value.data();
-        copy.value_len = value.size();
-        this->on_notify(copy);
+        if (value.has_value()) {
+          copy.value = value->data();
+          copy.value_len = value->size();
+          this->on_notify(copy);
+        } else {
+          ESP_LOGW(TAG, "Decryption failed: %s", hexencode(param->notify.value, param->notify.value_len).c_str());
+        }
       } else {
         this->on_notify(param->notify);
       }
@@ -169,7 +177,7 @@ void MiotClient::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t g
 
 bool MiotClient::register_for_notify(uint16_t handle) const {
   if (this->debug_) {
-    ESP_LOGD(TAG, "%s, handle=0x%x", "esp_ble_gattc_register_for_notify", handle);
+    ESP_LOGD(TAG, "%s, handle=0x%X", "esp_ble_gattc_register_for_notify", handle);
   }
   auto status = esp_ble_gattc_register_for_notify(this->parent_->gattc_if, this->parent_->remote_bda, handle);
   if (status == ESP_GATT_OK) {
@@ -181,7 +189,7 @@ bool MiotClient::register_for_notify(uint16_t handle) const {
 
 bool MiotClient::read_char(uint16_t handle) const {
   if (this->debug_) {
-    ESP_LOGD(TAG, "%s, handle=0x%x", "esp_ble_gattc_read_char", handle);
+    ESP_LOGD(TAG, "%s, handle=0x%X", "esp_ble_gattc_read_char", handle);
   }
   auto status =
       esp_ble_gattc_read_char(this->parent_->gattc_if, this->parent_->conn_id, handle, ESP_GATT_AUTH_REQ_NONE);
@@ -194,15 +202,19 @@ bool MiotClient::read_char(uint16_t handle) const {
 
 bool MiotClient::write_char(uint16_t handle, const uint8_t *data, uint16_t size, bool need_response) const {
   if (this->debug_) {
-    ESP_LOGD(TAG, "%s, handle=0x%x, data: %s", "esp_ble_gattc_write_char", handle, hexencode(data, size).c_str());
+    ESP_LOGD(TAG, "%s, handle=0x%X, data: %s", "esp_ble_gattc_write_char", handle, hexencode(data, size).c_str());
   }
 
   uint16_t wr_size;
   uint8_t *wr_data;
   if (this->is_encrypted_(handle)) {
     auto value = this->auth_->encode(data, size);
-    wr_data = value.data();
-    wr_size = value.size();
+    if (!value.has_value()) {
+      ESP_LOGW(TAG, "Encryption failed: %s", hexencode(data, size).c_str());
+      return false;
+    }
+    wr_data = value->data();
+    wr_size = value->size();
   } else {
     wr_data = const_cast<uint8_t *>(data);
     wr_size = size;
@@ -216,6 +228,16 @@ bool MiotClient::write_char(uint16_t handle, const uint8_t *data, uint16_t size,
   }
   GATC_ERR("esp_ble_gattc_write_char", this->parent_->address_str(), status);
   return false;
+}
+
+esphome::ble_client::BLECharacteristic *MiotClient::get_char(const esp32_ble_tracker::ESPBTUUID &srv,
+                                                             const esp32_ble_tracker::ESPBTUUID &chr,
+                                                             bool log_not_found) {
+  auto res = this->parent()->get_characteristic(srv, chr);
+  if (res == nullptr && log_not_found) {
+    ESP_LOGE(TAG, "Can't discover characteristics %s at service %s", chr.to_string().c_str(), srv.to_string().c_str());
+  }
+  return res;
 }
 
 }  // namespace miot_client
