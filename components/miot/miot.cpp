@@ -59,7 +59,7 @@ bool MiBeaconTracker::parse_mibeacon_(const esp32_ble_tracker::ESPBTDevice &devi
   auto mib = MiBeacon(reinterpret_cast<const RawMiBeaconHeader *>(raw.data()));
 
   if (mib.frame_control.mesh) {
-    ESP_LOGW(TAG, "Device data is a mesh type device: %s", format_hex_pretty(raw).c_str());
+    // ESP_LOGW(TAG, "Device data is a mesh type device: %s", format_hex_pretty(raw).c_str());
     return false;
   }
 
