@@ -71,7 +71,7 @@ std::vector<uint8_t> cipher(const uint8_t *key, const std::size_t key_size, cons
 std::array<uint8_t, 12> generate_random_token() {
   std::array<uint8_t, 12> token;
   for (int i = 0; i < token.size(); i++) {
-    token[i] = fast_random_8();
+    token[i] = random_uint32();
   }
   return token;
 }

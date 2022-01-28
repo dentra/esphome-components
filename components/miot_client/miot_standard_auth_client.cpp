@@ -31,7 +31,7 @@ void MiotStandardAuthClient::on_search_complete(const esp_ble_gattc_cb_param_t::
     this->load_ctx_ = new LoadCtx;
   }
   for (size_t i = 0; i < sizeof(this->load_ctx_->app_random_data); i++) {
-    this->load_ctx_->app_random_data[i] = fast_random_8();
+    this->load_ctx_->app_random_data[i] = random_uint32();
   }
   this->register_for_notify(this->char_.ctrlp);
   this->register_for_notify(this->char_.auth);
