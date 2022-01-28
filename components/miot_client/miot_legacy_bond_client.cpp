@@ -83,7 +83,7 @@ void MiotLegacyBondClient::start_auth() {
     return;
   }
   this->token_ = cipher::generate_random_token();
-  ESP_LOGD(TAG, "Bonding started, token: %s", hexencode(this->token_).c_str());
+  ESP_LOGD(TAG, "Bonding started, token: %s", format_hex_pretty(this->token_).c_str());
   this->step1_();
 }
 
@@ -138,14 +138,14 @@ void MiotLegacyBondClient::step6_() {
 
 optional<std::vector<uint8_t>> MiotLegacyBondClient::decode(const uint8_t *data, const uint16_t size) const {
   if (this->debug_) {
-    ESP_LOGD(TAG, "Decoding %s", hexencode(data, size).c_str());
+    ESP_LOGD(TAG, "Decoding %s", format_hex_pretty(data, size).c_str());
   }
   return cipher::cipher(this->token_, data, size);
 }
 
 optional<std::vector<uint8_t>> MiotLegacyBondClient::encode(const uint8_t *data, const uint16_t size) {
   if (this->debug_) {
-    ESP_LOGD(TAG, "Encoding %s", hexencode(data, size).c_str());
+    ESP_LOGD(TAG, "Encoding %s", format_hex_pretty(data, size).c_str());
   }
   return cipher::cipher(this->token_, data, size);
 }

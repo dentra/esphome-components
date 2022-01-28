@@ -71,7 +71,7 @@ bool MiotExplorer::process_object_(const miot::BLEObject &obj) {
       this->process_water_boil_(obj.id, "Water Boil", obj.get_water_boil());
       break;
     default:
-      this->process_string_(obj.id, "", hexencode(obj.data));
+      this->process_string_(obj.id, "", format_hex_pretty(obj.data));
       break;
   }
   return true;

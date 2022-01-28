@@ -45,7 +45,7 @@ void dump(const char *const TAG, const MiBeacon &mib) {
   if (mib.frame_control.object_include) {
     ESP_LOGD(TAG, "  Object:");
     ESP_LOGD(TAG, "    ID  : %04X", mib.object.id);
-    ESP_LOGD(TAG, "    data: %s", hexencode(mib.object.data.data(), mib.object.data.size()).c_str());
+    ESP_LOGD(TAG, "    data: %s", format_hex_pretty(mib.object.data.data(), mib.object.data.size()).c_str());
   }
   if (mib.frame_control.is_encrypted) {
     ESP_LOGD(TAG, "  RND: %06X", mib.random_number >> 8);

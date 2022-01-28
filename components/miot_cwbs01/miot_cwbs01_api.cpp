@@ -40,22 +40,22 @@ static uint8_t calc_crc(const uint8_t *data, size_t size) {
 static uint8_t calc_crc(const frame_t *frame) { return calc_crc(&frame->size, frame->size); }
 
 bool MiotCWBS01Api::read_frame(const uint8_t *data, uint8_t size) {
-  ESP_LOGV(TAG, "read frame: %s", hexencode(data, size).c_str());
+  ESP_LOGV(TAG, "read frame: %s", format_hex_pretty(data, size).c_str());
 
   auto frame = reinterpret_cast<const frame_t *>(data);
   if (frame->header != frame_t::FRAME_HEADER) {
-    ESP_LOGW(TAG, "Invalid frame magic: %s", hexencode(data, size).c_str());
+    ESP_LOGW(TAG, "Invalid frame magic: %s", format_hex_pretty(data, size).c_str());
     return false;
   }
 
   if (frame->size != size - 1 /*header*/ - 1 /*size*/) {
-    ESP_LOGW(TAG, "Invalid frame size: %s", hexencode(data, size).c_str());
+    ESP_LOGW(TAG, "Invalid frame size: %s", format_hex_pretty(data, size).c_str());
     return false;
   }
 
   const uint8_t crc = data[size - 1];
   if (calc_crc(frame) != crc) {
-    ESP_LOGW(TAG, "Invalid frame crc: %s", hexencode(data, size).c_str());
+    ESP_LOGW(TAG, "Invalid frame crc: %s", format_hex_pretty(data, size).c_str());
     return false;
   }
 
@@ -63,7 +63,7 @@ bool MiotCWBS01Api::read_frame(const uint8_t *data, uint8_t size) {
 }
 
 bool MiotCWBS01Api::read_packet_(Packet type, const void *data, uint8_t size) {
-  ESP_LOGV(TAG, "read packet %02x: %s", type, hexencode(static_cast<const uint8_t *>(data), size).c_str());
+  ESP_LOGV(TAG, "read packet %02x: %s", type, format_hex_pretty(static_cast<const uint8_t *>(data), size).c_str());
   if (type == PACKET_STATE) {
     if (size != sizeof(state_t)) {
       ESP_LOGW(TAG, "Incorrect state packet size: %u", size);
@@ -81,7 +81,7 @@ bool MiotCWBS01Api::read_packet_(Packet type, const void *data, uint8_t size) {
   }
 
   ESP_LOGW(TAG, "Unknown packet type: %02x, data: %s", type,
-           hexencode(reinterpret_cast<const uint8_t *>(&data), size).c_str());
+           format_hex_pretty(reinterpret_cast<const uint8_t *>(&data), size).c_str());
 
   return false;
 }
@@ -101,7 +101,7 @@ bool MiotCWBS01Api::read_command_(Command cmd, const void *data, uint8_t size) {
 }
 
 bool MiotCWBS01Api::send_packet_(Packet type, const void *data, uint8_t size) const {
-  ESP_LOGV(TAG, "send packet %02x, %s", type, hexencode(static_cast<const uint8_t *>(data), size).c_str());
+  ESP_LOGV(TAG, "send packet %02x, %s", type, format_hex_pretty(static_cast<const uint8_t *>(data), size).c_str());
   auto frame_size = sizeof(frame_t) + size;
   auto frame = static_cast<frame_t *>(std::malloc(frame_size));
   if (frame == nullptr) {
@@ -125,7 +125,7 @@ bool MiotCWBS01Api::send_packet_(Packet type, const void *data, uint8_t size) co
 }
 
 bool MiotCWBS01Api::send_command_(Command cmd, const void *data, uint8_t size) const {
-  ESP_LOGV(TAG, "send command %04x, %s", cmd, hexencode(static_cast<const uint8_t *>(data), size).c_str());
+  ESP_LOGV(TAG, "send command %04x, %s", cmd, format_hex_pretty(static_cast<const uint8_t *>(data), size).c_str());
   Packet p = static_cast<Packet>(cmd & 0xFF);
   uint8_t c = cmd >> 8;
 
@@ -220,7 +220,7 @@ bool MiotCWBS01Api::set_schedule(const schedule_t &schedule, Scene scene, Mode m
     Mode mode;
   } data{.schedule = schedule, .scene = scene, .mode = mode};
   ESP_LOGD(TAG, "Set schedule %s, scene %u, mode %u",
-           hexencode(reinterpret_cast<const uint8_t *>(&data), sizeof(data)).c_str(), scene, mode);
+           format_hex_pretty(reinterpret_cast<const uint8_t *>(&data), sizeof(data)).c_str(), scene, mode);
   return this->send_command_(COMMAND_SCHEDULE, &data, sizeof(data));
 }
 }  // namespace miot_cwbs01

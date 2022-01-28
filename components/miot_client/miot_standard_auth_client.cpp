@@ -81,7 +81,7 @@ void debug(const char *prefix, const AuthFrame &frame, uint16_t frame_size) {
     }
   } else {
     ESP_LOGD(TAG, "%s DAT: sn=%u: %s", prefix, frame.sn,
-             hexencode(frame.data, AuthFrame::data_size(frame_size)).c_str());
+             format_hex_pretty(frame.data, AuthFrame::data_size(frame_size)).c_str());
   }
 }
 
@@ -144,14 +144,14 @@ void MiotStandardAuthClient::process_auth_dev_random_(const AuthFrame &frame, ui
   const size_t data_size = AuthFrame::data_size(frame_size);
 
   ESP_LOGD(TAG, "Collect DEV_RANDOM %u of %u: %s", frame.sn, this->load_ctx_->max_rx_frames,
-           hexencode(frame.data, data_size).c_str());
+           format_hex_pretty(frame.data, data_size).c_str());
 
   // this->dev_random_data_.insert(this->dev_random_data_.end(), frame.data, frame.data + data_size);
   std::memcpy(this->load_ctx_->dev_random_data + (frame.sn - 1) * sizeof(frame.data), frame.data, data_size);
 
   if (frame.sn >= this->load_ctx_->max_rx_frames) {
     ESP_LOGD(TAG, "<=== dev_random_data: %s",
-             hexencode(this->load_ctx_->dev_random_data, sizeof(this->load_ctx_->dev_random_data)).c_str());
+             format_hex_pretty(this->load_ctx_->dev_random_data, sizeof(this->load_ctx_->dev_random_data)).c_str());
 
     this->load_ctx_->max_rx_frames = 0;
     this->state_ = AuthFrame::CMD_PASS_THROUGH;
@@ -188,26 +188,28 @@ void MiotStandardAuthClient::process_auth_dev_confirmation_(const AuthFrame &fra
   const size_t data_size = AuthFrame::data_size(frame_size);
 
   ESP_LOGD(TAG, "Collect DEV_CONFIRMATION %u of %u: %s", frame.sn, this->load_ctx_->max_rx_frames,
-           hexencode(frame.data, data_size).c_str());
+           format_hex_pretty(frame.data, data_size).c_str());
 
   // this->dev_confirmation_data_.insert(this->dev_confirmation_data_.end(), frame.data, frame.data + data_size);
   std::memcpy(this->load_ctx_->dev_confirmation_data + (frame.sn - 1) * sizeof(frame.data), frame.data, data_size);
 
   if (frame.sn >= this->load_ctx_->max_rx_frames) {
     ESP_LOGD(TAG, "<=== dev_confirmation_data: %s",
-             hexencode(this->load_ctx_->dev_confirmation_data, sizeof(this->load_ctx_->dev_confirmation_data)).c_str());
+             format_hex_pretty(this->load_ctx_->dev_confirmation_data, sizeof(this->load_ctx_->dev_confirmation_data))
+                 .c_str());
 
     this->load_ctx_->max_rx_frames = 0;
     this->write_ack_(AuthFrame::ACK_SUCCESS);
     if (std::memcmp(this->load_ctx_->exp_confirmation_data, this->load_ctx_->dev_confirmation_data,
                     sizeof(this->load_ctx_->dev_confirmation_data)) != 0) {
-      ESP_LOGW(
-          TAG,
-          "Fail compare\n"
-          "  exp_confirmation_data: %s\n"
-          "  dev_confirmation_data: %s\n",
-          hexencode(this->load_ctx_->exp_confirmation_data, sizeof(this->load_ctx_->exp_confirmation_data)).c_str(),
-          hexencode(this->load_ctx_->dev_confirmation_data, sizeof(this->load_ctx_->dev_confirmation_data)).c_str());
+      ESP_LOGW(TAG,
+               "Fail compare\n"
+               "  exp_confirmation_data: %s\n"
+               "  dev_confirmation_data: %s\n",
+               format_hex_pretty(this->load_ctx_->exp_confirmation_data, sizeof(this->load_ctx_->exp_confirmation_data))
+                   .c_str(),
+               format_hex_pretty(this->load_ctx_->dev_confirmation_data, sizeof(this->load_ctx_->dev_confirmation_data))
+                   .c_str());
     }
     this->write_cmd_(AuthFrame::CMD_APP_CONFIRMATION, sizeof(this->load_ctx_->app_confirmation_data));
   }
@@ -221,10 +223,10 @@ void MiotStandardAuthClient::generate_login_data_() {
   std::memcpy(salt + n, this->load_ctx_->dev_random_data, sizeof(this->load_ctx_->dev_random_data));
 
   ESP_LOGD(TAG, "app_random_data: %s",
-           hexencode(this->load_ctx_->app_random_data, sizeof(this->load_ctx_->app_random_data)).c_str());
+           format_hex_pretty(this->load_ctx_->app_random_data, sizeof(this->load_ctx_->app_random_data)).c_str());
   ESP_LOGD(TAG, "dev_random_data: %s",
-           hexencode(this->load_ctx_->dev_random_data, sizeof(this->load_ctx_->dev_random_data)).c_str());
-  ESP_LOGD(TAG, "salt1: %s", hexencode(salt, sizeof(salt)).c_str());
+           format_hex_pretty(this->load_ctx_->dev_random_data, sizeof(this->load_ctx_->dev_random_data)).c_str());
+  ESP_LOGD(TAG, "salt1: %s", format_hex_pretty(salt, sizeof(salt)).c_str());
 
   auto md_info = mbedtls_md_info_from_type(mbedtls_md_type_t::MBEDTLS_MD_SHA256);
 
@@ -244,7 +246,7 @@ void MiotStandardAuthClient::generate_login_data_() {
   std::memcpy(salt + 0, this->load_ctx_->dev_random_data, sizeof(this->load_ctx_->dev_random_data));
   const auto m = sizeof(this->load_ctx_->dev_random_data);
   std::memcpy(salt + m, this->load_ctx_->app_random_data, sizeof(this->load_ctx_->app_random_data));
-  ESP_LOGD(TAG, "salt2: %s", hexencode(salt, sizeof(salt)).c_str());
+  ESP_LOGD(TAG, "salt2: %s", format_hex_pretty(salt, sizeof(salt)).c_str());
 
   res = mbedtls_md_hmac(md_info, this->session_ctx_.dev_key, sizeof(this->session_ctx_.dev_key), salt, sizeof(salt),
                         this->load_ctx_->exp_confirmation_data);
@@ -253,9 +255,11 @@ void MiotStandardAuthClient::generate_login_data_() {
   }
 
   ESP_LOGD(TAG, "prepared exp_confirmation_data: %s",
-           hexencode(this->load_ctx_->exp_confirmation_data, sizeof(this->load_ctx_->exp_confirmation_data)).c_str());
+           format_hex_pretty(this->load_ctx_->exp_confirmation_data, sizeof(this->load_ctx_->exp_confirmation_data))
+               .c_str());
   ESP_LOGD(TAG, "prepared app_confirmation_data: %s",
-           hexencode(this->load_ctx_->app_confirmation_data, sizeof(this->load_ctx_->app_confirmation_data)).c_str());
+           format_hex_pretty(this->load_ctx_->app_confirmation_data, sizeof(this->load_ctx_->app_confirmation_data))
+               .c_str());
 }
 
 bool MiotStandardAuthClient::write_data_(const uint8_t *data, const size_t data_size) {
@@ -304,7 +308,7 @@ bool MiotStandardAuthClient::write_ack_(AuthFrame::Ack ack) {
 
 optional<std::vector<uint8_t>> MiotStandardAuthClient::decode(const uint8_t *data, const uint16_t size) const {
   if (this->debug_) {
-    ESP_LOGD(TAG, "Decoding %s", hexencode(data, size).c_str());
+    ESP_LOGD(TAG, "Decoding %s", format_hex_pretty(data, size).c_str());
   }
 
   // data struct: seq (2 bytes) + data (N bytes) + tag (4 bytes)
@@ -327,7 +331,7 @@ optional<std::vector<uint8_t>> MiotStandardAuthClient::decode(const uint8_t *dat
 
 optional<std::vector<uint8_t>> MiotStandardAuthClient::encode(const uint8_t *data, const uint16_t size) {
   if (this->debug_) {
-    ESP_LOGD(TAG, "Encoding %s", hexencode(data, size).c_str());
+    ESP_LOGD(TAG, "Encoding %s", format_hex_pretty(data, size).c_str());
   }
 
   // buffer struct: seq (2 bytes) + data (N bytes) + tag (4 bytes)
