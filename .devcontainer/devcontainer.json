@@ -3,7 +3,7 @@
   "build": {
     "args": {
       // ESPHome version
-      "esphome_version": "2021.12.1",
+      "esphome_version": "2022.1.2",
       // additional APT dependicies
       "apt_deps": "bash-completion less"
     }
@@ -41,7 +41,9 @@
       "**/*.pyc": {
         "when": "$(basename).py"
       },
-      "**/__pycache__": true
+      "**/__pycache__": true,
+      "**/.esphome": true,
+      ".pio": true,
     },
     "files.associations": {
       "**/.vscode/*.json": "jsonc"
