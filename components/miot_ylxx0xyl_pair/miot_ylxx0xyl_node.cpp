@@ -14,18 +14,16 @@ void MiotYLxx0xYLNode::on_disconnect(const esp_ble_gattc_cb_param_t::gattc_disco
 }
 
 void MiotYLxx0xYLNode::on_search_complete(const esp_ble_gattc_cb_param_t::gattc_search_cmpl_evt_param &param) {
-  this->char_.ver = this->get_characteristic_handle(miot_client::BT_UUID_MI_SERVICE, miot_client::BT_UUID_MI_VERSION);
+  this->char_.ver = this->get_char_handle(miot_client::BLE_UUID_MI_SERVICE, miot_client::BLE_UUID_MI_VERSION);
   if (this->char_.ver == ESP_GATT_ILLEGAL_HANDLE) {
-    ESP_LOGE(TAG, "Can't discover characteristics %04X", miot_client::BT_UUID_MI_VERSION);
     return;
   }
-  this->add_auth_char(this->char_.ver);
-
-  this->char_.key = this->get_characteristic_handle(miot_client::BT_UUID_MI_SERVICE, miot_client::BT_UUID_MI_BEACONKEY);
+  this->char_.key = this->get_char_handle(miot_client::BLE_UUID_MI_SERVICE, miot_client::BLE_UUID_MI_BEACONKEY);
   if (this->char_.key == ESP_GATT_ILLEGAL_HANDLE) {
-    ESP_LOGE(TAG, "Can't discover characteristics %04X", miot_client::BT_UUID_MI_BEACONKEY);
     return;
   }
+
+  this->add_auth_char(this->char_.ver);
   this->add_auth_char(this->char_.key);
 }
 

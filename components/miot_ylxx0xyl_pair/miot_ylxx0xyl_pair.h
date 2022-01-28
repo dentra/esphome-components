@@ -18,7 +18,7 @@ class MiotYLxx0xYLPair : public Component,
   uint16_t get_product_id() const override { return this->product_id_; }
   void set_product_id(uint16_t product_id) { this->product_id_ = product_id; }
 
-  void set_auth_client(miot_client::MiotLegacyAuthClient *auth) { this->auth_ = auth; }
+  void set_auth_client(miot_client::MiotLegacyBondClient *auth) { this->auth_ = auth; }
   void set_version(text_sensor::TextSensor *version) { this->version_ = version; }
 
   void publish_bindkey(const std::string &value) override { this->publish_state(value); }
@@ -33,7 +33,7 @@ class MiotYLxx0xYLPair : public Component,
  protected:
   text_sensor::TextSensor *version_ = {};
   uint16_t product_id_ = {};
-  miot_client::MiotLegacyAuthClient *auth_ = {};
+  miot_client::MiotLegacyBondClient *auth_ = {};
   void process_pairing_(const miot::BLEObject &obj);
   bool process_object_(const miot::BLEObject &obj) override { return false; };
 };

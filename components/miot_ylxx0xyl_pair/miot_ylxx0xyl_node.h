@@ -2,7 +2,7 @@
 
 #include "esphome/components/ble_client/ble_client.h"
 #include "../miot_client/miot_client.h"
-#include "../miot_client/miot_legacy_auth_client.h"
+#include "../miot_client/miot_legacy_bond_client.h"
 
 namespace esphome {
 namespace miot_ylxx0xyl {

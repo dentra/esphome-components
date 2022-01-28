@@ -1,4 +1,5 @@
 from esphome.const import (
+    CONF_ICON,
     CONF_ID,
     CONF_VERSION,
 )
@@ -9,6 +10,8 @@ from esphome.components import miot, miot_client, text_sensor, ble_client
 
 CODEOWNERS = ["@dentra"]
 AUTO_LOAD = ["miot", "miot_client", "text_sensor", "ble_client"]
+
+ICON_VERSION = "cellphone-arrow-down"
 
 miot_ylxx0xyl_ns = cg.esphome_ns.namespace("miot_ylxx0xyl")
 MiotYLxx0xYLPair = miot_ylxx0xyl_ns.class_(
@@ -26,6 +29,7 @@ CONFIG_SCHEMA = (
             cv.Optional(CONF_VERSION): text_sensor.TEXT_SENSOR_SCHEMA.extend(
                 {
                     cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
+                    cv.Optional(CONF_ICON, default=ICON_VERSION): cv.icon,
                 }
             ),
             cv.Optional(miot.CONF_PRODUCT_ID): cv.uint16_t,
@@ -33,7 +37,8 @@ CONFIG_SCHEMA = (
     )
     .extend(ble_client.BLE_CLIENT_SCHEMA)
     .extend(cv.COMPONENT_SCHEMA)
-    .extend(miot_client.legacy_auth_schema(MiotYLxx0xYLNode))
+    .extend(miot_client.client_schema(MiotYLxx0xYLNode))
+    .extend(miot_client.legacy_auth_schema())
 )
 
 
