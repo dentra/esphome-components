@@ -83,7 +83,7 @@ void MiotLegacyBondClient::start_auth() {
     return;
   }
   this->token_ = cipher::generate_random_token();
-  ESP_LOGD(TAG, "Bonding started, token: %s", format_hex_pretty(this->token_).c_str());
+  ESP_LOGD(TAG, "Bonding started, token: %s", format_hex(this->token_.data(), this->token_.size()).c_str());
   this->step1_();
 }
 
