@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<!-- <script src="http://bitwiseshiftleft.github.io/sjcl/sjcl.js"></script> -->
+<script src="https://pvvx.github.io/ATC_MiThermometer/core.js"></script>
+<script>
+  class BLE_UUID {
+    static MI_SERVICE = 0xFE95;
+    static MI_VERSION = 0x0004;
+    static MI_CONTROL_POINT = 0x0010;
+    static MI_STANDARD_AUTH = 0x0019;
+
+    static MI_STDIO_SERVICE = '00000100-0065-6c62-2e74-6f696d2e696d';
+    static MI_STDIO_RX = '00000101-0065-6c62-2e74-6f696d2e696d';
+    static MI_STDIO_TX = '00000102-0065-6c62-2e74-6f696d2e696d';
+  }
+
+  class MODE {
+    static CMD = 0;
+    static ACK = 1;
+
+    static str(mode) {
+      switch (mode) {
+        case MODE.CMD:
+          return "CMD";
+        case MODE.ACK:
+          return "ACK";
+      }
+      return "MODE_" + mode;
+    }
+  }
+
+  class CMD {
+    static PASS_THROUGH = 0x00;
+    static DEV_CERT = 0x01;
+    static DEV_MANU_CERT = 0x02;
+    static ECC_PUBKEY = 0x03;
+    static DEV_SIGNATURE = 0x04;
+    static DEV_LOGIN_INFO = 0x05;
+    static DEV_SHARE_INFO = 0x06;
+    static SERVER_CERT = 0x07;
+    static SERVER_SIGN = 0x08;
+    static MESH_CONFIG = 0x09;
+    static APP_CONFIRMATION = 0x0A;
+    static APP_RANDOM = 0x0B;
+    static DEV_CONFIRMATION = 0x0C;
+    static DEV_RANDOM = 0x0D;
+    static BIND_KEY = 0x0E;
+
+    static str(cmd) {
+      switch (cmd) {
+        case CMD.PASS_THROUGH:
+          return "PASS_THROUGH";
+        case CMD.DEV_CERT:
+          return "DEV_CERT";
+        case CMD.DEV_MANU_CERT:
+          return "DEV_MANU_CERT";
+        case CMD.ECC_PUBKEY:
+          return "ECC_PUBKEY";
+        case CMD.DEV_SIGNATURE:
+          return "DEV_SIGNATURE";
+        case CMD.DEV_LOGIN_INFO:
+          return "DEV_LOGIN_INFO";
+        case CMD.DEV_SHARE_INFO:
+          return "DEV_SHARE_INFO";
+        case CMD.SERVER_CERT:
+          return "SERVER_CERT";
+        case CMD.SERVER_SIGN:
+          return "SERVER_SIGN";
+        case CMD.MESH_CONFIG:
+          return "MESH_CONFIG";
+        case CMD.APP_CONFIRMATION:
+          return "APP_CONFIRMATION";
+        case CMD.APP_RANDOM:
+          return "APP_RANDOM";
+        case CMD.DEV_CONFIRMATION:
+          return "DEV_CONFIRMATION";
+        case CMD.DEV_RANDOM:
+          return "DEV_RANDOM";
+        case CMD.BIND_KEY:
+          return "BIND_KEY";
+      }
+      return "CMD_" + cmd.toString(16).toUpperCase().padStart(2, '0');
+    }
+  }
+
+  class ACK {
+    static SUCCESS = 0;
+    static READY = 1;
+    static BUSY = 2;
+    static TIMEOUT = 3;
+    static CANCEL = 4;
+    static LOST = 5;
+
+    static str(ack) {
+      switch (ack) {
+        case ACK.SUCCESS:
+          return "SUCCESS";
+        case ACK.READY:
+          return "READY";
+        case ACK.BUSY:
+          return "BUSY";
+        case ACK.TIMEOUT:
+          return "TIMEOUT";
+        case ACK.CANCEL:
+          return "CANCEL";
+        case ACK.LOST:
+          return "LOST";
+      }
+      return "ACK_" + ack.toString(16).toUpperCase().padStart(2, '0');
+    }
+  }
+
+  class OPCODE {
+    static REG_TYPE = 0x10;
+    static REG_START = OPCODE.REG_TYPE;
+    static REG_SUCCESS = OPCODE.REG_TYPE + 1;
+    static REG_FAILED = OPCODE.REG_TYPE + 2;
+    static REG_VERIFY_SUCC = OPCODE.REG_TYPE + 3;
+    static REG_VERIFY_FAIL = OPCODE.REG_TYPE + 4;
+    static REG_START_WO_PKI = OPCODE.REG_TYPE + 5;
+
+    static LOGIN_TYPE = 0x20; // 0x20UL
+    static LOGIN_START = OPCODE.LOGIN_TYPE + 0;
+    static LOGIN_SUCCESS = OPCODE.LOGIN_TYPE + 1;
+    static LOGIN_INVALID_LTMK = OPCODE.LOGIN_TYPE + 2;
+    static LOGIN_FAILED = OPCODE.LOGIN_TYPE + 3;
+    static LOGIN_START_W_RANDOM = OPCODE.LOGIN_TYPE + 4;
+
+    static SYS_TYPE = 0xA0;
+    static KEY_RESTORE = OPCODE.SYS_TYPE;
+    static KEY_DELETE = OPCODE.SYS_TYPE + 1;
+    static DEV_INFO_GET = OPCODE.SYS_TYPE + 2;
+    static SYS_UNKNOWN_A4 = OPCODE.SYS_TYPE + 4;
+
+    static str(opcode) {
+      switch (opcode) {
+        case OPCODE.REG_START:
+          return "REG_START";
+        case OPCODE.REG_SUCCESS:
+          return "REG_SUCCESS";
+        case OPCODE.REG_FAILED:
+          return "REG_FAILED";
+        case OPCODE.REG_VERIFY_SUCC:
+          return "REG_VERIFY_SUCC";
+        case OPCODE.REG_VERIFY_FAIL:
+          return "REG_VERIFY_FAIL";
+        case OPCODE.REG_START_WO_PKI:
+          return "REG_START_WO_PKI";
+        case OPCODE.LOGIN_START:
+          return "LOGIN_START";
+        case OPCODE.LOGIN_SUCCESS:
+          return "LOGIN_SUCCESS";
+        case OPCODE.LOGIN_INVALID_LTMK:
+          return "LOGIN_INVALID_LTMK";
+        case OPCODE.LOGIN_FAILED:
+          return "LOGIN_FAILED";
+        case OPCODE.LOGIN_START_W_RANDOM:
+          return "LOGIN_START_W_RANDOM";
+        case OPCODE.KEY_RESTORE:
+          return "KEY_RESTORE";
+        case OPCODE.KEY_DELETE:
+          return "KEY_DELETE";
+        case OPCODE.DEV_INFO_GET:
+          return "DEV_INFO_GET";
+        case OPCODE.SYS_UNKNOWN_A4:
+          return "SYS_UNKNOWN_A4";
+      }
+      return "OPCODE_" + opcode.toString(16).toUpperCase().padStart(8, '0');
+    }
+  }
+
+  const MAX_RXFER_DATA_SIZE = 18;
+
+  var beaconkey = '';
+  var token = '';
+  const appRandomData = crypto.getRandomValues(new Uint8Array(16));
+  var devRandomData = new Uint8Array(0);
+  var devConfirmationData = new Uint8Array(0);
+  var appConfirmationData = new Uint8Array(0);
+  var expConfirmationData = new Uint8Array(0);
+  const session_ctx = { dev_key: '', app_key: '', dev_iv: '', app_iv: '' };
+
+  var state = CMD.PASS_THROUGH;
+
+  function hex(buffer, separator) {
+    separator = separator || '';
+    var str = [...new Uint8Array(buffer)].map(b => {
+      return b.toString(16).padStart(2, '0');
+    }).join(separator);
+    if (separator != '') {
+      str += ` (${buffer.byteLength})`
+    }
+    return str;
+  }
+
+  function from_hex(hexString) {
+    return new Uint8Array(hexString.match(/.{1,2}/g).map(byte => parseInt(byte, 16)))
+  };
+
+  function log(s) {
+    console.log(s);
+    var logarea = document.getElementById("logarea");
+    logarea.textContent += s + "\n"
+    logarea.scrollTop = logarea.scrollHeight;
+  }
+
+  function rxfer(dataView) {
+    sn = (new Uint16Array(dataView.buffer, 0, 1))[0];
+    if (sn > 0) {
+      data = new Uint8Array(dataView.buffer, 2, dataView.byteLength - 2);
+      return { sn: sn, data: data };
+    }
+    res = { sn: sn, mode: (new Uint8Array(dataView.buffer, 2, 1))[0] };
+    type = (new Uint8Array(dataView.buffer, 3, 1))[0];
+    if (res.mode == MODE.CMD) {
+      res["cmd"] = type;
+    } else if (res.mode == MODE.ACK) {
+      res["ack"] = type;
+    } else {
+      res["type"] = type;
+    }
+    if (dataView.byteLength > 4) {
+      res["num"] = (new Uint16Array(dataView.buffer, 4, 1))[0];
+    }
+    return res;
+  }
+
+  function rxfer_str(rxfer) {
+    if (rxfer["data"] != undefined) {
+      return `sn=${sn}, data=${hex(rxfer.data, ' ')}`
+    }
+    mode = MODE.str(rxfer.mode);
+    if (rxfer["cmd"] != undefined) {
+      type = "cmd=" + CMD.str(rxfer.cmd);
+    }
+    if (rxfer["ack"] != undefined) {
+      type = "ack=" + ACK.str(rxfer.ack);
+    }
+    if (rxfer["type"] != undefined) {
+      type = "type=" + rxfer.type;
+    }
+    num = rxfer.num > 0 ? `, num=${rxfer.num}` : '';
+    return `sn=${rxfer.sn}, mode=${mode}, ${type}` + num;
+  }
+
+  function rxfer_to_data(rxfer) {
+    if (rxfer["data"] != undefined) {
+      res = new Uint8Array(2 + rxfer.data.byteLength);
+      res.set(Uint16Array.of(rxfer.sn));
+      res.set(rxfer.data, 2);
+    } else {
+      res = new Uint8Array(4);
+      res.set(Uint16Array.of(rxfer.sn));
+      res.set(Uint8Array.of(rxfer.mode), 2);
+      switch (rxfer.mode) {
+        case MODE.CMD:
+          res.set(Uint8Array.of(rxfer.cmd), 3);
+          break;
+        case MODE.ACK:
+          res.set(Uint8Array.of(rxfer.ack), 3);
+          break;
+        default:
+          res.set(Uint8Array.of(rxfer.type), 3);
+          break;
+      }
+      if (rxfer.num != undefined) {
+        cpy = new Uint8Array(6);
+        cpy.set(res, 0);
+        cpy.set(Uint16Array.of(rxfer.num), 4);
+        res = cpy;
+      }
+    }
+    return res;
+  }
+
+  async function rxfer_write(rxfer) {
+    log(`send rxfer: ${rxfer_str(rxfer)}`)
+    return char_write(auth, rxfer_to_data(rxfer));
+  }
+
+  async function rxfer_write_cmd(cmd, data) {
+    state = cmd;
+    var res = { sn: 0, mode: MODE.CMD, cmd: cmd };
+    if (data != undefined) {
+      res['num'] = Math.ceil(data.byteLength / MAX_RXFER_DATA_SIZE);
+    }
+    return rxfer_write(res);
+  }
+
+  async function rxfer_write_ack(ack) {
+    return rxfer_write({ sn: 0, mode: MODE.ACK, ack: ack });
+  }
+
+  async function rxfer_write_data(data) {
+
+    for (var i = 0, max = Math.ceil(data.byteLength / MAX_RXFER_DATA_SIZE); i < max; i++) {
+      var ofs = i * MAX_RXFER_DATA_SIZE;
+      var res = new Uint8Array(data.buffer, ofs, ofs + MAX_RXFER_DATA_SIZE < data.byteLength ? MAX_RXFER_DATA_SIZE : data.byteLength - ofs);
+      await rxfer_write({ sn: i + 1, data: res });
+    }
+  }
+
+  function opcode_from_dataView(dataView) {
+    var res = new Uint32Array(dataView.buffer);
+    return res[0];
+  }
+
+  async function opcode_write(opcode) {
+    log(`send opcode: ${OPCODE.str(opcode)}`)
+    var v = Uint32Array.of(opcode)
+    var data = new Uint8Array(v.byteLength);
+    data.set(v)
+    return char_write(ctrlp, data);
+  }
+
+  async function char_write(char, data) {
+    return char.writeValue(data).then(v => {
+      log(`${char.uuid} send => ${hex(data, ' ')}`);
+    });
+  }
+
+  async function char_subscribe(char, func) {
+    char.addEventListener('characteristicvaluechanged', event => {
+      const value = event.target.value;
+      log(`${char.uuid} recv <= ${hex(value.buffer, ' ')}`);
+      func(event);
+    });
+    return char.startNotifications();
+  }
+
+  var stdio_send_counter = 0;
+  async function stdio_send(data_str) {
+    log("send stdio => " + data_str.toLowerCase());
+
+    var v = Uint16Array.of(stdio_send_counter++)
+    var data = new Uint8Array(v.byteLength);
+    data.set(v)
+
+    var counter_hex = hex(data);
+
+    var encoded = sjcl.codec.hex.fromBits(
+      sjcl.mode.ccm.encrypt(
+        new sjcl.cipher.aes(sjcl.codec.hex.toBits(session_ctx.app_key)), // prf - The pseudorandom function. It must have a block size of 16 bytes.
+        sjcl.codec.hex.toBits(data_str), // plaintext - The plaintext data.
+        sjcl.codec.hex.toBits(session_ctx.app_iv + "00000000" + counter_hex + "0000"), // iv -The initialization value.
+        sjcl.codec.hex.toBits(""), //adata - The authenticated data.
+        32 //tlen - the desired tag length, in bits.
+      )
+    );
+    char_write(stdio_rx, from_hex(counter_hex + encoded));
+  }
+
+  // @param input hex string
+  // return decoded hex string
+  async function stdio_recv(encoded_data_str) {
+    var counter_hex = encoded_data_str.substring(0, 4);
+    var decoded = sjcl.codec.hex.fromBits(
+      sjcl.mode.ccm.decrypt(
+        new sjcl.cipher.aes(sjcl.codec.hex.toBits(session_ctx.dev_key)), // prf - The pseudorandom function. It must have a block size of 16 bytes.
+        sjcl.codec.hex.toBits(encoded_data_str.substring(4)), // plaintext - The plaintext data.
+        sjcl.codec.hex.toBits(session_ctx.dev_iv + "00000000" + counter_hex + "0000"), // iv -The initialization value.
+        sjcl.codec.hex.toBits(""), //adata - The authenticated data.
+        32 //tlen - the desired tag length, in bits.
+      )
+    );
+    log("recv stdio <= " + decoded);
+    return decoded;
+  }
+
+  async function generate_login_data() {
+    var salt0 = hex(appRandomData) + hex(devRandomData);
+
+    var derivedKey = sjcl.codec.hex.fromBits(
+      sjcl.misc.hkdf(
+        sjcl.codec.hex.toBits(token),
+        8 * 64,
+        sjcl.codec.hex.toBits(salt0),
+        "mible-login-info",
+        sjcl.hash["sha256"]
+      )
+    );
+    log(`derivedKey: ${derivedKey} (${derivedKey.length / 2})`);
+    session_ctx.dev_key = derivedKey.substring(0, 32);
+    session_ctx.app_key = derivedKey.substring(32, 64);
+    session_ctx.dev_iv = derivedKey.substring(64, 72);
+    session_ctx.app_iv = derivedKey.substring(72, 80);
+    log("session_ctx: " + JSON.stringify(session_ctx));
+
+    appConfirmationData = from_hex(sjcl.codec.hex.fromBits(
+      new sjcl.misc.hmac(sjcl.codec.hex.toBits(session_ctx.app_key)).mac(sjcl.codec.hex.toBits(salt0))
+    ));
+
+    var salt1 = hex(devRandomData) + hex(appRandomData);
+    expConfirmationData = from_hex(sjcl.codec.hex.fromBits(
+      new sjcl.misc.hmac(sjcl.codec.hex.toBits(session_ctx.dev_key)).mac(sjcl.codec.hex.toBits(salt1))
+    ));
+  }
+
+  async function auth_appRandom(r) {
+    if (r.mode == MODE.ACK && r.ack == ACK.READY) {
+      await rxfer_write_data(appRandomData);
+    } else if (r.mode == MODE.ACK && r.ack == ACK.SUCCESS) {
+      state = CMD.PASS_THROUGH;
+    }
+  }
+
+  var max_rx_frames = 0;
+  async function auth_devRandom(r) {
+    if (r.mode == MODE.CMD) {
+      max_rx_frames = r.num;
+      await rxfer_write_ack(ACK.READY);
+    } else if (r.sn > 0) {
+      log(`collect DEV_RANDOM ${sn} of ${max_rx_frames}: ` + hex(r.data, ' '));
+      data = new Uint8Array(devRandomData.byteLength + r.data.byteLength);
+      data.set(devRandomData);
+      data.set(r.data, devRandomData.byteLength);
+      devRandomData = data;
+      if (r.data.byteLength < MAX_RXFER_DATA_SIZE) { // check frames instead
+        await rxfer_write_ack(ACK.SUCCESS);
+        await generate_login_data();
+        state = CMD.PASS_THROUGH;
+      }
+    }
+  }
+
+  async function auth_devConfirmation(r) {
+    if (r.mode == MODE.CMD) {
+      max_rx_frames = r.num;
+      await rxfer_write_ack(ACK.READY);
+    } else if (r.sn > 0) {
+      log(`collect DEV_CONFIRMATION ${sn} of ${max_rx_frames}: ` + hex(r.data, ' '));
+      data = new Uint8Array(devConfirmationData.byteLength + r.data.byteLength);
+      data.set(devConfirmationData);
+      data.set(r.data, devConfirmationData.byteLength);
+      devConfirmationData = data;
+      if (r.data.byteLength < MAX_RXFER_DATA_SIZE) { // check frames instead
+        await rxfer_write_ack(ACK.SUCCESS);
+        log("expConfirmationData: " + hex(expConfirmationData, ' '));
+        log("devConfirmationData: " + hex(devConfirmationData, ' '));
+        log("appConfirmationData: " + hex(appConfirmationData, ' '));
+        await rxfer_write_cmd(CMD.APP_CONFIRMATION, appConfirmationData);
+      }
+    }
+  }
+
+  async function auth_appConfirmation(r) {
+    if (r.mode == MODE.ACK && r.ack == ACK.READY) {
+      await rxfer_write_data(appConfirmationData);
+    } else if (r.mode == MODE.ACK && r.ack == ACK.SUCCESS) {
+      state = CMD.PASS_THROUGH;
+    }
+  }
+
+  function auth_process(r) {
+    log("recv rxfer: " + rxfer_str(r));
+
+    if (state == CMD.PASS_THROUGH && r.sn == 0 && r.mode == MODE.CMD) {
+      state = r.cmd;
+    }
+
+    switch (state) {
+      case CMD.APP_RANDOM:
+        auth_appRandom(r);
+        break;
+      case CMD.DEV_RANDOM:
+        auth_devRandom(r);
+        break;
+      case CMD.DEV_CONFIRMATION:
+        auth_devConfirmation(r);
+        break;
+      case CMD.APP_CONFIRMATION:
+        auth_appConfirmation(r);
+        break;
+      default:
+        log("Unknown state: " + state);
+        break;
+    }
+  }
+
+  async function version_read() {
+    return version.readValue().then(value => {
+      log("version = " + new TextDecoder('ascii').decode(value.buffer));
+    });
+  }
+
+  async function stdio_init(server) {
+    stdio = await server.getPrimaryService(BLE_UUID.MI_STDIO_SERVICE);
+    stdio_rx = await stdio.getCharacteristic(BLE_UUID.MI_STDIO_RX);
+    stdio_tx = await stdio.getCharacteristic(BLE_UUID.MI_STDIO_TX);
+    return char_subscribe(stdio_tx, (event) => {
+      const value = event.target.value;
+      return stdio_recv(hex(value.buffer)).then(deo_process_msg);
+    });
+  }
+
+  function ctrlp_process(opcode) {
+    log("recv opcode: " + OPCODE.str(opcode));
+
+    if (opcode != OPCODE.LOGIN_SUCCESS) {
+      disable_login_controls(false);
+    } else {
+      version_read();
+      deo_init();
+    }
+  }
+
+  async function ctrlp_init(service) {
+    ctrlp = await service.getCharacteristic(BLE_UUID.MI_CONTROL_POINT);
+    return char_subscribe(ctrlp, event => {
+      const value = event.target.value;
+      const opcode = new Uint32Array(value.buffer)[0];
+      ctrlp_process(opcode)
+    });
+  }
+
+  async function version_init(service) {
+    version = await service.getCharacteristic(BLE_UUID.MI_VERSION);
+  }
+
+  async function auth_init(service) {
+    auth = await service.getCharacteristic(BLE_UUID.MI_STANDARD_AUTH);
+    return char_subscribe(auth, event => {
+      const value = event.target.value;
+      auth_process(rxfer(value));
+    });
+  };
+
+  async function doAuth() {
+    var deviceOptions = {
+      optionalServices: [
+        BLE_UUID.MI_SERVICE,
+        BLE_UUID.MI_STDIO_SERVICE,
+      ],
+      acceptAllDevices: true,
+    };
+
+    var loginnameprefix = document.getElementById("loginnameprefix").value;
+    if (loginnameprefix != "") {
+      deviceOptions.acceptAllDevices = false;
+      deviceOptions.filters = [{ namePrefix: loginnameprefix }]
+    }
+
+    device = await navigator.bluetooth.requestDevice(deviceOptions);
+    log("device discovered")
+    server = await device.gatt.connect();
+    log("connection estabilished")
+    service = await server.getPrimaryService(BLE_UUID.MI_SERVICE);
+
+    await ctrlp_init(service);
+    await auth_init(service);
+    version_init(service);
+    stdio_init(server);
+
+    await opcode_write(OPCODE.LOGIN_START_W_RANDOM);
+    await rxfer_write_cmd(CMD.APP_RANDOM, appRandomData);
+  }
+
+  function disable_login_controls(disable) {
+    token = document.getElementById("token").value;
+    beaconkey = document.getElementById("beaconkey").value;
+    document.getElementById("logininfo").disabled = disable;
+  }
+
+  var deo_device_data = {};
+  async function deo_process_msg(data_str) {
+    if (data_str == 'aa0406050110') {
+      deo_send_time();
+      return;
+    }
+    var dataList = from_hex(data_str);
+    if (dataList[0] != 0xAA && dataList[1] != 0x0B && dataList.length != 13) {
+      log('The length of the received data is incorrect and will not be parsed: ' + data_str);
+      return;
+    }
+
+    var deviceData = {
+      powerSwitch: (dataList[3] >> 4) == 1,
+      workState: dataList[3] & 0x0F,
+      mode: dataList[4] >> 4,
+      cycleSwitch: (dataList[4] & 0x0F) == 2,
+      scene: dataList[5],
+      powerState: dataList[6] >> 4,
+      error: dataList[6] & 0x0F,
+      battery: dataList[7],
+      begin: dataList[8],
+      end: dataList[9],
+      allSwitch: (dataList[10] & (1 << 0)) != 0,
+      repeat: {
+        mon: (dataList[10] & (1 << 1)) != 0,
+        tue: (dataList[10] & (1 << 2)) != 0,
+        wed: (dataList[10] & (1 << 3)) != 0,
+        thu: (dataList[10] & (1 << 4)) != 0,
+        fri: (dataList[10] & (1 << 5)) != 0,
+        sat: (dataList[10] & (1 << 6)) != 0,
+        sun: (dataList[10] & (1 << 7)) != 0,
+      },
+      tScene: dataList[11] >> 4,
+      tMode: dataList[11] & 0x0F
+    };
+
+    deo_device_data = deviceData;
+
+    log(JSON.stringify(deviceData));
+
+    deo_update_controls();
+  }
+
+  function deo_update_controls() {
+    const deviceData = deo_device_data;
+    document.getElementById("deviceinfo").disabled = false;
+
+    document.getElementById("dd_battery").innerText = deviceData.battery;
+    document.getElementById("dd_workState").innerText = deviceData.workState ? "On" : "Off";
+    document.getElementById("dd_powerSwitch").value = deviceData.powerSwitch ? "Power off" : "Power on";
+    document.getElementById("dd_cycleSwitch").value = deviceData.cycleSwitch ? "Cycle off" : "Cycle on";
+    document.getElementById("dd_scene").value = deviceData.scene;
+    document.getElementById("dd_mode").value = deviceData.mode;
+    document.getElementById("dd_allSwitch").checked = deviceData.allSwitch;
+    document.getElementById("dd_begin").value = deviceData.begin;
+    document.getElementById("dd_end").value = deviceData.end;
+    document.getElementById("dd_repeat_mon").checked = deviceData.repeat.mon;
+    document.getElementById("dd_repeat_tue").checked = deviceData.repeat.tue;
+    document.getElementById("dd_repeat_wed").checked = deviceData.repeat.wed;
+    document.getElementById("dd_repeat_thu").checked = deviceData.repeat.thu;
+    document.getElementById("dd_repeat_fri").checked = deviceData.repeat.fri;
+    document.getElementById("dd_repeat_sat").checked = deviceData.repeat.sat;
+    document.getElementById("dd_repeat_sun").checked = deviceData.repeat.sun;
+    document.getElementById("dd_tScene").value = deviceData.tScene;
+    document.getElementById("dd_tMode").value = deviceData.tMode;
+  }
+
+  function deo_init() {
+    // setNotify          : AA03 72.00 75
+    stdio_send("AA03720075");
+  }
+
+  function deo_send_time() {
+    // sendTime           : AA0B 05.06 + YYYYMMHHMMSS+day+crc (crc=22+...)
+    var time = new Date();
+    var year2 = time.getFullYear() % 100;
+    var year1 = (time.getFullYear() - year2) / 100;
+    var month = time.getMonth() + 1;
+    var date = time.getDate();
+    var hour = time.getHours();
+    var minute = time.getMinutes();
+    var second = time.getSeconds();
+    var day = time.getDay() == 0 ? 7 : time.getDay();
+    stdio_send("AA0B0506" +
+      year1.toString(16).padStart(2, '0') +
+      year2.toString(16).padStart(2, '0') +
+      month.toString(16).padStart(2, '0') +
+      date.toString(16).padStart(2, '0') +
+      hour.toString(16).padStart(2, '0') +
+      minute.toString(16).padStart(2, '0') +
+      second.toString(16).padStart(2, '0') +
+      day.toString(16).padStart(2, '0') +
+      deo_crc_hex(22, year1 + year2 + month + date + hour + minute + second + day)
+    );
+  }
+
+  function deo_switch_cycle() {
+    // circleChange      1: AA04 06.06 02 12
+    // circleChange      0: AA04 06.06 01 11
+    stdio_send(deo_device_data.cycleSwitch ? 'AA0406060111' : 'AA0406060212');
+  }
+
+  function deo_switch_power() {
+    // powerSwitchChange 1: AA04 06.01 01 0C
+    // powerSwitchChange 0: AA04 06.01 00 0B
+    stdio_send(deo_device_data.powerSwitch ? "AA040601000B" : "AA040601010C");
+  }
+
+  function deo_change_mode() {
+    // changeMode         : AA04 06.02 0 + value + crc (crc=12+value)
+    var value = parseInt(document.getElementById("dd_mode").value);
+    stdio_send("AA040602" + value.toString(16).padStart(2, '0') + deo_crc_hex(12, value));
+  }
+
+  function deo_change_scene() {
+    // selectScene        : AA04 06.03 0 + value + crc (crc=13+value)
+    var value = parseInt(document.getElementById("dd_scene").value);
+    stdio_send("AA040603" + value.toString(16).padStart(2, '0') + deo_crc_hex(13, value));
+  }
+
+  function deo_change_timing() {
+    // surePress          : AA08 06.04 + byte1 + byte2 + byte3 + byte4 + byte5 + checkSum (crc=18+...)
+    var byte1 = parseInt(document.getElementById("dd_begin").value);
+    var byte2 = parseInt(document.getElementById("dd_end").value);
+    var byte3 = 0;
+    const bits = ['dd_allSwitch', 'dd_repeat_mon', 'dd_repeat_tue', 'dd_repeat_wed', 'dd_repeat_thu', 'dd_repeat_fri', 'dd_repeat_sat', 'dd_repeat_sun'];
+    for (var i = 0; i < bits.length; i++) {
+      if (document.getElementById(bits[i]).checked) {
+        byte3 |= 1 << i;
+      }
+    }
+    var byte4 = parseInt(document.getElementById("dd_tScene").value);
+    var byte5 = parseInt(document.getElementById("dd_tMode").value);
+    stdio_send("AA080604" +
+      byte1.toString(16).padStart(2, '0') +
+      byte2.toString(16).padStart(2, '0') +
+      byte3.toString(16).padStart(2, '0') +
+      byte4.toString(16).padStart(2, '0') +
+      byte5.toString(16).padStart(2, '0') +
+      deo_crc_hex(18, byte1 + byte2 + byte3 + byte4 + byte5));
+  }
+
+  function deo_crc_hex(add, value) {
+    var crc = (add + value).toString(16).padStart(2, '0');
+    return crc.substring(crc.length - 2, crc.length);
+  }
+
+</script>
+<fieldset id="logininfo">
+  <input id="token" placeholder="token" value="" />
+  <input id="beaconkey" placeholder="beaconkey" value="" />
+  <input id="loginnameprefix" placeholder="prefix" value="QD" />
+  <button id="loginbutton" onclick=" disable_login_controls(true);doAuth();">Connect</button>
+</fieldset>
+<fieldset id="deviceinfo" disabled="disabled">
+  <div>
+    Work state: <span id="dd_workState"></span>
+    Battery: <span id="dd_battery"></span>%
+  </div>
+  <div>Mode <select id="dd_mode" onchange="deo_change_mode()">
+      <option value="0">None</option>
+      <option value="1">Keep-Freshing</option>
+      <option value="2">Anion</option>
+      <option value="3">Deodorization</option>
+      <option value="4">Purification</option>
+      <option value="5">Deep Purification</option>
+    </select></div>
+  <div>Scene <select id="dd_scene" onchange="deo_change_scene()">
+      <option value="2">Mini refrigirator (smaller than 150L)</option>
+      <option value="3">Middle refrigirator (150L-300L)</option>
+      <option value="4">Big refrigirator</option>
+      <option value="5">5-seater car</option>
+      <option value="6">7-seater car</option>
+      <option value="7">Pet House</option>
+      <option value="8">Toilet / Bathroom</option>
+      <option value="9">Cabinet (shoe cabinet, wardrobe, cabinet)</option>
+    </select></div>
+  <div>
+    <input id="dd_powerSwitch" onclick="deo_switch_power()" type="button" value="Power" />
+    <input id="dd_cycleSwitch" onclick="deo_switch_cycle()" type="button" value="Cycle" />
+  </div>
+  <fieldset>
+    <legend>Timing settings</legend>
+    <div>Timers switches <input id="dd_allSwitch" type="checkbox" onchange="deo_change_timing()" /></div>
+    <div>Starting time <select id="dd_begin" onchange="deo_change_timing()">
+        <option value="0">00:00</option>
+        <option value="1">01:00</option>
+        <option value="2">02:00</option>
+        <option value="3">03:00</option>
+        <option value="4">04:00</option>
+        <option value="5">05:00</option>
+        <option value="6">06:00</option>
+        <option value="7">07:00</option>
+        <option value="8">08:00</option>
+        <option value="9">09:00</option>
+        <option value="10">10:00</option>
+        <option value="11">11:00</option>
+        <option value="12">12:00</option>
+        <option value="13">13:00</option>
+        <option value="14">14:00</option>
+        <option value="15">15:00</option>
+        <option value="16">16:00</option>
+        <option value="17">17:00</option>
+        <option value="18">18:00</option>
+        <option value="19">19:00</option>
+        <option value="20">20:00</option>
+        <option value="21">21:00</option>
+        <option value="22">22:00</option>
+        <option value="23">23:00</option>
+      </select></div>
+    <div>Closing time <select id="dd_end" onchange="deo_change_timing()">
+        <option value="0">00:00</option>
+        <option value="1">01:00</option>
+        <option value="2">02:00</option>
+        <option value="3">03:00</option>
+        <option value="4">04:00</option>
+        <option value="5">05:00</option>
+        <option value="6">06:00</option>
+        <option value="7">07:00</option>
+        <option value="8">08:00</option>
+        <option value="9">09:00</option>
+        <option value="10">10:00</option>
+        <option value="11">11:00</option>
+        <option value="12">12:00</option>
+        <option value="13">13:00</option>
+        <option value="14">14:00</option>
+        <option value="15">15:00</option>
+        <option value="16">16:00</option>
+        <option value="17">17:00</option>
+        <option value="18">18:00</option>
+        <option value="18">19:00</option>
+        <option value="20">20:00</option>
+        <option value="21">21:00</option>
+        <option value="22">22:00</option>
+        <option value="23">23:00</option>
+      </select>
+    </div>
+    <fieldset>
+      <legend>Repeat</legend>
+      <input id="dd_repeat_mon" type="checkbox" onchange="deo_change_timing()" /><label
+        for="dd_repeat_mon">Monday</label>
+      <input id="dd_repeat_tue" type="checkbox" onchange="deo_change_timing()" /><label
+        for="dd_repeat_tue">Tuesday</label>
+      <input id="dd_repeat_wed" type="checkbox" onchange="deo_change_timing()" /><label
+        for="dd_repeat_wed">Wednesday</label>
+      <input id="dd_repeat_thu" type="checkbox" onchange="deo_change_timing()" /><label
+        for="dd_repeat_thu">Thursday</label>
+      <input id="dd_repeat_fri" type="checkbox" onchange="deo_change_timing()" /><label
+        for="dd_repeat_fri">Friday</label>
+      <input id="dd_repeat_sat" type="checkbox" onchange="deo_change_timing()" /><label
+        for="dd_repeat_sat">Saturday</label>
+      <input id="dd_repeat_sun" type="checkbox" onchange="deo_change_timing()" /><label
+        for="dd_repeat_sun">Sunday</label>
+    </fieldset>
+    <div>Scene settings <select id="dd_tScene" onchange="deo_change_timing()">
+        <option value="2">Mini refrigirator (smaller than 150L)</option>
+        <option value="3">Middle refrigirator (150L-300L)</option>
+        <option value="4">Big refrigirator</option>
+        <option value="5">5-seater car</option>
+        <option value="6">7-seater car</option>
+        <option value="7">Pet House</option>
+        <option value="8">Toilet / Bathroom</option>
+        <option value="9">Cabinet (shoe cabinet, wardrobe, cabinet)</option>
+      </select></div>
+    <div>Mode settings <select id="dd_tMode" onchange="deo_change_timing()">
+        <option value="0">None</option>
+        <option value="1">Keep-Freshing</option>
+        <option value="2">Anion</option>
+        <option value="3">Deodorization</option>
+        <option value="4">Purification</option>
+        <option value="5">Deep Purification</option>
+      </select></div>
+  </fieldset>
+</fieldset>
+<fieldset style="height:300px">
+  <legend>Log</legend>
+  <textarea id="logarea" readonly="readonly" style="width:100%;height:100%"></textarea>
+</fieldset>
