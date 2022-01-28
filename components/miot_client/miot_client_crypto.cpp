@@ -10,7 +10,7 @@
 #ifndef CEIL_DIV
 #define CEIL_DIV(a, b) (((a) + (b) -1) / (b))
 #endif
-/*
+
 extern "C" unsigned int mbedtls_hkdf(const mbedtls_md_info_t *md_info, const unsigned char *salt, unsigned int salt_len,
                                      const unsigned char *key, unsigned int key_len, const unsigned char *info,
                                      unsigned int info_len, unsigned char *out, unsigned int out_len) {
@@ -59,7 +59,7 @@ extern "C" unsigned int mbedtls_hkdf(const mbedtls_md_info_t *md_info, const uns
 
   return 0;
 }
-*/
+
 namespace esphome {
 namespace miot_client {
 
