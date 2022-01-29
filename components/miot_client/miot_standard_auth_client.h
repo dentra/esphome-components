@@ -18,6 +18,7 @@ class MiotStandardAuthClient : public MiotClient, public AuthClient {
   void on_search_complete(const esp_ble_gattc_cb_param_t::gattc_search_cmpl_evt_param &param) override;
   void on_notify(const esp_ble_gattc_cb_param_t::gattc_notify_evt_param &param) override;
   void on_register_for_notification(const esp_ble_gattc_cb_param_t::gattc_reg_for_notify_evt_param &param) override;
+  void on_open(const esp_ble_gattc_cb_param_t::gattc_open_evt_param &param) override;
 
   optional<std::vector<uint8_t>> decode(const uint8_t *data, const uint16_t size) const override;
   optional<std::vector<uint8_t>> encode(const uint8_t *data, const uint16_t size) override;

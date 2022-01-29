@@ -5,11 +5,11 @@ namespace esphome {
 namespace miot_client {
 
 struct SessionNonce {
-  uint32_t iv = {};
-  uint8_t reserved[4] = {};  // always 0 0 0 0
-  uint16_t seq = {};
-  uint16_t seq_hi = {};  // always 0
-  SessionNonce(uint32_t iv, uint16_t seq) : iv(iv), seq(seq){};
+  uint32_t iv;
+  uint32_t reserved;  // always 0
+  uint16_t seq;
+  uint16_t seq_hi;  // always 0
+  SessionNonce(uint32_t iv, uint16_t seq) : iv(iv), reserved(0), seq(seq), seq_hi(0){};
 } PACKED;
 
 /**

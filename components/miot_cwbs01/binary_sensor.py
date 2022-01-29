@@ -44,7 +44,7 @@ MiotCWBS01 = miot_cwbs01_ns.class_(
 MiotCWBS01PowerSwitch = miot_cwbs01_ns.class_("MiotCWBS01PowerSwitch", switch.Switch)
 MiotCWBS01CycleSwitch = miot_cwbs01_ns.class_("MiotCWBS01CycleSwitch", switch.Switch)
 
-MiotCWBS01ModeSelect = miot_cwbs01_ns.class_("MiotCWBS01ModeSelect", select.Select)
+MiotCWBS01ModeSelect  = miot_cwbs01_ns.class_("MiotCWBS01ModeSelect", select.Select)
 MiotCWBS01SceneSelect = miot_cwbs01_ns.class_("MiotCWBS01SceneSelect", select.Select)
 
 CONF_SCENE = "scene"
@@ -100,25 +100,16 @@ CONFIG_SCHEMA = (
             cv.Optional(CONF_MODE): select.SELECT_SCHEMA.extend(
                 {
                     cv.GenerateID(): cv.declare_id(MiotCWBS01ModeSelect),
-                    cv.Optional(
-                        CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_CONFIG
-                    ): cv.entity_category,
                 }
             ),
             cv.Optional(CONF_CYCLE): switch.SWITCH_SCHEMA.extend(
                 {
                     cv.GenerateID(): cv.declare_id(MiotCWBS01CycleSwitch),
-                    cv.Optional(
-                        CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_CONFIG
-                    ): cv.entity_category,
                 }
             ),
             cv.Optional(CONF_SCENE): select.SELECT_SCHEMA.extend(
                 {
                     cv.GenerateID(): cv.declare_id(MiotCWBS01SceneSelect),
-                    cv.Optional(
-                        CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_CONFIG
-                    ): cv.entity_category,
                 }
             ),
             cv.Optional(CONF_CHARGING): binary_sensor.BINARY_SENSOR_SCHEMA.extend(

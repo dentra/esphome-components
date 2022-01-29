@@ -53,6 +53,9 @@ enum Scene : uint8_t {
   SCENE_BATHROOM = 8,
   // Cabinet (shoe cabinet, wardrobe, cabinet)
   SCENE_CABINET = 9,
+
+  SCENE__FIRST = SCENE_MINI_REFRIGIRATOR,
+  SCENE__LAST = SCENE_CABINET,
 };
 
 // Mode settings.
@@ -68,6 +71,9 @@ enum Mode : uint8_t {
   MODE_PURIFICATION = 4,
   // Deep Purification
   MODE_DEEP_PURIFICATION = 5,
+
+  MODE__FIRST = MODE_NONE,
+  MODE__LAST = MODE_DEEP_PURIFICATION,
 };
 
 enum State : uint8_t {

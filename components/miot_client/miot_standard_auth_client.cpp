@@ -70,7 +70,7 @@ void MiotStandardAuthClient::process_ctrlp_(const OpCode opcode) {
   }
 }
 
-void debug(const char *prefix, const AuthFrame &frame, uint16_t frame_size) {
+static void debug(const char *prefix, const AuthFrame &frame, uint16_t frame_size) {
   if (frame.is_control()) {
     if (frame.is_cmd()) {
       ESP_LOGD(TAG, "%s CMD: 0x%02X (%u), num=%u", prefix, frame.ctrl.cmd, frame.ctrl.cmd, frame.ctrl.num);
@@ -306,6 +306,10 @@ bool MiotStandardAuthClient::write_ack_(AuthFrame::Ack ack) {
   return this->write_char(this->char_.auth, &frame, frame_size);
 }
 
+void MiotStandardAuthClient::on_open(const esp_ble_gattc_cb_param_t::gattc_open_evt_param &param) {
+  this->auth_seq_ = 0;
+}
+
 optional<std::vector<uint8_t>> MiotStandardAuthClient::decode(const uint8_t *data, const uint16_t size) const {
   if (this->debug_) {
     ESP_LOGD(TAG, "Decoding %s", format_hex_pretty(data, size).c_str());
@@ -321,9 +325,12 @@ optional<std::vector<uint8_t>> MiotStandardAuthClient::decode(const uint8_t *dat
   int ret = session_decrypt(this->session_ctx_.dev_key, sizeof(this->session_ctx_.dev_key), nonce, input, res.size(),
                             res.data(), tag, tag_size);
   if (ret != 0) {
-    const uint16_t product_id = 0;
     ESP_LOGW(TAG, "session_decrypt failed: %d", ret);
     return {};
+  }
+
+  if (this->debug_) {
+    ESP_LOGD(TAG, "Decoded %s", format_hex_pretty(res.data(), res.size()).c_str());
   }
 
   return res;
@@ -343,12 +350,15 @@ optional<std::vector<uint8_t>> MiotStandardAuthClient::encode(const uint8_t *dat
   auto output = res.data() + sizeof(this->auth_seq_);
   auto tag = output + size;
 
-  int ret = session_encrypt(this->session_ctx_.dev_key, sizeof(this->session_ctx_.dev_key), nonce, data, size, output,
+  int ret = session_encrypt(this->session_ctx_.app_key, sizeof(this->session_ctx_.app_key), nonce, data, size, output,
                             tag, tag_size);
   if (ret != 0) {
-    const uint16_t product_id = 0;
     ESP_LOGW(TAG, "session_encrypt failed: %d", ret);
     return {};
+  }
+
+  if (this->debug_) {
+    ESP_LOGD(TAG, "Encoded %s", format_hex_pretty(res.data(), res.size()).c_str());
   }
 
   this->auth_seq_++;

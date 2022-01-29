@@ -16,8 +16,12 @@
 namespace esphome {
 namespace miot_cwbs01 {
 
-class MiotCWBS01ModeSelect;
-class MiotCWBS01SceneSelect;
+enum UpdateState : uint32_t {
+  UPDATE_STATE_POWER = 1 << 0,
+  UPDATE_STATE_CYCLE = 1 << 1,
+  UPDATE_STATE_MODE = 1 << 2,
+  UPDATE_STATE_SCENE = 1 << 3,
+};
 
 /**
  * @brief EraClean Refrigerator Odor Eliminator Max.
@@ -26,38 +30,47 @@ class MiotCWBS01 : public miot_client::MiotClient,
                    public miot_client::AuthClientListener,
                    public MiotCWBS01Api,
                    public MiotCWBS01ApiListener,
-                   public esp32_ble_tracker::ESPBTDeviceListener,
+                   //  public esp32_ble_tracker::ESPBTDeviceListener,
                    public binary_sensor::BinarySensor,
                    public PollingComponent {
  public:
+  MiotCWBS01() { MiotCWBS01Api::add_listener(this); }
+
   float get_setup_priority() const override { return setup_priority::DATA; }
 
-  bool parse_device(const esp32_ble_tracker::ESPBTDevice &device) override {
-    return device.address_uint64() == this->address_;
-  }
+  void update() override { this->parent_->set_enabled(true); }
+
+  // bool parse_device(const esp32_ble_tracker::ESPBTDevice &device) override {
+  //   return device.address_uint64() == this->address_;
+  // }
 
   void on_search_complete(const esp_ble_gattc_cb_param_t::gattc_search_cmpl_evt_param &param) override;
   void on_read_char(const esp_ble_gattc_cb_param_t::gattc_read_char_evt_param &param) override;
   void on_notify(const esp_ble_gattc_cb_param_t::gattc_notify_evt_param &param) override;
 
-  void update() override {}
-
   void on_auth_complete() override;
 
   void read(const state_t &state) override;
   void read(const datetime_sync_t &dts) override;
-  bool send_frame(const void *data, uint8_t size) const { return this->write_char(this->char_.stdio_tx, data, size); }
+  bool send_frame(const void *data, uint8_t size) const override {
+    return this->write_char(this->char_.stdio_tx, data, size);
+  }
 
   void set_time(time::RealTimeClock *rtc) { this->rtc_ = rtc; }
-  void set_version(text_sensor::TextSensor *version) { this->version_ = version; }
 
+  void set_version(text_sensor::TextSensor *version) { this->version_ = version; }
   void set_power(switch_::Switch *power) { this->power_ = power; }
-  void set_mode(MiotCWBS01ModeSelect *mode) { this->mode_ = mode; }
   void set_cycle(switch_::Switch *cycle) { this->cycle_ = cycle; }
-  void set_scene(MiotCWBS01SceneSelect *scene) { this->scene_ = scene; }
+  void set_mode(select::Select *mode) { this->mode_ = mode; }
+  void set_scene(select::Select *scene) { this->scene_ = scene; }
+  void set_battery_level(sensor::Sensor *battery_level) { this->battery_level_ = battery_level; }
   void set_charging(binary_sensor::BinarySensor *charging) { this->charging_ = charging; }
   void set_error(binary_sensor::BinarySensor *error) { this->error_ = error; }
-  void set_battery_level(sensor::Sensor *battery_level) { this->battery_level_ = battery_level; }
+
+  void set_dirty(uint32_t flag) {
+    this->update_state_ |= flag;
+    this->defer([this]() { this->sync_state_(); });
+  }
 
  protected:
   struct {
@@ -66,71 +79,69 @@ class MiotCWBS01 : public miot_client::MiotClient,
     uint16_t stdio_tx;
   } char_ = {};
 
-  time::RealTimeClock *rtc_;
+  uint32_t update_state_{};
+
+  time::RealTimeClock *rtc_{};
   text_sensor::TextSensor *version_{};
   switch_::Switch *power_ = {};
-  MiotCWBS01ModeSelect *mode_ = {};
   switch_::Switch *cycle_ = {};
-  MiotCWBS01SceneSelect *scene_ = {};
+  select::Select *mode_ = {};
+  select::Select *scene_ = {};
+  sensor::Sensor *battery_level_ = {};
   binary_sensor::BinarySensor *charging_ = {};
   binary_sensor::BinarySensor *error_ = {};
-  sensor::Sensor *battery_level_ = {};
+
+  void sync_state_();
 };
 
 class MiotCWBS01PowerSwitch : public switch_::Switch {
  public:
-  explicit MiotCWBS01PowerSwitch(MiotCWBS01Api *api) : api_(api) {}
+  explicit MiotCWBS01PowerSwitch(MiotCWBS01 *parent) : parent_(parent) {}
+
+  void write_state(bool state) override {
+    this->publish_state(state);
+    this->parent_->set_dirty(UPDATE_STATE_POWER);
+  }
 
  protected:
-  MiotCWBS01Api *api_;
-  void write_state(bool state) override { this->api_->set_power(state); }
+  MiotCWBS01 *parent_;
 };
 
 class MiotCWBS01CycleSwitch : public switch_::Switch {
  public:
-  explicit MiotCWBS01CycleSwitch(MiotCWBS01Api *api) : api_(api) {}
+  explicit MiotCWBS01CycleSwitch(MiotCWBS01 *parent) : parent_(parent) {}
 
- protected:
-  MiotCWBS01Api *api_;
-  void write_state(bool state) override { this->api_->set_cycle(state); }
-};
-
-template<typename T, int S> class MiotCWBS01Select : public select::Select {
- public:
-  explicit MiotCWBS01Select(MiotCWBS01Api *api) : api_(api) {}
-
-  const std::string &get_option(int index) const {
-    auto idx = index - S;
-    auto &options = this->traits.get_options();
-    return options[idx];
+  void write_state(bool state) override {
+    this->publish_state(state);
+    this->parent_->set_dirty(UPDATE_STATE_CYCLE);
   }
 
+ protected:
+  MiotCWBS01 *parent_;
+};
+
+class MiotCWBS01ModeSelect : public select::Select {
+ public:
+  explicit MiotCWBS01ModeSelect(MiotCWBS01 *parent) : parent_(parent) {}
   void control(const std::string &value) override {
-    auto &options = this->traits.get_options();
-    auto pos = std::find(options.begin(), options.end(), value);
-    if (pos == options.end()) {
-      return;
-    }
-    auto idx = std::distance(options.begin(), pos) - S;
-    this->select(static_cast<T>(idx));
+    this->publish_state(state);
+    this->parent_->set_dirty(UPDATE_STATE_MODE);
   }
 
-  virtual void select(T value) const = 0;
+ protected:
+  MiotCWBS01 *parent_;
+};
+
+class MiotCWBS01SceneSelect : public select::Select {
+ public:
+  explicit MiotCWBS01SceneSelect(MiotCWBS01 *parent) : parent_(parent) {}
+  void control(const std::string &value) override {
+    this->publish_state(state);
+    this->parent_->set_dirty(UPDATE_STATE_SCENE);
+  }
 
  protected:
-  MiotCWBS01Api *api_;
-};
-
-class MiotCWBS01ModeSelect : public MiotCWBS01Select<Mode, Mode::MODE_NONE> {
- public:
-  explicit MiotCWBS01ModeSelect(MiotCWBS01Api *api) : MiotCWBS01Select(api) {}
-  void select(Mode value) const override { this->api_->set_mode(value); }
-};
-
-class MiotCWBS01SceneSelect : public MiotCWBS01Select<Scene, Scene::SCENE_MINI_REFRIGIRATOR> {
- public:
-  explicit MiotCWBS01SceneSelect(MiotCWBS01Api *api) : MiotCWBS01Select(api) {}
-  void select(Scene value) const override { this->api_->set_scene(value); }
+  MiotCWBS01 *parent_;
 };
 
 }  // namespace miot_cwbs01

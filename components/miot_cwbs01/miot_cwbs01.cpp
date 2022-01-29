@@ -5,6 +5,23 @@ namespace miot_cwbs01 {
 
 static const char *const TAG = "miot_cwbs01";
 
+static std::string get_option(select::Select *select, size_t index, size_t first, size_t last) {
+  ESP_LOGD(TAG, "get_option at %u, from max %u", index - first, select->traits.get_options().size());
+  return select->traits.get_options().at(index - first);
+}
+
+static int get_state_index(select::Select *select, size_t first, size_t last) {
+  if (select->state.empty()) {
+    return -1;
+  }
+  auto options = select->traits.get_options();
+  auto pos = std::find(options.begin(), options.end(), select->state);
+  if (pos == options.end()) {
+    return -1;
+  }
+  return std::distance(options.begin(), pos) + first;
+}
+
 void MiotCWBS01::on_search_complete(const esp_ble_gattc_cb_param_t::gattc_search_cmpl_evt_param &param) {
   this->char_.version = this->get_char_handle(miot_client::BLE_UUID_MI_SERVICE, miot_client::BLE_UUID_MI_VERSION);
   if (this->char_.version == ESP_GATT_ILLEGAL_HANDLE) {
@@ -32,6 +49,7 @@ void MiotCWBS01::on_auth_complete() {
     this->read_char(this->char_.version);
   }
   this->enable_state_reporting();
+  this->sync_state_();
 }
 
 void MiotCWBS01::on_read_char(const esp_ble_gattc_cb_param_t::gattc_read_char_evt_param &param) {
@@ -63,13 +81,13 @@ void MiotCWBS01::read(const state_t &state) {
     this->power_->publish_state(state.power == State::STATE_ON);
   }
   if (this->mode_ != nullptr) {
-    this->mode_->publish_state(this->mode_->get_option(state.mode));
+    this->mode_->publish_state(get_option(this->mode_, state.mode, Mode::MODE__FIRST, Mode::MODE__LAST));
   }
   if (this->cycle_ != nullptr) {
     this->cycle_->publish_state(state.cycle == Cycle::CYCLE_ON);
   }
   if (this->scene_ != nullptr) {
-    this->scene_->publish_state(this->scene_->get_option(state.scene));
+    this->scene_->publish_state(get_option(this->scene_, state.scene, Scene::SCENE__FIRST, Scene::SCENE__LAST));
   }
   if (this->charging_ != nullptr) {
     this->charging_->publish_state(state.power_state == PowerState::POWER_STATE_CHARGING);
@@ -79,6 +97,40 @@ void MiotCWBS01::read(const state_t &state) {
   }
   if (this->battery_level_ != nullptr) {
     this->battery_level_->publish_state(state.battery);
+  }
+
+  // this->parent_->set_enabled(false);
+}
+
+void MiotCWBS01::sync_state_() {
+  if (this->update_state_ == 0 || !this->parent_->enabled) {
+    return;
+  }
+
+  if (this->update_state_ & UPDATE_STATE_POWER) {
+    this->update_state_ &= ~UPDATE_STATE_POWER;
+    MiotCWBS01Api::set_power(this->power_->state);
+  }
+
+  if (this->update_state_ & UPDATE_STATE_CYCLE) {
+    this->update_state_ &= ~UPDATE_STATE_CYCLE;
+    MiotCWBS01Api::set_cycle(this->cycle_->state);
+  }
+
+  if (this->update_state_ & UPDATE_STATE_MODE) {
+    this->update_state_ &= ~UPDATE_STATE_MODE;
+    auto index = get_state_index(this->mode_, Mode::MODE__FIRST, Mode::MODE__LAST);
+    if (index >= 0) {
+      MiotCWBS01Api::set_mode(static_cast<Mode>(index));
+    }
+  }
+
+  if (this->update_state_ & UPDATE_STATE_SCENE) {
+    this->update_state_ &= ~UPDATE_STATE_SCENE;
+    auto index = get_state_index(this->scene_, Scene::SCENE__FIRST, Scene::SCENE__LAST);
+    if (index >= 0) {
+      MiotCWBS01Api::set_scene(static_cast<Scene>(index));
+    }
   }
 }
 
