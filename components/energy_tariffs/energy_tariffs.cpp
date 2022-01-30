@@ -10,7 +10,6 @@ namespace esphome {
 namespace energy_tariffs {
 
 static const char *const TAG = "energy_tariffs";
-static const char *const GAP = "  ";
 
 EnergyTariffs::~EnergyTariffs() {
   delete this->tariff_callback_;
@@ -22,14 +21,7 @@ void EnergyTariffs::dump_config() {
   for (auto t : this->tariffs_) {
     t->dump_config();
   }
-  if (this->time_offset_ != 0) {
-    ESP_LOGCONFIG(GAP, "Time offset: %d", this->time_offset_);
-  }
-#ifdef USE_API
-  if (!this->time_offset_service_.empty()) {
-    ESP_LOGCONFIG(GAP, "Time offset service: %s", this->time_offset_service_.c_str());
-  }
-#endif
+  LOG_NUMBER("", "Time offset", this->time_offset_)
 }
 
 void EnergyTariffs::setup() {
@@ -37,37 +29,32 @@ void EnergyTariffs::setup() {
     t->setup();
   }
 
-#ifdef USE_API
-  this->rtc_ = global_preferences->make_preference<float>(fnv1_hash(TAG));
-  float loaded;
-  if (this->rtc_.load(&loaded)) {
-    this->set_time_offset(loaded);
-  } else {
-    this->rtc_.save(&this->time_offset_);
+  if (this->time_offset_) {
+    const bool save_to_flash = true;
+    this->rtc_ = global_preferences->make_preference<float>(fnv1_hash(TAG), save_to_flash);
+    float loaded;
+    if (this->rtc_.load(&loaded)) {
+      this->time_offset_->set(loaded);
+    }
   }
-
-  if (!this->time_offset_service_.empty()) {
-    this->register_service(&EnergyTariffs::set_time_offset_, this->time_offset_service_, {"value"});
-  }
-#endif
 
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
 }
 
 void EnergyTariffs::loop() {
-  auto t = this->time_->now();
-  if (!t.is_valid()) {
+  auto time = this->time_->now();
+  if (!time.is_valid()) {
     // time is not sync yet
     return;
   }
 
-  if (this->time_offset_ != 0) {
+  if (this->time_offset_ && this->time_offset_->has_state()) {
     // sync time with mains
-    time_t ts = t.timestamp + this->time_offset_;
-    t = time::ESPTime::from_epoch_local(ts);
+    time_t ts = time.timestamp + this->time_offset_->state;
+    time = time::ESPTime::from_epoch_local(ts);
   }
 
-  auto ct = this->get_tariff_(t);
+  auto ct = this->get_tariff_(time);
   if (ct != this->current_tariff_) {
     auto total = this->total_->get_state();
     if (!isnan(total)) {
@@ -80,8 +67,8 @@ void EnergyTariffs::loop() {
   }
 
   if (this->before_tariff_callback_) {
-    t.increment_second();
-    ct = this->get_tariff_(t);
+    time.increment_second();
+    ct = this->get_tariff_(time);
     if (ct != this->current_tariff_) {
       this->before_tariff_callback_->call();
     }
@@ -98,7 +85,7 @@ void EnergyTariffs::process_(float total) {
 }
 
 EnergyTariff *EnergyTariffs::get_tariff_(const time::ESPTime &time) const {
-  EnergyTariff *def{nullptr};
+  EnergyTariff *def{};
   for (auto t : this->tariffs_) {
     if (t->is_default()) {
       def = t;
@@ -108,15 +95,6 @@ EnergyTariff *EnergyTariffs::get_tariff_(const time::ESPTime &time) const {
   }
   return def;
 }
-
-#ifdef USE_API
-void EnergyTariffs::set_time_offset_(float value) {
-  int seconds = value;
-  ESP_LOGD(TAG, "Setting time offset to %d seconds", seconds);
-  this->set_time_offset(seconds);
-  this->rtc_.save(&value);
-}
-#endif
 
 void EnergyTariffs::add_on_tariff_callback(std::function<void(Sensor *)> &&callback) {
   if (!this->tariff_callback_) {

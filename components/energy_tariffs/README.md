@@ -15,7 +15,8 @@ external_components:
 - platform: "energy_tariffs"
     id: tariffs
     total: total
-    time_offset_service: time_offset_set
+    time_offset:
+      name: "$name Time Offset"
     tariffs:
       - name: "$name Peak Tariff"
         id: peak

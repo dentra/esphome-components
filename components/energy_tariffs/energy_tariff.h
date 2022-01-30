@@ -80,7 +80,7 @@ class EnergyTariff : public Sensor,
     return min <= x || x < max;
   }
 
-  uint32_t last_save_{0};
+  uint32_t last_save_{};
   uint32_t save_to_flash_interval_{};
 
 };  // class TariffSensor

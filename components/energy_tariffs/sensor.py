@@ -1,15 +1,20 @@
 import esphome.config_validation as cv
 import esphome.codegen as cg
 from esphome.core import TimePeriod
-from esphome.components import sensor, time
+from esphome.components import sensor, time, number
 from esphome import automation
 from esphome.const import (
+    CONF_ENTITY_CATEGORY,
+    CONF_ICON,
     CONF_ID,
+    CONF_MODE,
     CONF_TIME_ID,
     CONF_TOTAL,
     CONF_TRIGGER_ID,
     CONF_SERVICE,
+    CONF_UNIT_OF_MEASUREMENT,
     DEVICE_CLASS_ENERGY,
+    ENTITY_CATEGORY_CONFIG,
     STATE_CLASS_TOTAL_INCREASING,
     UNIT_KILOWATT_HOURS,
 )
@@ -17,6 +22,7 @@ from esphome.const import (
 CODEOWNERS = ["@dentra"]
 
 DEPENDENCIES = ["time"]
+AUTO_LOAD = ["number", "sensor"]
 
 # CONF_CURRENT_TARIFF = 'current_tariff'
 CONF_TARIFFS = "tariffs"
@@ -38,6 +44,7 @@ EnergyTariffs = energy_tariffs_ns.class_("EnergyTariffs", cg.Component)
 
 EnergyTariff = energy_tariffs_ns.class_("EnergyTariff", sensor.Sensor)
 EnergyTariffPtr = EnergyTariff.operator("ptr")
+TimeOffsetNumber = EnergyTariffs.class_("TimeOffsetNumber", number.Number)
 
 TariffChangeTrigger = energy_tariffs_ns.class_(
     "TariffChangeTrigger", automation.Trigger.template(sensor.SensorPtr)
@@ -131,8 +138,21 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(
                 CONF_SAVE_TO_FLASH_INTERVAL
             ): cv.positive_time_period_milliseconds,
-            cv.Optional(CONF_TIME_OFFSET): cv.int_,
-            cv.Optional(CONF_TIME_OFFSET_SERVICE): cv.valid_name,
+            cv.Optional(CONF_TIME_OFFSET): number.NUMBER_SCHEMA.extend(
+                {
+                    cv.GenerateID(): cv.declare_id(TimeOffsetNumber),
+                    cv.Optional(CONF_ICON, default="mdi:clock-fast"): cv.icon,
+                    cv.Optional(
+                        CONF_UNIT_OF_MEASUREMENT, default="s"
+                    ): cv.string_strict,
+                    cv.Optional(CONF_MODE, default="BOX"): cv.enum(
+                        number.NUMBER_MODES, upper=True
+                    ),
+                    cv.Optional(
+                        CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_CONFIG
+                    ): cv.entity_category,
+                }
+            ),
             cv.Optional(CONF_TARIFFS): cv.All(
                 cv.ensure_list(TARIFF_SCHEMA), cv.Length(min=1, max=4)
             ),
@@ -181,9 +201,15 @@ async def to_code(config):
     await setup_input(config, CONF_TOTAL, var.set_total)
 
     if CONF_TIME_OFFSET in config:
-        cg.add(var.set_time_offset(config[CONF_TIME_OFFSET]))
-    if CONF_TIME_OFFSET_SERVICE in config:
-        cg.add(var.set_time_offset_service(config[CONF_TIME_OFFSET_SERVICE]))
+        numb = await number.new_number(
+            config[CONF_TIME_OFFSET], min_value=-3600, max_value=3600, step=1
+        )
+        cg.add(numb.set_parent(var))
+        cg.add(var.set_time_offset(numb))
+    # if CONF_TIME_OFFSET in config:
+    #     cg.add(var.set_time_offset(config[CONF_TIME_OFFSET]))
+    # if CONF_TIME_OFFSET_SERVICE in config:
+    #     cg.add(var.set_time_offset_service(config[CONF_TIME_OFFSET_SERVICE]))
 
     # exposed sensors
     for conf in config.get(CONF_TARIFFS, []):
@@ -196,8 +222,8 @@ async def to_code(config):
         cg.add(var.add_tariff(sens))
         if CONF_SERVICE in conf:
             cg.add(sens.set_service(conf[CONF_SERVICE]))
-        if CONF_SAVE_TO_FLASH_INTERVAL in config:
-            cg.add(sens.set_save_to_flash_interval(config[CONF_SAVE_TO_FLASH_INTERVAL]))
+        if config.get(CONF_SAVE_TO_FLASH_INTERVAL, False):
+            cg.add(sens.set_save_to_flash_interval(True))
 
     for conf in config.get(CONF_ON_TARIFF, []):
         trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)

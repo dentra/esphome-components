@@ -1,0 +1,8 @@
+packages:
+  main: !include zmai90.yaml
+
+external_components:
+  - source: components
+
+time:
+  timezone: UTC-3

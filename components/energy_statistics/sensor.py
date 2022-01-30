@@ -87,8 +87,8 @@ async def to_code(config):
     await setup_input(config, CONF_POWER, var.set_power)
     await setup_input(config, CONF_TOTAL, var.set_total)
 
-    if CONF_SAVE_TO_FLASH_INTERVAL in config:
-        cg.add(var.set_save_to_flash_interval(config[CONF_SAVE_TO_FLASH_INTERVAL]))
+    if config.get(CONF_SAVE_TO_FLASH_INTERVAL, False):
+        cg.add(var.set_save_to_flash_interval(True))
 
     # exposed sensors
     await setup_sensor(config, CONF_ENERGY_TODAY, var.set_energy_today)

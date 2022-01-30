@@ -9,64 +9,41 @@ substitutions:
   dp_current: "18"
   dp_voltage: "20"
 
-  # WiFi configuration
-  wifi_ssid: !secret wifi_ssid
-  wifi_password: !secret wifi_password
-  wifi_ap_ssid: "$name Fallback Hotspot"
-  wifi_ap_password: !secret wifi_ap_password
-
-  # HA API configuration
-  api_password: !secret api_password # disabled if absent or empty
-
-  # OTA configuration
-  ota_password: !secret ota_password # disabled if absent or empty
-
-  # Web Server configuration
-  web_port: "80"
-  web_username: !secret web_username # disabled if absent or empty
-  web_password: !secret web_password # disabled if absent or empty
-
 esphome:
   platform: ESP8266
   board: esp01_1m
   name: $node_name
+  project:
+    name: "dentra.zmai90v2"
+    version: "2022.1.0"
 
 external_components:
   - source: github://dentra/esphome-components
 
 backup:
-  auth:
-    username: $web_username
-    password: $web_password
 
 wifi:
-  ssid: $wifi_ssid
-  password: $wifi_password
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: $wifi_ap_ssid
-    password: $wifi_ap_password
+    ssid: "$name Fallback Hotspot"
+    password: !secret wifi_ap_password
   fast_connect: true
 
 captive_portal:
 
 # Enable Home Assistant API
 api:
-  password: $api_password
 
 # Make sure you can upload new firmware OTA
 ota:
-  password: $ota_password
 
 web_server:
-  port: $web_port
-  auth:
-    username: $web_username
-    password: $web_password
 
 time:
-  - platform: homeassistant
-    id: g_time
+  platform: homeassistant
+  id: g_time
 # Uncomment next 4 lines if you want to force update values from Tuya MCU every 10 seconds
 #    on_time:
 #      seconds: 9,19,29,39,49,59
@@ -75,13 +52,12 @@ time:
 
 # Enable logging
 logger:
-  esp8266_store_log_strings_in_flash: false
   # Make sure logging is not using the serial port
   baud_rate: 0
 
 uart:
-  rx_pin: GPIO3
-  tx_pin: GPIO1
+  rx_pin: RX
+  tx_pin: TX
   baud_rate: 9600
 
 # Register the Tuya MCU connection
@@ -107,7 +83,6 @@ text_sensor:
     id: current_tariff
     name: "$name Current Tariff"
     icon: "mdi:theme-light-dark"
-    # entity_category: system
     entity_category: diagnostic
 
 # Create sensors
@@ -181,7 +156,7 @@ sensor:
   - platform: "energy_statistics"
     id: stat
     total: total
-    save_to_flash_interval: 60s
+    save_to_flash_interval: 600s
     energy_today:
       id: today
       name: "$name Energy Today"
@@ -189,8 +164,9 @@ sensor:
   - platform: "energy_tariffs"
     id: tariffs
     total: total
-    save_to_flash_interval: 60s
-    time_offset_service: time_offset_set
+    save_to_flash_interval: 600s
+    time_offset:
+      name: "$name Time Offset"
     tariffs:
       - name: "$name Peak Tariff"
         id: peak
@@ -212,21 +188,9 @@ sensor:
     on_before_tariff:
       - uart.write: [0x55, 0xaa, 0x00, 0x08, 0x00, 0x00, 0x07]
 
-  - platform: template
-    id: time_offset
-    name: "$name Time Offset"
-    icon: mdi:clock-fast
-    accuracy_decimals: 0
-    unit_of_measurement: "s"
-    lambda: |-
-      return id(tariffs).get_time_offset();
-    entity_category: config
-
   - platform: startup
     id: uptime
     name: "$name Uptime"
-    entity_category: diagnostic
 
   - platform: wifi_signal
     name: "$name WiFi Signal"
-    entity_category: diagnostic
