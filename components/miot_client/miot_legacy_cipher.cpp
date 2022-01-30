@@ -1,10 +1,12 @@
 #include "esphome/core/log.h"
 #include "esphome/core/helpers.h"
-#include "../miot/miot_utils.h"
 #include "miot_legacy_cipher.h"
 
 namespace esphome {
 namespace miot_client {
+
+inline const uint8_t *mac_reverse(const uint64_t &mac) { return reinterpret_cast<const uint8_t *>(&mac); }
+
 namespace cipher {
 
 std::array<uint8_t, 8> mix_a(const uint8_t *mac, const uint16_t product_id) {
@@ -15,7 +17,7 @@ std::array<uint8_t, 8> mix_a(const uint8_t *mac, const uint16_t product_id) {
 }
 
 std::array<uint8_t, 8> mix_a(const uint64_t &mac, const uint16_t product_id) {
-  return mix_a(miot::mac_reverse(mac), product_id);
+  return mix_a(mac_reverse(mac), product_id);
 }
 
 std::array<uint8_t, 8> mix_b(const uint8_t *mac, const uint16_t product_id) {
@@ -26,7 +28,7 @@ std::array<uint8_t, 8> mix_b(const uint8_t *mac, const uint16_t product_id) {
 }
 
 std::array<uint8_t, 8> mix_b(const uint64_t &mac, const uint16_t product_id) {
-  return mix_b(miot::mac_reverse(mac), product_id);
+  return mix_b(mac_reverse(mac), product_id);
 }
 
 std::array<uint8_t, 256> cipher_init(const uint8_t *key, const std::size_t key_size) {

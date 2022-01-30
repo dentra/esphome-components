@@ -12,12 +12,12 @@ ota:
     then:
       - lambda: id(sw_ble_client).turn_off();
 
-miot:
-  xiaomi_account:
-    username: !secret xiaomi_username
-    password: !secret xiaomi_password
-    servers: cn
-    update_interval: 24h
+
+xiaomi_account:
+  username: !secret xiaomi_username
+  password: !secret xiaomi_password
+  servers: cn
+  update_interval: 24h
 
 ble_client:
   - mac_address: $mac_deodorizer

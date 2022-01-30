@@ -8,7 +8,6 @@
 #include "esphome/components/ble_client/ble_client.h"
 #include "esphome/components/time/real_time_clock.h"
 
-#include "../miot/miot.h"
 #include "../miot_client/miot_client.h"
 
 #include "miot_cwbs01_api.h"

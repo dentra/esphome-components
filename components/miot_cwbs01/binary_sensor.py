@@ -33,7 +33,7 @@ from esphome.const import (
 )
 
 CODEOWNERS = ["@dentra"]
-AUTO_LOAD = ["miot", "miot_client", "text_sensor", "switch", "sensor", "select"]
+AUTO_LOAD = ["miot_client", "text_sensor", "switch", "sensor", "select"]
 DEPENDENCIES = ["time"]
 
 miot_cwbs01_ns = cg.esphome_ns.namespace("miot_cwbs01")
@@ -168,7 +168,7 @@ async def to_code(config):
     tvar = await cg.get_variable(config[CONF_TIME_ID])
     cg.add(var.set_time(tvar))
 
-    if config.get(miot_client.CONF_MIOT_CLIENT_DEBUG, False) :
+    if config.get(miot_client.CONF_MIOT_CLIENT_DEBUG, False):
         cg.add(var.set_debug(True))
 
     if CONF_VERSION in config:
