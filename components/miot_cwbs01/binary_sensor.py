@@ -67,9 +67,9 @@ OPTIONS_MODE = [
 
 OPTIONS_SCENE = [
     # starting from 2
-    "Mini refrigirator (smaller than 150L)",
-    "Middle refrigirator (150L - 300L)",
-    "Big refrigirator",
+    "Mini refrigerator (smaller than 150L)",
+    "Middle refrigerator (150L - 300L)",
+    "Big refrigerator",
     "5 - seater car",
     "7 - seater car",
     "Pet House",

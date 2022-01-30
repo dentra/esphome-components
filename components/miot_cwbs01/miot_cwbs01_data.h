@@ -37,12 +37,12 @@ enum Command : uint16_t {
 
 // Scene settings.
 enum Scene : uint8_t {
-  // Mini refrigirator (smaller than 150L).
-  SCENE_MINI_REFRIGIRATOR = 2,
-  // Middle refrigirator (150L - 300L)
-  SCENE_MIDDLE_REFRIGIRATOR = 3,
-  // Big refrigirator
-  SCENE_BIG_REFRIGIRATOR = 4,
+  // Mini refrigerator (smaller than 150L).
+  SCENE_MINI_REFRIGERATOR = 2,
+  // Middle refrigerator (150L - 300L)
+  SCENE_MIDDLE_REFRIGERATOR = 3,
+  // Big refrigerator
+  SCENE_BIG_REFRIGERATOR = 4,
   // 5 - seater car
   SCENE_FIVE_SEATER_CAR = 5,
   // 7 - seater car
@@ -54,7 +54,7 @@ enum Scene : uint8_t {
   // Cabinet (shoe cabinet, wardrobe, cabinet)
   SCENE_CABINET = 9,
 
-  SCENE__FIRST = SCENE_MINI_REFRIGIRATOR,
+  SCENE__FIRST = SCENE_MINI_REFRIGERATOR,
   SCENE__LAST = SCENE_CABINET,
 };
 
