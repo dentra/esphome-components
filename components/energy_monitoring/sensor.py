@@ -9,6 +9,7 @@ from esphome.const import (
     CONF_VOLTAGE,
     CONF_POWER_FACTOR,
     DEVICE_CLASS_POWER_FACTOR,
+    ICON_FLASH,
     STATE_CLASS_MEASUREMENT,
     UNIT_VOLT_AMPS,
     UNIT_VOLT_AMPS_REACTIVE,
@@ -37,11 +38,13 @@ CONFIG_SCHEMA = cv.Schema(
             unit_of_measurement=UNIT_VOLT_AMPS,
             accuracy_decimals=1,
             state_class=STATE_CLASS_MEASUREMENT,
+            icon=ICON_FLASH,
         ),
         cv.Optional(CONF_REACTIVE_POWER): sensor.sensor_schema(
             unit_of_measurement=UNIT_VOLT_AMPS_REACTIVE,
             accuracy_decimals=1,
             state_class=STATE_CLASS_MEASUREMENT,
+            icon=ICON_FLASH,
         ),
         cv.Optional(CONF_POWER_FACTOR): sensor.sensor_schema(
             unit_of_measurement=UNIT_POWER_FACTOR,
