@@ -5,6 +5,7 @@ from esphome.const import (
     CONF_ID,
     CONF_TIME_ID,
     DEVICE_CLASS_TIMESTAMP,
+    ENTITY_CATEGORY_DIAGNOSTIC,
     UNIT_EMPTY,
 )
 
@@ -23,7 +24,7 @@ CONFIG_SCHEMA = (
         icon=ICON_CLOCK_START,
         accuracy_decimals=0,
         device_class=DEVICE_CLASS_TIMESTAMP,
-        # entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
     )
     .extend(
         {
