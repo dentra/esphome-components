@@ -67,10 +67,7 @@ class MiotCWBS01 : public miot_client::MiotClient,
   void set_charging(binary_sensor::BinarySensor *charging) { this->charging_ = charging; }
   void set_error(binary_sensor::BinarySensor *error) { this->error_ = error; }
 
-  void set_dirty(uint32_t flag) {
-    this->update_state_ |= flag;
-    this->defer([this]() { this->sync_state_(); });
-  }
+  void set_dirty(uint32_t flag);
 
  protected:
   struct {
@@ -92,6 +89,7 @@ class MiotCWBS01 : public miot_client::MiotClient,
   binary_sensor::BinarySensor *error_ = {};
 
   void sync_state_();
+  bool is_dirty_() const { return this->update_state_ != 0; }
 };
 
 class MiotCWBS01PowerSwitch : public switch_::Switch {

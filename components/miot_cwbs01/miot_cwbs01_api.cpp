@@ -8,7 +8,7 @@ namespace miot_cwbs01 {
 static const char *const TAG = "miot_cwbs01.api";
 
 // *** TX ***
-// AA03 72.00 xx                  init
+// AA03 72.00 xx                  request state
 // AA0B 05.06 0 0 0 0 0 0 0 0 xx  sync time
 // AA04 06.06 0 xx                cycle (OFF=1, ON=2)
 // AA04 06.01 0 xx                power (OFF=0, ON=1)
@@ -69,8 +69,10 @@ bool MiotCWBS01Api::read_packet_(Packet type, const void *data, uint8_t size) {
       ESP_LOGW(TAG, "Incorrect state packet size: %u", size);
       return false;
     }
+    auto state = static_cast<const state_t *>(data);
+    ESP_LOGD(TAG, "Got state: %s", format_hex_pretty(reinterpret_cast<uint8_t *>(&state), sizeof(state)).c_str());
     for (auto listener : this->listeners_) {
-      listener->read(*static_cast<const state_t *>(data));
+      listener->read(*state);
     }
     return true;
   }
@@ -92,8 +94,11 @@ bool MiotCWBS01Api::read_command_(Command cmd, const void *data, uint8_t size) {
       ESP_LOGW(TAG, "Incorrect time sync packet size: %u", size);
       return false;
     }
+    auto dt_sync = reinterpret_cast<const datetime_sync_t *>(data);
+    ESP_LOGD(TAG, "Got datetime sync: %s",
+             format_hex_pretty(reinterpret_cast<uint8_t *>(&dt_sync), sizeof(dt_sync)).c_str());
     for (auto listener : this->listeners_) {
-      listener->read(*reinterpret_cast<const datetime_sync_t *>(data));
+      listener->read(*dt_sync);
     }
     return true;
   }
@@ -147,9 +152,9 @@ bool MiotCWBS01Api::send_command_(Command cmd, const void *data, uint8_t size) c
   return res;
 }
 
-bool MiotCWBS01Api::enable_state_reporting() const {
-  ESP_LOGD(TAG, "Enable state reporting");
-  return this->send_command_(COMMAND_ENABLE_STATE_REPORTING, nullptr, 0);
+bool MiotCWBS01Api::request_state() const {
+  ESP_LOGD(TAG, "Request state");
+  return this->send_command_(COMMAND_REQUEST_STATE, nullptr, 0);
 }
 
 bool MiotCWBS01Api::sync_time(const esphome::time::ESPTime &tm) const {

@@ -1,16 +1,25 @@
 #include "esphome/core/log.h"
+#include "esphome/core/application.h"
+
 #include "miot_cwbs01.h"
+
 namespace esphome {
 namespace miot_cwbs01 {
 
+#define UNUSED __attribute__((unused))
+
 static const char *const TAG = "miot_cwbs01";
 
-static std::string get_option(select::Select *select, size_t index, size_t first, size_t last) {
-  ESP_LOGD(TAG, "get_option at %u, from max %u", index - first, select->traits.get_options().size());
-  return select->traits.get_options().at(index - first);
+static std::string get_option(select::Select *select, size_t index, size_t first, size_t last UNUSED) {
+  auto options = select->traits.get_options();
+  index -= first;
+  if (index >= options.size()) {
+    return "";
+  }
+  return options[index];
 }
 
-static int get_state_index(select::Select *select, size_t first, size_t last) {
+static int get_state_index(select::Select *select, size_t first, size_t last UNUSED) {
   if (select->state.empty()) {
     return -1;
   }
@@ -48,7 +57,7 @@ void MiotCWBS01::on_auth_complete() {
   if (this->version_ != nullptr) {
     this->read_char(this->char_.version);
   }
-  this->enable_state_reporting();
+  this->request_state();
   this->sync_state_();
 }
 
@@ -99,11 +108,18 @@ void MiotCWBS01::read(const state_t &state) {
     this->battery_level_->publish_state(state.battery);
   }
 
-  // this->parent_->set_enabled(false);
+  if (!this->is_dirty_()) {
+    this->parent_->set_enabled(false);
+  }
 }
 
 void MiotCWBS01::sync_state_() {
-  if (this->update_state_ == 0 || !this->parent_->enabled) {
+  if (!this->is_dirty_()) {
+    return;
+  }
+
+  if (!this->parent_->enabled) {
+    this->parent_->set_enabled(true);
     return;
   }
 
@@ -132,6 +148,11 @@ void MiotCWBS01::sync_state_() {
       MiotCWBS01Api::set_scene(static_cast<Scene>(index));
     }
   }
+}
+
+void MiotCWBS01::set_dirty(uint32_t flag) {
+  this->update_state_ |= flag;
+  App.scheduler.set_timeout(this, TAG, 500, [this]() { this->sync_state_(); });
 }
 
 }  // namespace miot_cwbs01

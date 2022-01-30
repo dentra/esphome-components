@@ -23,12 +23,6 @@ ble_client:
   - mac_address: $mac_deodorizer
     id: ble_client_deodorizer
 
-switch:
-  - platform: ble_client
-    id: sw_ble_client
-    ble_client_id: ble_client_deodorizer
-    name: cwbs01 Enabled
-
 binary_sensor:
   - platform: miot_cwbs01
     ble_client_id: ble_client_deodorizer
@@ -54,9 +48,10 @@ binary_sensor:
     # Optional, battery level %
     battery_level:
       name: "${name} Battery Level"
-    # Optional, device state
+    # Optional, internal device state
     error:
       name: "${name} Error"
-
+    # Optional, Time: The interval that the device state should be checked. Defaults to 1 hour.
+    update_interval: 1h
 ```
 

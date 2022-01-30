@@ -18,7 +18,7 @@ class MiotCWBS01Api {
   bool read_frame(const uint8_t *data, uint8_t size);
   virtual bool send_frame(const void *data, uint8_t size) const = 0;
 
-  bool enable_state_reporting() const;
+  bool request_state() const;
   bool sync_time(const esphome::time::ESPTime &tm) const;
   bool set_cycle(bool enabled) const;
   bool set_power(bool enabled) const;

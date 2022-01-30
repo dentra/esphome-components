@@ -38,13 +38,16 @@ DEPENDENCIES = ["time"]
 
 miot_cwbs01_ns = cg.esphome_ns.namespace("miot_cwbs01")
 MiotCWBS01 = miot_cwbs01_ns.class_(
-    "MiotCWBS01", miot_client.MiotClient, Component, binary_sensor.BinarySensor
+    "MiotCWBS01",
+    cg.PollingComponent,
+    binary_sensor.BinarySensor,
+    miot_client.MiotClient,
 )
 
 MiotCWBS01PowerSwitch = miot_cwbs01_ns.class_("MiotCWBS01PowerSwitch", switch.Switch)
 MiotCWBS01CycleSwitch = miot_cwbs01_ns.class_("MiotCWBS01CycleSwitch", switch.Switch)
 
-MiotCWBS01ModeSelect  = miot_cwbs01_ns.class_("MiotCWBS01ModeSelect", select.Select)
+MiotCWBS01ModeSelect = miot_cwbs01_ns.class_("MiotCWBS01ModeSelect", select.Select)
 MiotCWBS01SceneSelect = miot_cwbs01_ns.class_("MiotCWBS01SceneSelect", select.Select)
 
 CONF_SCENE = "scene"
@@ -147,6 +150,7 @@ CONFIG_SCHEMA = (
     .extend(esp32_ble_tracker.ESP_BLE_DEVICE_SCHEMA)
     .extend(ble_client.BLE_CLIENT_SCHEMA)
     .extend(miot_client.standard_auth_schema())
+    .extend(cv.polling_component_schema("1h"))
 )
 
 
@@ -164,7 +168,7 @@ async def to_code(config):
     tvar = await cg.get_variable(config[CONF_TIME_ID])
     cg.add(var.set_time(tvar))
 
-    if miot_client.CONF_MIOT_CLIENT_DEBUG in config:
+    if config.get(miot_client.CONF_MIOT_CLIENT_DEBUG, False) :
         cg.add(var.set_debug(True))
 
     if CONF_VERSION in config:

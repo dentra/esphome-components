@@ -8,7 +8,7 @@ namespace miot_cwbs01 {
 #pragma pack(push, 1)
 
 enum Packet : uint8_t {
-  PACKET_COMMAND_INIT = 0x72,
+  PACKET_COMMAND_STATE = 0x72,
   PACKET_COMMAND_TIME = 0x05,
   PACKET_COMMAND_MODE = 0x06,
   PACKET_STATE = 0x07,
@@ -17,22 +17,22 @@ enum Packet : uint8_t {
 #define COMMAND(command, packet) static_cast<Command>((static_cast<uint16_t>(command) << 8) | packet)
 
 enum Command : uint16_t {
-  // enable PACKET_STATE reporting
-  COMMAND_ENABLE_STATE_REPORTING = COMMAND(0x00, PACKET_COMMAND_INIT),
+  // request PACKET_STATE
+  COMMAND_REQUEST_STATE = COMMAND(0x00, PACKET_COMMAND_STATE),
   // set power
-  COMMAND_POWER /*            */ = COMMAND(0x01, PACKET_COMMAND_MODE),
+  COMMAND_POWER = COMMAND(0x01, PACKET_COMMAND_MODE),
   // set mode
-  COMMAND_MODE /*             */ = COMMAND(0x02, PACKET_COMMAND_MODE),
+  COMMAND_MODE = COMMAND(0x02, PACKET_COMMAND_MODE),
   // set scene
-  COMMAND_SCENE /*            */ = COMMAND(0x03, PACKET_COMMAND_MODE),
+  COMMAND_SCENE = COMMAND(0x03, PACKET_COMMAND_MODE),
   // set schedule
-  COMMAND_SCHEDULE /*         */ = COMMAND(0x04, PACKET_COMMAND_MODE),
+  COMMAND_SCHEDULE = COMMAND(0x04, PACKET_COMMAND_MODE),
   // request to sync time
-  COMMAND_SYNC_TIME /*        */ = COMMAND(0x05, PACKET_COMMAND_MODE),
+  COMMAND_SYNC_TIME = COMMAND(0x05, PACKET_COMMAND_MODE),
   // set cycle
-  COMMAND_CYCLE /*            */ = COMMAND(0x06, PACKET_COMMAND_MODE),
+  COMMAND_CYCLE = COMMAND(0x06, PACKET_COMMAND_MODE),
   // set time
-  COMMAND_SET_TIME /*         */ = COMMAND(0x06, PACKET_COMMAND_TIME),
+  COMMAND_SET_TIME = COMMAND(0x06, PACKET_COMMAND_TIME),
 };
 
 // Scene settings.
