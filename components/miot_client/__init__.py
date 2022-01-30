@@ -108,7 +108,7 @@ def secure_auth_schema() -> cv.Schema:
 async def register_client(config, parent=None):
     node = cg.new_Pvariable(config[CONF_MIOT_CLIENT_ID], parent)
     await ble_client.register_ble_node(node, config)
-    if CONF_MIOT_CLIENT_DEBUG in config:
+    if config.get(CONF_MIOT_CLIENT_DEBUG, False):
         cg.add(node.set_debug(True))
     return node
 
@@ -116,7 +116,7 @@ async def register_client(config, parent=None):
 async def register_legacy_auth_client(config, product_id=None):
     auth = cg.new_Pvariable(config[CONF_AUTH_CLIENT_ID])
     await ble_client.register_ble_node(auth, config)
-    if CONF_AUTH_CLIENT_DEBUG in config:
+    if config.get(CONF_AUTH_CLIENT_DEBUG, False):
         cg.add(auth.set_debug(True))
     if product_id:
         cg.add(auth.set_product_id(product_id))
@@ -126,7 +126,7 @@ async def register_legacy_auth_client(config, product_id=None):
 async def register_standard_auth_client(config):
     auth = cg.new_Pvariable(config[CONF_AUTH_CLIENT_ID])
     await ble_client.register_ble_node(auth, config)
-    if CONF_AUTH_CLIENT_DEBUG in config:
+    if config.get(CONF_AUTH_CLIENT_DEBUG, False):
         cg.add(auth.set_debug(True))
 
     if CONF_BINDKEY in config:

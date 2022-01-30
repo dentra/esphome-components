@@ -9,9 +9,6 @@ namespace miot_client {
 
 /**
  * Provide auth throught BLE_UUID::MI_STANDARD_AUTH.
- *
- * 1. Read version
- * 2
  */
 class MiotStandardAuthClient : public MiotClient, public AuthClient {
  public:

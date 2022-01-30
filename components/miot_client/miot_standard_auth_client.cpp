@@ -73,14 +73,14 @@ void MiotStandardAuthClient::process_ctrlp_(const OpCode opcode) {
 static void debug(const char *prefix, const AuthFrame &frame, uint16_t frame_size) {
   if (frame.is_control()) {
     if (frame.is_cmd()) {
-      ESP_LOGD(TAG, "%s CMD: 0x%02X (%u), num=%u", prefix, frame.ctrl.cmd, frame.ctrl.cmd, frame.ctrl.num);
+      ESP_LOGV(TAG, "%s CMD: 0x%02X (%u), num=%u", prefix, frame.ctrl.cmd, frame.ctrl.cmd, frame.ctrl.num);
     } else if (frame.is_ack()) {
-      ESP_LOGD(TAG, "%s ACK: 0x%02X (%u)", prefix, frame.ctrl.ack, frame.ctrl.ack);
+      ESP_LOGV(TAG, "%s ACK: 0x%02X (%u)", prefix, frame.ctrl.ack, frame.ctrl.ack);
     } else {
-      ESP_LOGD(TAG, "%s UNK: mode=0x%02X (%u)", prefix, frame.ctrl.mode, frame.ctrl.mode);
+      ESP_LOGV(TAG, "%s UNK: mode=0x%02X (%u)", prefix, frame.ctrl.mode, frame.ctrl.mode);
     }
   } else {
-    ESP_LOGD(TAG, "%s DAT: sn=%u: %s", prefix, frame.sn,
+    ESP_LOGV(TAG, "%s DAT: sn=%u: %s", prefix, frame.sn,
              format_hex_pretty(frame.data, AuthFrame::data_size(frame_size)).c_str());
   }
 }
@@ -95,19 +95,19 @@ void MiotStandardAuthClient::process_auth_(const AuthFrame &frame, uint16_t fram
 
   switch (this->state_) {
     case AuthFrame::CMD_APP_RANDOM:
-      ESP_LOGD(TAG, "processing CMD_APP_RANDOM");
+      ESP_LOGV(TAG, "processing CMD_APP_RANDOM");
       this->process_auth_app_random_(frame, frame_size);
       break;
     case AuthFrame::CMD_DEV_RANDOM:
-      ESP_LOGD(TAG, "processing CMD_DEV_RANDOM");
+      ESP_LOGV(TAG, "processing CMD_DEV_RANDOM");
       this->process_auth_dev_random_(frame, frame_size);
       break;
     case AuthFrame::CMD_DEV_CONFIRMATION:
-      ESP_LOGD(TAG, "processing CMD_DEV_CONFIRMATION");
+      ESP_LOGV(TAG, "processing CMD_DEV_CONFIRMATION");
       this->process_auth_dev_confirmation_(frame, frame_size);
       break;
     case AuthFrame::CMD_APP_CONFIRMATION:
-      ESP_LOGD(TAG, "processing CMD_APP_CONFIRMATION");
+      ESP_LOGV(TAG, "processing CMD_APP_CONFIRMATION");
       this->process_auth_app_confirmation_(frame, frame_size);
       break;
     default:
@@ -143,14 +143,14 @@ void MiotStandardAuthClient::process_auth_dev_random_(const AuthFrame &frame, ui
 
   const size_t data_size = AuthFrame::data_size(frame_size);
 
-  ESP_LOGD(TAG, "Collect DEV_RANDOM %u of %u: %s", frame.sn, this->load_ctx_->max_rx_frames,
+  ESP_LOGV(TAG, "Collect DEV_RANDOM %u of %u: %s", frame.sn, this->load_ctx_->max_rx_frames,
            format_hex_pretty(frame.data, data_size).c_str());
 
   // this->dev_random_data_.insert(this->dev_random_data_.end(), frame.data, frame.data + data_size);
   std::memcpy(this->load_ctx_->dev_random_data + (frame.sn - 1) * sizeof(frame.data), frame.data, data_size);
 
   if (frame.sn >= this->load_ctx_->max_rx_frames) {
-    ESP_LOGD(TAG, "<=== dev_random_data: %s",
+    ESP_LOGV(TAG, "<=== dev_random_data: %s",
              format_hex_pretty(this->load_ctx_->dev_random_data, sizeof(this->load_ctx_->dev_random_data)).c_str());
 
     this->load_ctx_->max_rx_frames = 0;
@@ -187,14 +187,14 @@ void MiotStandardAuthClient::process_auth_dev_confirmation_(const AuthFrame &fra
 
   const size_t data_size = AuthFrame::data_size(frame_size);
 
-  ESP_LOGD(TAG, "Collect DEV_CONFIRMATION %u of %u: %s", frame.sn, this->load_ctx_->max_rx_frames,
+  ESP_LOGV(TAG, "Collect DEV_CONFIRMATION %u of %u: %s", frame.sn, this->load_ctx_->max_rx_frames,
            format_hex_pretty(frame.data, data_size).c_str());
 
   // this->dev_confirmation_data_.insert(this->dev_confirmation_data_.end(), frame.data, frame.data + data_size);
   std::memcpy(this->load_ctx_->dev_confirmation_data + (frame.sn - 1) * sizeof(frame.data), frame.data, data_size);
 
   if (frame.sn >= this->load_ctx_->max_rx_frames) {
-    ESP_LOGD(TAG, "<=== dev_confirmation_data: %s",
+    ESP_LOGV(TAG, "<=== dev_confirmation_data: %s",
              format_hex_pretty(this->load_ctx_->dev_confirmation_data, sizeof(this->load_ctx_->dev_confirmation_data))
                  .c_str());
 
@@ -222,11 +222,11 @@ void MiotStandardAuthClient::generate_login_data_() {
   const auto n = sizeof(this->load_ctx_->app_random_data);
   std::memcpy(salt + n, this->load_ctx_->dev_random_data, sizeof(this->load_ctx_->dev_random_data));
 
-  ESP_LOGD(TAG, "app_random_data: %s",
+  ESP_LOGV(TAG, "app_random_data: %s",
            format_hex_pretty(this->load_ctx_->app_random_data, sizeof(this->load_ctx_->app_random_data)).c_str());
-  ESP_LOGD(TAG, "dev_random_data: %s",
+  ESP_LOGV(TAG, "dev_random_data: %s",
            format_hex_pretty(this->load_ctx_->dev_random_data, sizeof(this->load_ctx_->dev_random_data)).c_str());
-  ESP_LOGD(TAG, "salt1: %s", format_hex_pretty(salt, sizeof(salt)).c_str());
+  ESP_LOGV(TAG, "salt1: %s", format_hex_pretty(salt, sizeof(salt)).c_str());
 
   auto md_info = mbedtls_md_info_from_type(mbedtls_md_type_t::MBEDTLS_MD_SHA256);
 
@@ -246,7 +246,7 @@ void MiotStandardAuthClient::generate_login_data_() {
   std::memcpy(salt + 0, this->load_ctx_->dev_random_data, sizeof(this->load_ctx_->dev_random_data));
   const auto m = sizeof(this->load_ctx_->dev_random_data);
   std::memcpy(salt + m, this->load_ctx_->app_random_data, sizeof(this->load_ctx_->app_random_data));
-  ESP_LOGD(TAG, "salt2: %s", format_hex_pretty(salt, sizeof(salt)).c_str());
+  ESP_LOGV(TAG, "salt2: %s", format_hex_pretty(salt, sizeof(salt)).c_str());
 
   res = mbedtls_md_hmac(md_info, this->session_ctx_.dev_key, sizeof(this->session_ctx_.dev_key), salt, sizeof(salt),
                         this->load_ctx_->exp_confirmation_data);
@@ -254,10 +254,10 @@ void MiotStandardAuthClient::generate_login_data_() {
     ESP_LOGW(TAG, "mbedtls_md_hmac for exp_confirmation_data failed: %d", res);
   }
 
-  ESP_LOGD(TAG, "prepared exp_confirmation_data: %s",
+  ESP_LOGV(TAG, "prepared exp_confirmation_data: %s",
            format_hex_pretty(this->load_ctx_->exp_confirmation_data, sizeof(this->load_ctx_->exp_confirmation_data))
                .c_str());
-  ESP_LOGD(TAG, "prepared app_confirmation_data: %s",
+  ESP_LOGV(TAG, "prepared app_confirmation_data: %s",
            format_hex_pretty(this->load_ctx_->app_confirmation_data, sizeof(this->load_ctx_->app_confirmation_data))
                .c_str());
 }
@@ -265,7 +265,7 @@ void MiotStandardAuthClient::generate_login_data_() {
 bool MiotStandardAuthClient::write_data_(const uint8_t *data, const size_t data_size) {
   AuthFrame frame;
   const size_t max_frames = AuthFrame::frames_num(data_size);
-  ESP_LOGD(TAG, "Prepare write_data: size=%u, frames num=%u", data_size, max_frames);
+  ESP_LOGV(TAG, "Prepare write_data: size=%u, frames num=%u", data_size, max_frames);
   for (size_t i = 0; i < max_frames; i++) {
     frame.sn = i + 1;
 
@@ -311,9 +311,7 @@ void MiotStandardAuthClient::on_open(const esp_ble_gattc_cb_param_t::gattc_open_
 }
 
 optional<std::vector<uint8_t>> MiotStandardAuthClient::decode(const uint8_t *data, const uint16_t size) const {
-  if (this->debug_) {
-    ESP_LOGD(TAG, "Decoding %s", format_hex_pretty(data, size).c_str());
-  }
+  ESP_LOGV(TAG, "Decoding %s", format_hex_pretty(data, size).c_str());
 
   // data struct: seq (2 bytes) + data (N bytes) + tag (4 bytes)
   auto nonce = SessionNonce(this->session_ctx_.dev_iv, *reinterpret_cast<const uint16_t *>(data));
@@ -329,17 +327,13 @@ optional<std::vector<uint8_t>> MiotStandardAuthClient::decode(const uint8_t *dat
     return {};
   }
 
-  if (this->debug_) {
-    ESP_LOGD(TAG, "Decoded %s", format_hex_pretty(res.data(), res.size()).c_str());
-  }
+  ESP_LOGV(TAG, "Decoded %s", format_hex_pretty(res.data(), res.size()).c_str());
 
   return res;
 }
 
 optional<std::vector<uint8_t>> MiotStandardAuthClient::encode(const uint8_t *data, const uint16_t size) {
-  if (this->debug_) {
-    ESP_LOGD(TAG, "Encoding %s", format_hex_pretty(data, size).c_str());
-  }
+  ESP_LOGV(TAG, "Encoding %s", format_hex_pretty(data, size).c_str());
 
   // buffer struct: seq (2 bytes) + data (N bytes) + tag (4 bytes)
   std::vector<uint8_t> res;
@@ -357,9 +351,7 @@ optional<std::vector<uint8_t>> MiotStandardAuthClient::encode(const uint8_t *dat
     return {};
   }
 
-  if (this->debug_) {
-    ESP_LOGD(TAG, "Encoded %s", format_hex_pretty(res.data(), res.size()).c_str());
-  }
+  ESP_LOGV(TAG, "Encoded %s", format_hex_pretty(res.data(), res.size()).c_str());
 
   this->auth_seq_++;
 
