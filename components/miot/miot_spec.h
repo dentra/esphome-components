@@ -1,5 +1,5 @@
 #pragma once
-#ifdef ARDUINO_ARCH_ESP32
+
 #include <functional>
 #include "esphome/core/optional.h"
 
@@ -775,4 +775,3 @@ struct RawBLEObject {
 
 }  // namespace miot
 }  // namespace esphome
-#endif

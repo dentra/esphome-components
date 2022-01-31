@@ -1,5 +1,4 @@
 #pragma once
-#ifdef ARDUINO_ARCH_ESP32
 
 #include "esphome/components/binary_sensor/binary_sensor.h"
 #include "esphome/components/text_sensor/text_sensor.h"
@@ -143,5 +142,3 @@ class MiotCWBS01SceneSelect : public select::Select {
 
 }  // namespace miot_cwbs01
 }  // namespace esphome
-
-#endif

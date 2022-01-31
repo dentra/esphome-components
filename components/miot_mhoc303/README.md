@@ -16,7 +16,7 @@ sensor:
     # String (Required), device MAC-address.
     mac_address: "device-mac-address"
     # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
-    bindkey: "device-bin-key"
+    bindkey: "device-bind-key"
     # String, (Optional), the name of sensor
     name: "$name Temperature"
     # Sensor (Optional), Humidity, %

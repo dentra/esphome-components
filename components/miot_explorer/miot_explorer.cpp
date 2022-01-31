@@ -1,5 +1,3 @@
-#ifdef ARDUINO_ARCH_ESP32
-
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
 
@@ -159,5 +157,3 @@ void MiotExplorer::process_water_boil_(miot::MIID miid, const std::string &name,
 
 }  // namespace miot_explorer
 }  // namespace esphome
-
-#endif

@@ -1,4 +1,3 @@
-#ifdef ARDUINO_ARCH_ESP32
 #include "esphome/core/log.h"
 #include "mbedtls/ccm.h"
 #include "inttypes.h"
@@ -254,4 +253,3 @@ void MiotComponent::dump_config_(const char *TAG) const {
 
 }  // namespace miot
 }  // namespace esphome
-#endif

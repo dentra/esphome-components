@@ -14,7 +14,7 @@ binary_sensor:
     # String (Required), device MAC-address.
     mac_address: "device-mac-address"
     # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
-    bindkey: "device-bin-key"
+    bindkey: "device-bind-key"
     # String, (Optional), the name of binary sensor.
     name: "$name Motion"
     # Boolean, (Optional), detect no motion as soon as possible (Usually when idle_time = 0). Default is false.

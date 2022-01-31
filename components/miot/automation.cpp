@@ -1,5 +1,3 @@
-#ifdef ARDUINO_ARCH_ESP32
-
 #include "esphome/core/log.h"
 #include "automation.h"
 #include "miot_dump.h"
@@ -24,4 +22,3 @@ bool MiotAdvertiseTrigger::process_mibeacon(const MiBeacon &mib) {
 
 }  // namespace miot
 }  // namespace esphome
-#endif

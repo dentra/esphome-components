@@ -1,5 +1,5 @@
 #pragma once
-#ifdef ARDUINO_ARCH_ESP32
+
 #include "esphome/core/component.h"
 #include "esphome/components/binary_sensor/binary_sensor.h"
 #include "../miot/miot.h"
@@ -30,5 +30,3 @@ class MiotKettle : public miot::MiotComponent, public binary_sensor::BinarySenso
 
 }  // namespace miot_kettle
 }  // namespace esphome
-
-#endif

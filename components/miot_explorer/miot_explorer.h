@@ -1,5 +1,5 @@
 #pragma once
-#ifdef ARDUINO_ARCH_ESP32
+
 #include <map>
 #include "esphome/core/component.h"
 #include "esphome/components/text_sensor/text_sensor.h"
@@ -38,4 +38,3 @@ class MiotExplorer : public miot::MiotComponent, public text_sensor::TextSensor 
 }  // namespace miot_explorer
 }  // namespace esphome
 
-#endif

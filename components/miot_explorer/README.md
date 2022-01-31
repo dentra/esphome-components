@@ -16,7 +16,7 @@ text_sensor:
     # String (Required), device MAC-address.
     mac_address: "device-mac-address"
     # String, (Optional), device bind key
-    bindkey: "device-bin-key"
+    bindkey: "device-bind-key"
     # String, (Required), the name of sensor
     name: "$name"
     # Sensor (Optional), Humidity, %

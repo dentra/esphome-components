@@ -1,5 +1,4 @@
 #pragma once
-#ifdef ARDUINO_ARCH_ESP32
 
 #include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
@@ -37,5 +36,3 @@ class MiotRTCGQ02LM : public miot::MiotComponent, public binary_sensor::BinarySe
 
 }  // namespace miot_rtcgq02lm
 }  // namespace esphome
-
-#endif

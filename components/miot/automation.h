@@ -1,5 +1,4 @@
 #pragma once
-#ifdef ARDUINO_ARCH_ESP32
 
 #include "esphome/components/esp32_ble_tracker/esp32_ble_tracker.h"
 #include "esphome/core/automation.h"
@@ -30,4 +29,3 @@ class MiotAdvertiseTrigger : public Trigger<const BLEObject &>, public MiotListe
 
 }  // namespace miot
 }  // namespace esphome
-#endif

@@ -1,5 +1,5 @@
 #pragma once
-#ifdef ARDUINO_ARCH_ESP32
+
 #include "esphome/core/component.h"
 #include "../miot/miot.h"
 
@@ -21,5 +21,3 @@ class MiotYLKG0XYL : public miot::MiotComponent {
 
 }  // namespace miot_ylkg0xyl
 }  // namespace esphome
-
-#endif

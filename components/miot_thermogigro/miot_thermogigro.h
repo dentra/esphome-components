@@ -1,5 +1,4 @@
 #pragma once
-#ifdef ARDUINO_ARCH_ESP32
 
 #include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
@@ -34,5 +33,3 @@ class MiotThermoGigro : public miot::MiotComponent, public sensor::Sensor {
 
 }  // namespace miot_thermogigro
 }  // namespace esphome
-
-#endif

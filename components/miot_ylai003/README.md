@@ -14,7 +14,7 @@ sensor:
     # String (Required), device MAC-address.
     mac_address: "device-mac-address"
     # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
-    bindkey: "device-bin-key"
+    bindkey: "device-bind-key"
     # Sensor (Optional), Battey Level, % (not 100% sure that is working, please let me know it so)
     battery_level:
       name: "$name Battery Level"

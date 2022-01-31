@@ -1,5 +1,3 @@
-#ifdef ARDUINO_ARCH_ESP32
-
 #include "esphome/core/log.h"
 #include "miot_ylyk01yl.h"
 
@@ -26,5 +24,3 @@ bool MiotYLYK01YL::process_object_(const miot::BLEObject &obj) {
 
 }  // namespace miot_ylyk01yl
 }  // namespace esphome
-
-#endif

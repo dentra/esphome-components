@@ -1,5 +1,3 @@
-#ifdef ARDUINO_ARCH_ESP32
-
 #include "esphome/core/log.h"
 #include "miot_xmmfo1jqd.h"
 
@@ -23,5 +21,3 @@ bool MiotXMMFO1JQD::process_object_(const miot::BLEObject &obj) {
 
 }  // namespace miot_xmmfo1jqd
 }  // namespace esphome
-
-#endif

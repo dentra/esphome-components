@@ -1,4 +1,3 @@
-#ifdef ARDUINO_ARCH_ESP32
 #include "esphome/core/log.h"
 #include "automation.h"
 
@@ -34,5 +33,3 @@ bool MiotYLAI003Trigger::process_object_(const miot::BLEObject &obj) {
 
 }  // namespace miot_ylai003
 }  // namespace esphome
-
-#endif

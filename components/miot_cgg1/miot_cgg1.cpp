@@ -1,5 +1,3 @@
-#ifdef ARDUINO_ARCH_ESP32
-
 #include "esphome/core/log.h"
 #include "miot_cgg1.h"
 
@@ -62,5 +60,3 @@ bool MiotCGG1::process_object_(const miot::BLEObject &obj) {
 
 }  // namespace miot_cgg1
 }  // namespace esphome
-
-#endif

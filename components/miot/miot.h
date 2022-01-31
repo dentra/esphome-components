@@ -1,5 +1,4 @@
 #pragma once
-#ifdef ARDUINO_ARCH_ESP32
 
 #include <functional>
 #include <vector>
@@ -92,4 +91,3 @@ class MiotComponent : public Component, public MiotListener {
 
 }  // namespace miot
 }  // namespace esphome
-#endif

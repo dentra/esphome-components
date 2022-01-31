@@ -1,5 +1,3 @@
-#ifdef ARDUINO_ARCH_ESP32
-
 #include "esphome/core/log.h"
 #include "miot_kettle.h"
 
@@ -45,5 +43,3 @@ bool MiotKettle::process_object_(const miot::BLEObject &obj) {
 
 }  // namespace miot_kettle
 }  // namespace esphome
-
-#endif

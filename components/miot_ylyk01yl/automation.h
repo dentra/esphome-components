@@ -1,5 +1,4 @@
 #pragma once
-#ifdef ARDUINO_ARCH_ESP32
 
 #include "esphome/core/automation.h"
 #include "../miot/miot.h"
@@ -23,4 +22,3 @@ class MiotYLYK01YLTrigger : public Trigger<>, public miot::MiotListener {
 
 }  // namespace miot_ylyk01yl
 }  // namespace esphome
-#endif

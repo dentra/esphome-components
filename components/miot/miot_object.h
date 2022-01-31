@@ -1,5 +1,5 @@
 #pragma once
-#ifdef ARDUINO_ARCH_ESP32
+
 #include <functional>
 #include <vector>
 #include "esphome/core/component.h"
@@ -247,4 +247,3 @@ struct BLEObject {
 
 }  // namespace miot
 }  // namespace esphome
-#endif

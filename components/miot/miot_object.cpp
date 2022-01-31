@@ -1,4 +1,3 @@
-#ifdef ARDUINO_ARCH_ESP32
 #include "inttypes.h"
 #include "esphome/core/log.h"
 #include "miot_object.h"
@@ -248,4 +247,3 @@ optional<float> BLEObject::get_miaomiaoce_humidity() const {
 
 }  // namespace miot
 }  // namespace esphome
-#endif

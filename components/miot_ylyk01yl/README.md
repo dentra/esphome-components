@@ -14,7 +14,7 @@ sensor:
     # String (Required), device MAC-address.
     mac_address: "device-mac-address"
     # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
-    bindkey: "device-bin-key"
+    bindkey: "device-bind-key"
     # List, Automation (Optional), The automation activated when you clicked specified button
     on_click:
       # String (Required), The button name (case insensitive):
