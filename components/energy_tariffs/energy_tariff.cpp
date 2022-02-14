@@ -20,8 +20,7 @@ void EnergyTariff::dump_config() {
 }
 
 void EnergyTariff::setup() {
-  const bool save_to_flash = this->save_to_flash_interval_ > 0;
-  this->rtc_ = global_preferences->make_preference<float>(this->get_object_id_hash(), save_to_flash);
+  this->rtc_ = global_preferences->make_preference<float>(this->get_object_id_hash());
 
   float loaded;
   if (this->rtc_.load(&loaded)) {
@@ -40,14 +39,6 @@ void EnergyTariff::setup() {
 void EnergyTariff::publish_state_and_save(float state) {
   ESP_LOGD(TAG, "'%s': Setting new state to %f", this->get_name().c_str(), state);
   this->publish_state(state);
-
-  if (this->save_to_flash_interval_ > 0) {
-    const uint32_t now = millis();
-    if (now - this->last_save_ < this->save_to_flash_interval_) {
-      return;
-    }
-    this->last_save_ = now;
-  }
   this->rtc_.save(&state);
 }
 

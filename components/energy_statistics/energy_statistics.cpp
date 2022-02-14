@@ -27,8 +27,7 @@ void EnergyStatistics::dump_config() {
 void EnergyStatistics::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
 
-  const bool save_to_flash = this->save_to_flash_interval_ > 0;
-  this->pref_ = global_preferences->make_preference<energy_data_t>(fnv1_hash(TAG), save_to_flash);
+  this->pref_ = global_preferences->make_preference<energy_data_t>(fnv1_hash(TAG));
 
   energy_data_t loaded{};
   if (this->pref_.load(&loaded)) {
@@ -98,16 +97,7 @@ void EnergyStatistics::process_(float total) {
   this->save_();
 }
 
-void EnergyStatistics::save_() {
-  if (this->save_to_flash_interval_ > 0) {
-    const uint32_t now = millis();
-    if (now - this->last_save_ < this->save_to_flash_interval_) {
-      return;
-    }
-    this->last_save_ = now;
-  }
-  this->pref_.save(&(this->energy_));
-}
+void EnergyStatistics::save_() { this->pref_.save(&(this->energy_)); }
 
 }  // namespace energy_statistics
 }  // namespace esphome

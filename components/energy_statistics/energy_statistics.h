@@ -21,10 +21,6 @@ class EnergyStatistics : public Component {
   void set_time(time::RealTimeClock *time) { this->time_ = time; }
   void set_total(Sensor *sensor) { this->total_ = sensor; }
 
-  void set_save_to_flash_interval(uint32_t save_to_flash_interval) {
-    this->save_to_flash_interval_ = save_to_flash_interval;
-  }
-
   void set_energy_today(Sensor *sensor) { this->energy_today_ = sensor; }
   void set_energy_yesterday(Sensor *sensor) { this->energy_yesterday_ = sensor; }
   void set_energy_week(Sensor *sensor) { this->energy_week_ = sensor; }
@@ -58,10 +54,6 @@ class EnergyStatistics : public Component {
 
   void process_(float total);
   void save_();
-
-  uint32_t last_save_{0};
-  uint32_t save_to_flash_interval_{0};
-
 };  // class EnergyStatistics
 
 }  // namespace energy_statistics

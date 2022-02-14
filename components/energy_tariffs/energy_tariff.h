@@ -42,9 +42,6 @@ class EnergyTariff : public Sensor,
   }
 
   void set_service(const std::string &x) { this->service = x; }
-  void set_save_to_flash_interval(uint32_t save_to_flash_interval) {
-    this->save_to_flash_interval_ = save_to_flash_interval;
-  }
 
   bool is_default() const { return this->time_.empty(); }
 
@@ -79,10 +76,6 @@ class EnergyTariff : public Sensor,
     }
     return min <= x || x < max;
   }
-
-  uint32_t last_save_{};
-  uint32_t save_to_flash_interval_{};
-
 };  // class TariffSensor
 
 }  // namespace energy_tariffs

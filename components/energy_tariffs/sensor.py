@@ -31,7 +31,6 @@ CONF_TIME_OFFSET = "time_offset"
 CONF_TIME_OFFSET_SERVICE = "time_offset_service"
 CONF_ON_TARIFF = "on_tariff"
 CONF_ON_BEFORE_TARIFF = "on_before_tariff"
-CONF_SAVE_TO_FLASH_INTERVAL = "save_to_flash_interval"
 
 ICON_CURRENT_TARIFF = "mdi:theme-light-dark"
 ICON_TARIFF = ICON_CURRENT_TARIFF
@@ -135,9 +134,6 @@ CONFIG_SCHEMA = cv.All(
             cv.GenerateID(): cv.declare_id(EnergyTariffs),
             cv.GenerateID(CONF_TIME_ID): cv.use_id(time.RealTimeClock),
             cv.Required(CONF_TOTAL): cv.use_id(sensor.Sensor),
-            cv.Optional(
-                CONF_SAVE_TO_FLASH_INTERVAL
-            ): cv.positive_time_period_milliseconds,
             cv.Optional(CONF_TIME_OFFSET): number.NUMBER_SCHEMA.extend(
                 {
                     cv.GenerateID(): cv.declare_id(TimeOffsetNumber),
@@ -175,6 +171,7 @@ CONFIG_SCHEMA = cv.All(
 
 
 async def setup_sensor(config, key, setter):
+    """setting up sensor"""
     if key not in config:
         return None
     var = await sensor.new_sensor(config[key])
@@ -183,6 +180,7 @@ async def setup_sensor(config, key, setter):
 
 
 async def setup_input(config, key, setter):
+    """setting up input"""
     if key not in config:
         return None
     var = await cg.get_variable(config[key])
@@ -192,6 +190,7 @@ async def setup_input(config, key, setter):
 
 # code generation entry point
 async def to_code(config):
+    """gode generation entrypoint"""
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
 
@@ -222,8 +221,6 @@ async def to_code(config):
         cg.add(var.add_tariff(sens))
         if CONF_SERVICE in conf:
             cg.add(sens.set_service(conf[CONF_SERVICE]))
-        if config.get(CONF_SAVE_TO_FLASH_INTERVAL, False):
-            cg.add(sens.set_save_to_flash_interval(True))
 
     for conf in config.get(CONF_ON_TARIFF, []):
         trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)

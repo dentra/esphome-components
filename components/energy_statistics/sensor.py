@@ -20,8 +20,6 @@ CONF_ENERGY_YESTERDAY = "energy_yesterday"
 CONF_ENERGY_WEEK = "energy_week"
 CONF_ENERGY_MONTH = "energy_month"
 
-CONF_SAVE_TO_FLASH_INTERVAL = "save_to_flash_interval"
-
 energy_statistics_ns = cg.esphome_ns.namespace("energy_statistics")
 
 EnergyStatistics = energy_statistics_ns.class_("EnergyStatistics", cg.Component)
@@ -31,7 +29,6 @@ CONFIG_SCHEMA = cv.Schema(
         cv.GenerateID(): cv.declare_id(EnergyStatistics),
         cv.GenerateID(CONF_TIME_ID): cv.use_id(time.RealTimeClock),
         cv.Required(CONF_TOTAL): cv.use_id(sensor.Sensor),
-        cv.Optional(CONF_SAVE_TO_FLASH_INTERVAL): cv.positive_time_period_milliseconds,
         cv.Optional(CONF_ENERGY_TODAY): sensor.sensor_schema(
             unit_of_measurement=UNIT_KILOWATT_HOURS,
             accuracy_decimals=2,
@@ -61,6 +58,7 @@ CONFIG_SCHEMA = cv.Schema(
 
 
 async def setup_sensor(config, key, setter):
+    """setting up sensor"""
     if key not in config:
         return None
     var = await sensor.new_sensor(config[key])
@@ -69,6 +67,7 @@ async def setup_sensor(config, key, setter):
 
 
 async def setup_input(config, key, setter):
+    """setting up input"""
     if key not in config:
         return None
     var = await cg.get_variable(config[key])
@@ -78,6 +77,7 @@ async def setup_input(config, key, setter):
 
 # code generation entry point
 async def to_code(config):
+    """code generation entrypoint"""
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
 
@@ -86,9 +86,6 @@ async def to_code(config):
     # input sensors
     await setup_input(config, CONF_POWER, var.set_power)
     await setup_input(config, CONF_TOTAL, var.set_total)
-
-    if config.get(CONF_SAVE_TO_FLASH_INTERVAL, False):
-        cg.add(var.set_save_to_flash_interval(True))
 
     # exposed sensors
     await setup_sensor(config, CONF_ENERGY_TODAY, var.set_energy_today)
