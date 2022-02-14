@@ -55,6 +55,7 @@ At this moment there are list of supported device:
  * [Xiaomi MiaoMiaoce Digital Bluetooth Thermometer Hygrometer (MHO-C401)](components/miot_thermogigro/)
  * [Xiaomi MiaoMiaoce Digital Temperature and Humidity Monitor (XMWSDJ04MMC)](components/miot_thermogigro/)
  * [Yeelight Smart Bluetooth Wireless Dimmer Wall Light Switch Remote Control (YLKG08YL/YLKG07YL)](components/miot_ylkg0xyl/)
+ * [EraClean Refrigerator Odor Eliminator Max (CWBS-01)](components/miot_cwbs01/)
 
 And growing...
 

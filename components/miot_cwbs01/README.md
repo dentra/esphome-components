@@ -1,6 +1,8 @@
 # EraClean Refrigerator Odor Eliminator Max (CWBS-01)
 
-> This component is in early beta!
+> This component is in beta stage.
+
+This component is using active bluetooth device connection, so do not set updtate interval less to save your device battery life.
 
 Sample configuration:
 ```yaml
