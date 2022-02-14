@@ -17,6 +17,9 @@ esphome:
     name: "dentra.zmai90v2"
     version: "2022.1.0"
 
+preferences:
+  flash_write_interval: 30min
+
 external_components:
   - source: github://dentra/esphome-components
 
@@ -148,15 +151,20 @@ sensor:
     current: current
     apparent_power:
       name: "$name Apparent Power"
+      filters:
+        - throttle_average: 60s
     reactive_power:
       name: "$name Reactive Power"
+      filters:
+        - throttle_average: 60s
     power_factor:
       name: "$name Power Factor"
+      filters:
+        - throttle_average: 60s
 
   - platform: "energy_statistics"
     id: stat
     total: total
-    save_to_flash_interval: 600s
     energy_today:
       id: today
       name: "$name Energy Today"
@@ -164,7 +172,6 @@ sensor:
   - platform: "energy_tariffs"
     id: tariffs
     total: total
-    save_to_flash_interval: 600s
     time_offset:
       name: "$name Time Offset"
     tariffs:

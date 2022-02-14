@@ -1,3 +1,8 @@
+# 2021-10-26
+* [*] `zmai90.yaml`: add throttle_average filter to energy_monitoring sensors
+* [-] `energy_tariffs`: remove save_to_flash_interval parameter to use preferences.flash_write_interval
+* [-] `energy_statistics`: remove save_to_flash_interval parameter to use preferences.flash_write_interval
+
 # 2021-11-15
 * [+] new component `miot_ylkg0xyl`
 * [+] add battery voltage to all supported miot components

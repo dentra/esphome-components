@@ -1,3 +1,7 @@
+substitutions:
+  name: "Energy Meter"
+  node_name: "energy-meter"
+
 packages:
   main: !include zmai90.yaml
 
