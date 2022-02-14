@@ -69,5 +69,8 @@ Obtain beakonkey for Yeelight Remote (YLYK01YL), Dimmer (YLKG07YL/YLKG08YL), Bat
 ## [Electrolux Water Heater](https://github.com/dentra/esphome-ewh)
 Control Electrolux Water Heater and possibly other boilers (Ballu, Zanussi) using uart protocol.
 
+## [Tion](https://github.com/dentra/esphome-tion)
+Control Tion Breezers Lite and 4S via BLE protocol.
+
 ### Your thanks
 If this project was useful to you, you can [buy me](https://paypal.me/dentra0) a Cup of coffee :)
