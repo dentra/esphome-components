@@ -1,8 +1,6 @@
-from esphome.cpp_types import Component
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import (
-    miot_client,
     sensor,
     text_sensor,
     switch,
@@ -13,7 +11,6 @@ from esphome.components import (
     time,
 )
 from esphome.const import (
-    CONF_DEVICE_CLASS,
     CONF_ENTITY_CATEGORY,
     CONF_ICON,
     CONF_ID,
@@ -26,11 +23,11 @@ from esphome.const import (
     DEVICE_CLASS_BATTERY_CHARGING,
     DEVICE_CLASS_POWER,
     DEVICE_CLASS_PROBLEM,
-    ENTITY_CATEGORY_CONFIG,
     ENTITY_CATEGORY_DIAGNOSTIC,
     UNIT_PERCENT,
     STATE_CLASS_MEASUREMENT,
 )
+from .. import miot_client  # pylint: disable=relative-beyond-top-level
 
 CODEOWNERS = ["@dentra"]
 AUTO_LOAD = ["miot_client", "text_sensor", "switch", "sensor", "select"]
@@ -78,12 +75,9 @@ OPTIONS_SCENE = [
 ]
 
 CONFIG_SCHEMA = (
-    binary_sensor.BINARY_SENSOR_SCHEMA.extend(
+    binary_sensor.binary_sensor_schema(MiotCWBS01, device_class=DEVICE_CLASS_POWER)
+    .extend(
         {
-            cv.GenerateID(): cv.declare_id(MiotCWBS01),
-            cv.Optional(
-                CONF_DEVICE_CLASS, default=DEVICE_CLASS_POWER
-            ): binary_sensor.device_class,
             cv.Optional(miot_client.CONF_MIOT_CLIENT_DEBUG): cv.boolean,
             cv.GenerateID(CONF_TIME_ID): cv.use_id(time.RealTimeClock),
             cv.Optional(CONF_VERSION): text_sensor.TEXT_SENSOR_SCHEMA.extend(
@@ -115,27 +109,13 @@ CONFIG_SCHEMA = (
                     cv.GenerateID(): cv.declare_id(MiotCWBS01SceneSelect),
                 }
             ),
-            cv.Optional(CONF_CHARGING): binary_sensor.BINARY_SENSOR_SCHEMA.extend(
-                {
-                    cv.GenerateID(): cv.declare_id(binary_sensor.BinarySensor),
-                    cv.Optional(
-                        CONF_DEVICE_CLASS, default=DEVICE_CLASS_BATTERY_CHARGING
-                    ): binary_sensor.device_class,
-                    cv.Optional(
-                        CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_DIAGNOSTIC
-                    ): cv.entity_category,
-                }
+            cv.Optional(CONF_CHARGING): binary_sensor.binary_sensor_schema(
+                device_class=DEVICE_CLASS_BATTERY_CHARGING,
+                entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
             ),
-            cv.Optional(CONF_ERROR): binary_sensor.BINARY_SENSOR_SCHEMA.extend(
-                {
-                    cv.GenerateID(): cv.declare_id(binary_sensor.BinarySensor),
-                    cv.Optional(
-                        CONF_DEVICE_CLASS, default=DEVICE_CLASS_PROBLEM
-                    ): binary_sensor.device_class,
-                    cv.Optional(
-                        CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_DIAGNOSTIC
-                    ): cv.entity_category,
-                }
+            cv.Optional(CONF_ERROR): binary_sensor.binary_sensor_schema(
+                device_class=DEVICE_CLASS_PROBLEM,
+                entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
             ),
             cv.Optional(CONF_BATTERY_LEVEL): sensor.sensor_schema(
                 unit_of_measurement=UNIT_PERCENT,
@@ -155,10 +135,11 @@ CONFIG_SCHEMA = (
 
 
 async def to_code(config):
-    var = cg.new_Pvariable(config[CONF_ID])
+    """Code generation entry point"""
+    var = await binary_sensor.new_binary_sensor(config)
     await cg.register_component(var, config)
     # await miot.register_miot_device(var, config)
-    await binary_sensor.register_binary_sensor(var, config)
+
     await ble_client.register_ble_node(var, config)
 
     auth = await miot_client.register_standard_auth_client(config)

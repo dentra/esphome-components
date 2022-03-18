@@ -1,7 +1,7 @@
 import logging
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import sensor, miot
+from esphome.components import sensor
 from esphome.const import (
     CONF_HUMIDITY,
     DEVICE_CLASS_HUMIDITY,
@@ -10,6 +10,7 @@ from esphome.const import (
     UNIT_CELSIUS,
     UNIT_PERCENT,
 )
+from .. import miot  # pylint: disable=relative-beyond-top-level
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -23,6 +24,7 @@ MiotLYWSD03MMC = miot_lywsd03mmc_ns.class_(
 
 CONFIG_SCHEMA = (
     sensor.sensor_schema(
+        MiotLYWSD03MMC,
         unit_of_measurement=UNIT_CELSIUS,
         accuracy_decimals=1,
         device_class=DEVICE_CLASS_TEMPERATURE,
@@ -30,7 +32,6 @@ CONFIG_SCHEMA = (
     )
     .extend(
         {
-            cv.GenerateID(): cv.declare_id(MiotLYWSD03MMC),
             cv.Optional(CONF_HUMIDITY): sensor.sensor_schema(
                 unit_of_measurement=UNIT_PERCENT,
                 accuracy_decimals=1,
@@ -44,6 +45,7 @@ CONFIG_SCHEMA = (
 
 
 async def to_code(config):
+    """Code generation entry point"""
     _LOGGER.warning(
         "miot_lywsd03mmc is deprecated, please use miot_thermogigro instead."
     )

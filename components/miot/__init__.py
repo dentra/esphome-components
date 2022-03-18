@@ -1,4 +1,3 @@
-import logging
 from esphome.cpp_types import Component
 from esphome.core import Lambda
 from esphome import automation
@@ -21,7 +20,7 @@ from esphome.const import (
     UNIT_PERCENT,
     UNIT_VOLT,
 )
-from .. import xiaomi_account
+from .. import xiaomi_account  # pylint: disable=relative-beyond-top-level
 
 CODEOWNERS = ["@dentra"]
 ESP_PLATFORMS = [PLATFORM_ESP32]
@@ -151,6 +150,7 @@ async def new_text_sensor_device(config):
 
 
 async def to_code(config):
+    """Code generation entry point"""
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
     await esp32_ble_tracker.register_ble_device(var, config)

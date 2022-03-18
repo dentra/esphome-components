@@ -75,6 +75,7 @@ async def setup_input(config, key, setter):
 
 # code generation entry point
 async def to_code(config):
+    """Code generation entry point"""
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
 

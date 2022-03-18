@@ -113,6 +113,7 @@ def validate_tariffs(config):
 
 
 TARIFF_SCHEMA = sensor.sensor_schema(
+    EnergyTariff,
     unit_of_measurement=UNIT_KILOWATT_HOURS,
     accuracy_decimals=2,
     device_class=DEVICE_CLASS_ENERGY,
@@ -120,7 +121,6 @@ TARIFF_SCHEMA = sensor.sensor_schema(
     state_class=STATE_CLASS_TOTAL_INCREASING,
 ).extend(
     {
-        cv.GenerateID(): cv.declare_id(EnergyTariff),
         cv.Optional(CONF_TIME): cv.All(
             cv.ensure_list(validate_tariff_time), cv.Length(min=1, max=3)
         ),
@@ -190,7 +190,7 @@ async def setup_input(config, key, setter):
 
 # code generation entry point
 async def to_code(config):
-    """gode generation entrypoint"""
+    """Code generation entry point"""
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
 
@@ -212,8 +212,7 @@ async def to_code(config):
 
     # exposed sensors
     for conf in config.get(CONF_TARIFFS, []):
-        sens = cg.new_Pvariable(conf[CONF_ID])
-        await sensor.register_sensor(sens, conf)
+        sens = await sensor.new_sensor(conf)
         for tm in conf.get(CONF_TIME, []):
             parts = tm.split("-")
             t = [time_period(parts[0]), time_period(parts[1])]

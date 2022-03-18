@@ -1,4 +1,3 @@
-from esphome.components.ble_client import switch
 import logging
 from esphome import core, pins
 import esphome.codegen as cg
@@ -11,7 +10,6 @@ from esphome.const import (
     CONF_APPARENT_POWER,
     CONF_BAUD_RATE,
     CONF_CURRENT,
-    CONF_DEVICE_CLASS,
     CONF_FREQUENCY,
     CONF_ID,
     CONF_NUMBER,
@@ -91,16 +89,15 @@ def valid_button_pin(value):
 
 
 CONFIG_SCHEMA = (
-    binary_sensor.BINARY_SENSOR_SCHEMA.extend(
+    switch.SWITCH_SCHEMA.extend(
         {
             cv.GenerateID(): cv.declare_id(ZMAi90v1),
             cv.Optional(CONF_SWITCH_PIN, default=DEFAULT_SWITCH_PIN): valid_switch_pin,
             cv.Optional(CONF_BUTTON_PIN, default=DEFAULT_BUTTON_PIN): valid_button_pin,
-            cv.Optional(CONF_BUTTON): binary_sensor.BINARY_SENSOR_SCHEMA.extend(
+            cv.Optional(CONF_BUTTON): binary_sensor.binary_sensor_schema(
+                device_class=DEVICE_CLASS_EMPTY
+            ).extend(
                 {
-                    cv.Optional(
-                        CONF_DEVICE_CLASS, default=DEVICE_CLASS_EMPTY
-                    ): binary_sensor.device_class,
                     cv.Optional(CONF_BIND_TO_SWITCH, default=True): cv.boolean,
                 }
             ),
@@ -223,7 +220,9 @@ def add_button_trigger_(id_: core.ID, switch_, button_):
 
 
 async def to_code(config):
+    """Code generation entry point"""
     var = cg.new_Pvariable(config[CONF_ID])
+    await switch.register_switch(var, config)
     await cg.register_component(var, config)
     await uart.register_uart_device(var, config)
 
@@ -237,8 +236,7 @@ async def to_code(config):
 
     if CONF_BUTTON in config:
         conf = config[CONF_BUTTON]
-        button = cg.new_Pvariable(conf[CONF_ID])
-        await binary_sensor.register_binary_sensor(button, conf)
+        button = await binary_sensor.new_binary_sensor(conf)
         cg.add(var.set_button(button))
         if conf[CONF_BIND_TO_SWITCH]:
             add_button_trigger_(conf[CONF_ID], var, button)

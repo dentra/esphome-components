@@ -40,6 +40,7 @@ CONFIG_SCHEMA = cv.Schema(
 
 
 async def to_code(config):
+    """Code generation entry point"""
     for conf in config.get(CONF_ON_TWIST, []):
         trigger = cg.new_Pvariable(
             conf[CONF_TRIGGER_ID],

@@ -1,13 +1,26 @@
 # `ESPHome` components
 
+[![License][license-shield]][license]
+[![ESPHome release][esphome-release-shield]][esphome-release]
 [![Open in Visual Studio Code][open-in-vscode-shield]][open-in-vscode]
+[![Support author][donate-me-shield]][donate-me]
 [![PayPal.Me][paypal-me-shield]][paypal-me]
 
-[open-in-vscode-shield]: https://open.vscode.dev/badges/open-in-vscode.svg
+[license-shield]: https://img.shields.io/static/v1?label=License&message=MIT&color=orange&logo=license
+[license]: https://opensource.org/licenses/MIT
+
+[esphome-release-shield]: https://img.shields.io/static/v1?label=ESPHome&message=2022.3.0&color=green&logo=esphome
+[esphome-release]: https://GitHub.com/esphome/esphome/releases/
+
+[open-in-vscode-shield]: https://img.shields.io/static/v1?label=+&message=Open+in+VSCode&color=blue&logo=visualstudiocode
 [open-in-vscode]: https://open.vscode.dev/dentra/esphome-components
 
-[paypal-me-shield]: https://img.shields.io/static/v1.svg?label=%20&message=PayPal.Me&logo=paypal
+[donate-me-shield]: https://img.shields.io/static/v1?label=+&message=Donate
+[donate-me]: https://www.tinkoff.ru/cf/3dZPaLYDBAI
+
+[paypal-me-shield]: https://img.shields.io/static/v1?label=+&message=PayPal.Me&logo=paypal
 [paypal-me]: https://paypal.me/dentra0
+
 
 A collection of my ESPHome components.
 
@@ -74,4 +87,4 @@ Control Electrolux Water Heater and possibly other boilers (Ballu, Zanussi) usin
 Control Tion Breezers Lite and 4S via BLE protocol.
 
 ### Your thanks
-If this project was useful to you, you can [buy me](https://paypal.me/dentra0) a Cup of coffee :)
+If this project was useful to you, you can buy me a Cup of coffee via [C2C](https://www.tinkoff.ru/cf/3dZPaLYDBAI) or [PayPal](https://paypal.me/dentra0):)

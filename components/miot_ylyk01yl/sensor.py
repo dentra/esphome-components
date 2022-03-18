@@ -1,11 +1,11 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import automation
-from esphome.components import miot
 from esphome.const import (
     CONF_ON_CLICK,
     CONF_TRIGGER_ID,
 )
+from .. import miot  # pylint: disable=relative-beyond-top-level
 
 CONF_BUTTON = "button"
 CONF_ON_LONG_PRESS = "on_long_press"
@@ -68,6 +68,7 @@ async def configure_event_trigger_(config, param, enum):
 
 
 async def to_code(config):
+    """Code generation entry point"""
     await configure_event_trigger_(
         config,
         CONF_ON_CLICK,
