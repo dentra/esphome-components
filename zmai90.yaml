@@ -195,9 +195,9 @@ sensor:
     on_before_tariff:
       - uart.write: [0x55, 0xaa, 0x00, 0x08, 0x00, 0x00, 0x07]
 
-  - platform: startup
-    id: uptime
+  - platform: uptime
     name: "$name Uptime"
+    device_class: duration
 
   - platform: wifi_signal
     name: "$name WiFi Signal"

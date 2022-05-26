@@ -3,9 +3,11 @@
   "build": {
     "args": {
       // ESPHome version
-      "esphome_version": "2022.3.0",
+      "esphome_version": "2022.5.1",
       // additional APT dependicies
-      "apt_deps": "bash-completion less"
+      "apt_deps": "bash-completion less",
+      // additional PIP dependicies
+      "pip_deps": ""
     }
   },
   "runArgs": [
@@ -43,12 +45,12 @@
       },
       "**/__pycache__": true,
       "**/.esphome": true,
-      ".pio": true,
+      ".pio": true
     },
     "files.associations": {
       "**/.vscode/*.json": "jsonc"
     },
-    "C_Cpp.clang_format_path": "/usr/bin/clang-format-11",
+    "C_Cpp.clang_format_path": "/usr/bin/clang-format-11"
   },
   // Add the IDs of extensions you want installed when the container is created.
   "extensions": [
@@ -63,7 +65,7 @@
     // esphome yaml
     "esphome.esphome-vscode",
     // editorconfig
-    "editorconfig.editorconfig",
+    "editorconfig.editorconfig"
   ],
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],
@@ -79,6 +81,6 @@
     "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/.esphome,type=volume",
     "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/.pio,type=volume",
     "source=vscode-${containerWorkspaceFolderBasename}-lib,target=${containerWorkspaceFolder}/lib/.esphome,type=volume",
-    "source=vscode-${containerWorkspaceFolderBasename}-lib-miot,target=${containerWorkspaceFolder}/lib/miot/.esphome,type=volume",
+    "source=vscode-${containerWorkspaceFolderBasename}-lib-miot,target=${containerWorkspaceFolder}/lib/miot/.esphome,type=volume"
   ]
 }

@@ -9,7 +9,7 @@
 [license-shield]: https://img.shields.io/static/v1?label=License&message=MIT&color=orange&logo=license
 [license]: https://opensource.org/licenses/MIT
 
-[esphome-release-shield]: https://img.shields.io/static/v1?label=ESPHome&message=2022.3.0&color=green&logo=esphome
+[esphome-release-shield]: https://img.shields.io/static/v1?label=ESPHome&message=2022.5.0&color=green&logo=esphome
 [esphome-release]: https://GitHub.com/esphome/esphome/releases/
 
 [open-in-vscode-shield]: https://img.shields.io/static/v1?label=+&message=Open+in+VSCode&color=blue&logo=visualstudiocode
@@ -87,4 +87,5 @@ Control Electrolux Water Heater and possibly other boilers (Ballu, Zanussi) usin
 Control Tion Breezers Lite and 4S via BLE protocol.
 
 ### Your thanks
-If this project was useful to you, you can buy me a Cup of coffee via [C2C](https://www.tinkoff.ru/cf/3dZPaLYDBAI) or [PayPal](https://paypal.me/dentra0):)
+If this project was useful to you, you can buy me a Cup of coffee via
+[Card2Card](https://www.tinkoff.ru/cf/3dZPaLYDBAI) or [PayPal](https://paypal.me/dentra0) :)

@@ -34,7 +34,9 @@ void EnergyTariffs::setup() {
     this->rtc_ = global_preferences->make_preference<float>(fnv1_hash(TAG), save_to_flash);
     float loaded;
     if (this->rtc_.load(&loaded)) {
-      this->time_offset_->set(loaded);
+      auto call = this->time_offset_->make_call();
+      call.set_value(loaded);
+      call.perform();
     }
   }
 
