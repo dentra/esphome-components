@@ -10,15 +10,31 @@ namespace esphome {
 namespace zmai90v1 {
 
 struct zmai90_data_t {
-  uint8_t header[3];          // FE0108
-  uint8_t energy[4];          // kWh, divided by 100
-  uint8_t voltage[4];         // V, divided by 10
-  uint8_t current[4];         // A, divided by 10000
-  uint8_t frequency[4];       // Hz, divided by 100
-  uint8_t active_power[4];    // W, divided by 100
-  uint8_t reactive_power[4];  // divided by 100
-  uint8_t apparent_power[4];  // divided by 100
-  uint8_t power_factor[4];    // %, divided by 10
+  template<size_t DIV> struct field_t {
+    uint8_t data[4];
+    float value() { return value(1.0f / DIV); }
+    float value(float mul) {
+      float res = {};
+      for (size_t i = 0; i < sizeof(data); i++) {
+        res += (data[i] & 0x0f) * mul;
+        mul *= 10.f;
+        res += (data[i] >> 4) * mul;
+        mul *= 10.f;
+      }
+      return res;
+    }
+  } PACKED;
+  uint8_t header;               // FE
+  uint8_t version;              // version? always 01
+  uint8_t fields_count;         // fields count? always 08
+  field_t<100> energy;          // kWh, divided by 100
+  field_t<10> voltage;          // V, divided by 10
+  field_t<10000> current;       // A, divided by 10000
+  field_t<100> frequency;       // Hz, divided by 100
+  field_t<100> active_power;    // W, divided by 100
+  field_t<100> reactive_power;  // divided by 100
+  field_t<100> apparent_power;  // divided by 100
+  field_t<10> power_factor;     // %, divided by 10
   uint8_t checksum;
 } PACKED;
 
@@ -65,8 +81,8 @@ class ZMAi90v1 : public PollingComponent, public switch_::Switch, public uart::U
   sensor::Sensor *frequency_ = {};
   sensor::Sensor *power_factor_ = {};
 
-  float get_val(const uint8_t data[4], float mul);
-  uint8_t calc_crc_(const zmai90_data_t &data);
+  uint8_t calc_crc_(const void *data, size_t size);
+  uint8_t check_crc_(const zmai90_data_t &data) { return this->calc_crc_(data, sizeof(data) - 1) == data.checksum; }
 
   void write_state(bool state) override;
 };
