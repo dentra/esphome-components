@@ -87,10 +87,10 @@ inline float EnergyMonitoring::get_current_() {
 //   - reactive power
 //   - power factor
 void EnergyMonitoring::process_apparent_(float voltage, float current) {
-  if (isnan(voltage)) {
+  if (std::isnan(voltage)) {
     return;
   }
-  if (isnan(current)) {
+  if (std::isnan(current)) {
     return;
   }
   auto power = this->power_->get_state();
@@ -104,7 +104,7 @@ void EnergyMonitoring::process_apparent_(float voltage, float current) {
 //   - reactive power
 //   - power factor
 void EnergyMonitoring::process_power_(float power, float apparent, float current) {
-  if (isnan(apparent)) {
+  if (std::isnan(apparent)) {
     return;
   }
 

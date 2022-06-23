@@ -2,10 +2,6 @@
 #include "esphome/components/time/real_time_clock.h"
 #include "energy_tariffs.h"
 
-#ifndef isnan
-using std::isnan;
-#endif
-
 namespace esphome {
 namespace energy_tariffs {
 
@@ -58,10 +54,7 @@ void EnergyTariffs::loop() {
 
   auto ct = this->get_tariff_(time);
   if (ct != this->current_tariff_) {
-    auto total = this->total_->get_state();
-    if (!isnan(total)) {
-      this->process_(total);
-    }
+    this->process_(this->total_->get_state());
     this->current_tariff_ = ct;
     if (this->tariff_callback_) {
       this->tariff_callback_->call(ct);
@@ -81,9 +74,18 @@ void EnergyTariffs::process_(float total) {
   if (!this->current_tariff_) {
     return;
   }
+  if (std::isnan(total)) {
+    return;
+  }
+  if (std::isnan(this->last_total_)) {
+    this->last_total_ = total;
+    return;
+  }
   float x = total - this->last_total_;
-  this->current_tariff_->add(x);
-  this->last_total_ = total;
+  if (x > 0.005f) {
+    this->current_tariff_->add(x);
+    this->last_total_ = total;
+  }
 }
 
 EnergyTariff *EnergyTariffs::get_tariff_(const time::ESPTime &time) const {

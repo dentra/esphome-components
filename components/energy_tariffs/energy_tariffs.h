@@ -7,10 +7,6 @@
 #include "esphome/components/number/number.h"
 #include "esphome/components/time/real_time_clock.h"
 
-#ifdef USE_API
-#include "esphome/components/api/custom_api_device.h"
-#endif
-
 #include "energy_tariff.h"
 
 namespace esphome {
@@ -60,7 +56,7 @@ class EnergyTariffs : public Component {
 
   EnergyTariff *current_tariff_{};
 
-  float last_total_{0};
+  float last_total_{NAN};
 
   CallbackManager<void(Sensor *)> *tariff_callback_{};
   CallbackManager<void()> *before_tariff_callback_{};
