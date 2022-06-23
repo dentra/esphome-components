@@ -12,7 +12,6 @@ namespace zmai90v1 {
 struct zmai90_data_t {
   template<size_t DIV> struct field_t {
     uint8_t data[4];
-    float value() { return value(1.0f / DIV); }
     float value(float mul) {
       float res = {};
       for (size_t i = 0; i < sizeof(data); i++) {
@@ -23,6 +22,8 @@ struct zmai90_data_t {
       }
       return res;
     }
+    std::string format_hex_pretty() const { return esphome::format_hex_pretty(this->data, sizeof(this->data)); }
+    float value() { return value(1.0f / DIV); }
   } PACKED;
   uint8_t header;               // FE
   uint8_t version;              // version? always 01
@@ -82,7 +83,7 @@ class ZMAi90v1 : public PollingComponent, public switch_::Switch, public uart::U
   sensor::Sensor *power_factor_ = {};
 
   uint8_t calc_crc_(const void *data, size_t size);
-  uint8_t check_crc_(const zmai90_data_t &data) { return this->calc_crc_(data, sizeof(data) - 1) == data.checksum; }
+  uint8_t check_crc_(const zmai90_data_t &data) { return this->calc_crc_(&data, sizeof(data) - 1) == data.checksum; }
 
   void write_state(bool state) override;
 };

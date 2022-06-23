@@ -95,7 +95,7 @@ void ZMAi90v1::loop() {
       ESP_LOGW(TAG, "Invalid data header: %02X", data.version);
       break;
     }
-    if (data.field_count != DATA_FIELDS_COUNT) {
+    if (data.fields_count != DATA_FIELDS_COUNT) {
       ESP_LOGW(TAG, "Invalid data header: %u", data.fields_count);
       break;
     }
@@ -103,40 +103,36 @@ void ZMAi90v1::loop() {
       ESP_LOGW(TAG, "Invalid checksum");
       break;
     }
-    if (this->energy_ != nullptr) {
-      ESP_LOGD(TAG, "Reported energy: %s", format_hex_pretty(data.energy.data, sizeof(data.energy.data)).c_str());
+    if (this->energy_) {
+      ESP_LOGD(TAG, "Reported energy: %s", data.energy.format_hex_pretty().c_str());
       this->energy_->publish_state(data.energy.value());
     }
-    if (this->voltage_ != nullptr) {
-      ESP_LOGD(TAG, "Reported voltage: %s", format_hex_pretty(data.voltage, sizeof(data.voltage)).c_str());
+    if (this->voltage_) {
+      ESP_LOGD(TAG, "Reported voltage: %s", data.voltage.format_hex_pretty().c_str());
       this->voltage_->publish_state(data.voltage.value());
     }
-    if (this->current_ != nullptr) {
-      ESP_LOGD(TAG, "Reported current: %s", format_hex_pretty(data.current, sizeof(data.current)).c_str());
+    if (this->current_) {
+      ESP_LOGD(TAG, "Reported current: %s", data.current.format_hex_pretty().c_str());
       this->current_->publish_state(data.current.value());
     }
-    if (this->frequency_ != nullptr) {
-      ESP_LOGD(TAG, "Reported frequency: %s", format_hex_pretty(data.frequency, sizeof(data.frequency)).c_str());
+    if (this->frequency_) {
+      ESP_LOGD(TAG, "Reported frequency: %s", data.frequency.format_hex_pretty().c_str());
       this->frequency_->publish_state(data.frequency.value());
     }
-    if (this->active_power_ != nullptr) {
-      ESP_LOGD(TAG, "Reported active power: %s",
-               format_hex_pretty(data.active_power, sizeof(data.active_power)).c_str());
+    if (this->active_power_) {
+      ESP_LOGD(TAG, "Reported active power: %s", data.active_power.format_hex_pretty().c_str());
       this->active_power_->publish_state(data.active_power.value());
     }
-    if (this->reactive_power_ != nullptr) {
-      ESP_LOGD(TAG, "Reported reactive power: %s",
-               format_hex_pretty(data.reactive_power, sizeof(data.reactive_power)).c_str());
+    if (this->reactive_power_) {
+      ESP_LOGD(TAG, "Reported reactive power: %s", data.reactive_power.format_hex_pretty().c_str());
       this->reactive_power_->publish_state(data.reactive_power.value());
     }
-    if (this->apparent_power_ != nullptr) {
-      ESP_LOGD(TAG, "Reported apparent power: %s",
-               format_hex_pretty(data.apparent_power, sizeof(data.apparent_power)).c_str());
+    if (this->apparent_power_) {
+      ESP_LOGD(TAG, "Reported apparent power: %s", data.apparent_power.format_hex_pretty().c_str());
       this->apparent_power_->publish_state(data.apparent_power.value());
     }
-    if (this->power_factor_ != nullptr) {
-      ESP_LOGD(TAG, "Reported power factor: %s",
-               format_hex_pretty(data.power_factor, sizeof(data.power_factor)).c_str());
+    if (this->power_factor_) {
+      ESP_LOGD(TAG, "Reported power factor: %s", data.power_factor.format_hex_pretty().c_str());
       this->power_factor_->publish_state(data.power_factor.value());
     }
   }
@@ -148,7 +144,7 @@ void ZMAi90v1::update() {
 }
 
 uint8_t ZMAi90v1::calc_crc_(const void *data, size_t size) {
-  const uint8_t *bytes = static_cast<const uint8_t *>(&data);
+  const uint8_t *bytes = static_cast<const uint8_t *>(data);
   uint8_t crc = 0;
   for (int i = 0; i < size; i++) {
     crc += bytes[i];
