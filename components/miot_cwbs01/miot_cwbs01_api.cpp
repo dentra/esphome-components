@@ -29,15 +29,15 @@ struct frame_t {
   uint8_t data[sizeof(uint8_t)];  // crc size
 } PACKED;
 
-static uint8_t calc_crc(const uint8_t *data, size_t size) {
-  uint8_t res = 0;
-  for (size_t i = 0; i < size; i++) {
-    res += data[i];
+static uint8_t calc_crc(uint8_t init, const void *data, size_t size) {
+  auto data8 = static_cast<const uint8_t *>(data);
+  while (size--) {
+    init += *data8++;
   }
-  return res;
+  return init;
 }
-// static uint8_t calc_crc(const void *data, size_t size) { return calc_crc(static_cast<const uint8_t *>(data), size); }
-static uint8_t calc_crc(const frame_t *frame) { return calc_crc(&frame->size, frame->size); }
+
+static uint8_t calc_crc(const frame_t *frame) { return calc_crc(0, &frame->size, frame->size); }
 
 bool MiotCWBS01Api::read_frame(const uint8_t *data, uint8_t size) {
   ESP_LOGV(TAG, "read frame: %s", format_hex_pretty(data, size).c_str());
