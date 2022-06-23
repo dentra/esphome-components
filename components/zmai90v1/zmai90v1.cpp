@@ -144,10 +144,10 @@ void ZMAi90v1::update() {
 }
 
 uint8_t ZMAi90v1::calc_crc_(const void *data, size_t size) {
-  const uint8_t *bytes = static_cast<const uint8_t *>(data);
+  auto data8 = static_cast<const uint8_t *>(data);
   uint8_t crc = 0;
-  for (int i = 0; i < size; i++) {
-    crc += bytes[i];
+  while (size--) {
+    crc += *data8++;
   }
   return ~crc + 0x33;
 }
