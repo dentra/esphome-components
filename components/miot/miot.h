@@ -14,6 +14,9 @@
 namespace esphome {
 namespace miot {
 
+#define MIOT_ADDR_STR ESP_BD_ADDR_STR
+#define MIOT_ADDR_HEX_REVERSE(addr) addr[5], addr[4], addr[3], addr[2], addr[1], addr[0]
+
 using bindkey_t = uint8_t[16];
 
 struct MiBeacon {
@@ -29,12 +32,14 @@ struct MiBeacon {
   BLEObject object = {};
   uint32_t random_number = {};
   uint32_t message_integrity_check = {};
+  uint8_t version() const { return frame_control.version; }
   bool has_object() const { return frame_control.object_include; }
   bool has_address() const { return frame_control.mac_include; }
   bool has_capability() const { return frame_control.capability_include; }
-  bool has_io_capability() const { return frame_control.capability_include && capability.io; }
+  bool has_io_capability() const { return has_capability() && capability.io; }
   bool is_mesh() const { return frame_control.mesh; }
   bool is_registered() const { return frame_control.registered; }
+  bool is_encrypted() const { return frame_control.is_encrypted; }
 };
 
 class MiotListener;

@@ -20,7 +20,7 @@ void dump(const char *const TAG, const MiBeacon &mib) {
   ESP_LOGD(TAG, "  Frame Counter: %" PRIu8, mib.frame_counter);
   if (mib.frame_control.mac_include) {
     auto mac = mac_reverse(mib.mac_address);
-    ESP_LOGD(TAG, "  MAC address: " ESP_BD_ADDR_STR, mac[5], mac[4], mac[3], mac[2], mac[1], mac[0]);
+    ESP_LOGD(TAG, "  MAC address: " MIOT_ADDR_STR, MIOT_ADDR_HEX_REVERSE(mac));
   }
   if (mib.frame_control.capability_include) {
     ESP_LOGD(TAG, "  Capability:");

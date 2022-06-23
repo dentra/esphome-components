@@ -52,8 +52,7 @@ bool decrypt_mibeacon45(const MiotListener *listener, MiBeacon &mib) {
   if (ret != 0) {
     ESP_LOGW(TAG, "%12" PRIX64 " [%04X] mbedtls_ccm_auth_decrypt failed: %d", listener->get_address(),
              listener->get_product_id(), ret);
-    ESP_LOGW(TAG, "   mac: " ESP_BD_ADDR_STR, nonce.mac[5], nonce.mac[4], nonce.mac[3], nonce.mac[2], nonce.mac[1],
-             nonce.mac[0]);
+    ESP_LOGW(TAG, "   mac: " MIOT_ADDR_STR, MIOT_ADDR_HEX_REVERSE(nonce.mac));
     ESP_LOGW(TAG, "   key: %s", format_hex_pretty(listener->get_bindkey(), sizeof(bindkey_t)).c_str());
     ESP_LOGW(TAG, "    iv: %s", format_hex_pretty(iv, iv_len).c_str());
     ESP_LOGW(TAG, "   add: %s", format_hex_pretty(add, add_len).c_str());
