@@ -15,7 +15,7 @@ esphome:
   name: $node_name
   project:
     name: "dentra.zmai90v2"
-    version: "2022.1.0"
+    version: "2022.6.0"
 
 preferences:
   flash_write_interval: 30min
@@ -153,14 +153,17 @@ sensor:
       name: "$name Apparent Power"
       filters:
         - throttle_average: 60s
+        - filter_out: nan
     reactive_power:
       name: "$name Reactive Power"
       filters:
         - throttle_average: 60s
+        - filter_out: nan
     power_factor:
       name: "$name Power Factor"
       filters:
         - throttle_average: 60s
+        - filter_out: nan
 
   - platform: "energy_statistics"
     id: stat
