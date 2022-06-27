@@ -6,8 +6,8 @@ from esphome.const import CONF_MAC_ADDRESS, CONF_ID, CONF_BINDKEY, CONF_ALERT, C
 DEPENDENCIES = ['esp32_ble_tracker']
 AUTO_LOAD = ['xiaomi_ble']
 
-xiaomi_mccgq02hl_ns = cg.esphome_ns.namespace('xiaomi_mccgq02hl')
-XiaomiMCCGQ02HL = xiaomi_mccgq02hl_ns.class_('XiaomiMCCGQ02HL',cg.Component, binary_sensor.BinarySensor,
+miot1_mccgq02hl_ns = cg.esphome_ns.namespace('miot1_mccgq02hl')
+XiaomiMCCGQ02HL = miot1_mccgq02hl_ns.class_('XiaomiMCCGQ02HL',cg.Component, binary_sensor.BinarySensor,
                                              esp32_ble_tracker.ESPBTDeviceListener)
 
 CONFIG_SCHEMA = cv.All(binary_sensor.BINARY_SENSOR_SCHEMA.extend({
@@ -18,7 +18,7 @@ CONFIG_SCHEMA = cv.All(binary_sensor.BINARY_SENSOR_SCHEMA.extend({
         cv.Optional(CONF_DEVICE_CLASS, default='light'): binary_sensor.device_class,
     }),
     cv.Optional(CONF_ALERT): binary_sensor.BINARY_SENSOR_SCHEMA.extend({
-        cv.Optional(CONF_DEVICE_CLASS, default='opening'): binary_sensor.device_class,
+        cv.Optional(CONF_DEVICE_CLASS, default='alert'): binary_sensor.device_class,
     }),
     cv.Optional(CONF_BATTERY_LEVEL): sensor.sensor_schema(UNIT_PERCENT, ICON_BATTERY, 0),
 }).extend(esp32_ble_tracker.ESP_BLE_DEVICE_SCHEMA).extend(cv.COMPONENT_SCHEMA))
