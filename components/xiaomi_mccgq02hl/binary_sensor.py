@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import sensor, binary_sensor, esp32_ble_tracker
-from esphome.const import CONF_MAC_ADDRESS, CONF_ID, CONF_BINDKEY, CONF_OPEN, CONF_DEVICE_CLASS, CONF_LIGHT, CONF_BATTERY_LEVEL, UNIT_PERCENT, ICON_BATTERY
+from esphome.const import CONF_MAC_ADDRESS, CONF_ID, CONF_BINDKEY, CONF_ALERT, CONF_DEVICE_CLASS, CONF_LIGHT, CONF_BATTERY_LEVEL, UNIT_PERCENT, ICON_BATTERY
 
 DEPENDENCIES = ['esp32_ble_tracker']
 AUTO_LOAD = ['xiaomi_ble']
@@ -17,7 +17,7 @@ CONFIG_SCHEMA = cv.All(binary_sensor.BINARY_SENSOR_SCHEMA.extend({
     cv.Optional(CONF_LIGHT): binary_sensor.BINARY_SENSOR_SCHEMA.extend({
         cv.Optional(CONF_DEVICE_CLASS, default='light'): binary_sensor.device_class,
     }),
-    cv.Optional(CONF_OPEN): binary_sensor.BINARY_SENSOR_SCHEMA.extend({
+    cv.Optional(CONF_ALERT): binary_sensor.BINARY_SENSOR_SCHEMA.extend({
         cv.Optional(CONF_DEVICE_CLASS, default='opening'): binary_sensor.device_class,
     }),
     cv.Optional(CONF_BATTERY_LEVEL): sensor.sensor_schema(UNIT_PERCENT, ICON_BATTERY, 0),
