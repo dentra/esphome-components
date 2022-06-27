@@ -1,6 +1,6 @@
 #include "inttypes.h"
 #include "esphome/core/log.h"
-#include "xiaomi_mccgq02hl" //"miot_mccgq02hl.h"
+#include "miot_mccgq02hl.h"
 
 namespace esphome {
 namespace miot_mccgq02hl {
