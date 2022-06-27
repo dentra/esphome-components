@@ -1,12 +1,12 @@
-#include "xiaomi_mccgq02hl.h"
+#include "miot1_mccgq02hl.h"
 #include "esphome/core/log.h"
 
 #ifdef ARDUINO_ARCH_ESP32
 
 namespace esphome {
-namespace xiaomi_mccgq02hl {
+namespace miot1_mccgq02hl {
 
-static const char *TAG = "xiaomi_mccgq02hl";
+static const char *TAG = "miot1_mccgq02hl";
 
 void XiaomiMCCGQ02HL::dump_config() {
   ESP_LOGCONFIG(TAG, "Xiaomi MCCGQ02HL");
