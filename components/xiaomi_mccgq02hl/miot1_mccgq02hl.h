@@ -9,7 +9,7 @@
 #ifdef ARDUINO_ARCH_ESP32
 
 namespace esphome {
-namespace xiaomi_mccgq02hl {
+namespace miot1_mccgq02hl {
 
 class XiaomiMCCGQ02HL : public Component,
                         public binary_sensor::BinarySensorInitiallyOff,
