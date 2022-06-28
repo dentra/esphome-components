@@ -10,7 +10,7 @@ from esphome.const import (
     CONF_SERVERS,
     CONF_UPDATE_INTERVAL,
 )
-from .xiaomi_beaconkeys import XiaomiBeaconkeys
+from .xiaomi_account import XiaomiAccount
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -105,13 +105,13 @@ def as_bindkey(value):
     return cg.RawExpression("(const uint8_t[16]){{{}}}".format(",".join(cpp_array)))
 
 
-_xbk: XiaomiBeaconkeys = None
+_XIAOMI_ACCOUNT: XiaomiAccount = None
 
 
-def _get_xbk():
-    global _xbk
-    if _xbk is not None:
-        return _xbk
+def _get_xiaomi_account() -> XiaomiAccount:
+    global _XIAOMI_ACCOUNT
+    if _XIAOMI_ACCOUNT is not None:
+        return _XIAOMI_ACCOUNT
 
     conf = CORE.config.get("miot")
     if conf is not None:
@@ -121,7 +121,7 @@ def _get_xbk():
     if conf is None:
         return
 
-    _xbk = XiaomiBeaconkeys(
+    _XIAOMI_ACCOUNT = XiaomiAccount(
         username=conf[CONF_USERNAME],
         password=conf[CONF_PASSWORD],
         servers=conf[CONF_SERVERS],
@@ -129,15 +129,15 @@ def _get_xbk():
         update_interval=conf[CONF_UPDATE_INTERVAL].total_seconds,
     )
 
-    return _xbk
+    return _XIAOMI_ACCOUNT
 
 
 def set_bindkey(config, mac, setter):
     if CONF_BINDKEY in config:
         cg.add(setter(as_bindkey(config[CONF_BINDKEY])))
     else:
-        xbk = _get_xbk()
-        if xbk is None:
+        xa = _get_xiaomi_account()
+        if xa is None:
             _LOGGER.warning(
                 "%s not configured for %s %s",
                 CONF_XIAOMI_ACCOUNT,
@@ -146,7 +146,7 @@ def set_bindkey(config, mac, setter):
             )
             return
 
-        bindkey = xbk.get_beaconkey(mac)
+        bindkey = xa.get_beaconkey(mac)
         if bindkey:
             _LOGGER.info("Got bindkey for %s %s", mac, config.get(CONF_NAME, ""))
             cg.add(setter(as_bindkey(bindkey)))
@@ -158,8 +158,8 @@ def set_token(config, mac, setter):
     if CONF_TOKEN in config:
         cg.add(setter(as_bindkey(config[CONF_TOKEN])))
     else:
-        xbk = _get_xbk()
-        if xbk is None:
+        xa = _get_xiaomi_account()
+        if xa is None:
             _LOGGER.warning(
                 "%s not configured for %s %s",
                 CONF_XIAOMI_ACCOUNT,
@@ -168,7 +168,7 @@ def set_token(config, mac, setter):
             )
             return
 
-        token = xbk.get_token(mac)
+        token = xa.get_token(mac)
         if token:
             _LOGGER.info("Got token for %s %s", mac, config.get(CONF_NAME, ""))
             cg.add(setter(as_token(token)))
