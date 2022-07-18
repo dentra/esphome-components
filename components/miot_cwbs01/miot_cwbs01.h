@@ -120,7 +120,7 @@ class MiotCWBS01ModeSelect : public select::Select {
  public:
   explicit MiotCWBS01ModeSelect(MiotCWBS01 *parent) : parent_(parent) {}
   void control(const std::string &value) override {
-    this->publish_state(state);
+    this->publish_state(value);
     this->parent_->set_dirty(UPDATE_STATE_MODE);
   }
 
@@ -132,7 +132,7 @@ class MiotCWBS01SceneSelect : public select::Select {
  public:
   explicit MiotCWBS01SceneSelect(MiotCWBS01 *parent) : parent_(parent) {}
   void control(const std::string &value) override {
-    this->publish_state(state);
+    this->publish_state(value);
     this->parent_->set_dirty(UPDATE_STATE_SCENE);
   }
 
