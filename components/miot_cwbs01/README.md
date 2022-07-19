@@ -12,7 +12,7 @@ external_components:
 ota:
   on_begin:
     then:
-      - lambda: id(sw_ble_client).turn_off();
+      - lambda: id(ble_client_deodorizer).set_enabled(false);
 
 
 xiaomi_account:
