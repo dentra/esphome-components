@@ -6,30 +6,7 @@
 namespace esphome {
 namespace miot_cwbs01 {
 
-#define UNUSED __attribute__((unused))
-
 static const char *const TAG = "miot_cwbs01";
-
-static std::string get_option(select::Select *select, size_t index, size_t first, size_t last UNUSED) {
-  auto options = select->traits.get_options();
-  index -= first;
-  if (index >= options.size()) {
-    return "";
-  }
-  return options[index];
-}
-
-static int get_state_index(select::Select *select, size_t first, size_t last UNUSED) {
-  if (select->state.empty()) {
-    return -1;
-  }
-  auto options = select->traits.get_options();
-  auto pos = std::find(options.begin(), options.end(), select->state);
-  if (pos == options.end()) {
-    return -1;
-  }
-  return std::distance(options.begin(), pos) + first;
-}
 
 void MiotCWBS01::on_search_complete(const esp_ble_gattc_cb_param_t::gattc_search_cmpl_evt_param &param) {
   this->char_.version = this->get_char_handle(miot_client::BLE_UUID_MI_SERVICE, miot_client::BLE_UUID_MI_VERSION);
@@ -57,8 +34,13 @@ void MiotCWBS01::on_auth_complete() {
   if (this->version_ != nullptr) {
     this->read_char(this->char_.version);
   }
-  this->request_state();
-  this->sync_state_();
+
+  if (this->is_dirty_()) {
+    this->sync_state_();
+  } else {
+    this->request_state();
+  }
+  this->set_timeout(TAG, 10000, [this]() { this->parent_->set_enabled(false); });
 }
 
 void MiotCWBS01::on_read_char(const esp_ble_gattc_cb_param_t::gattc_read_char_evt_param &param) {
@@ -90,13 +72,21 @@ void MiotCWBS01::read(const state_t &state) {
     this->power_->publish_state(state.power == State::STATE_ON);
   }
   if (this->mode_ != nullptr) {
-    this->mode_->publish_state(get_option(this->mode_, state.mode, Mode::MODE__FIRST, Mode::MODE__LAST));
+    auto old_mode = this->mode_->active_index();
+    auto new_mode = state.mode - Mode::MODE__FIRST;
+    if (!old_mode.has_value() || (*old_mode != new_mode)) {
+      this->mode_->publish_state(this->mode_->at(new_mode).value());
+    }
   }
   if (this->cycle_ != nullptr) {
     this->cycle_->publish_state(state.cycle == Cycle::CYCLE_ON);
   }
   if (this->scene_ != nullptr) {
-    this->scene_->publish_state(get_option(this->scene_, state.scene, Scene::SCENE__FIRST, Scene::SCENE__LAST));
+    auto old_scene = this->scene_->active_index();
+    auto new_scene = state.scene - Scene::SCENE__FIRST;
+    if (!old_scene.has_value() || *old_scene != new_scene) {
+      this->scene_->publish_state(this->scene_->at(new_scene).value());
+    }
   }
   if (this->charging_ != nullptr) {
     this->charging_->publish_state(state.power_state == PowerState::POWER_STATE_CHARGING);
@@ -108,21 +98,10 @@ void MiotCWBS01::read(const state_t &state) {
     this->battery_level_->publish_state(state.battery);
   }
 
-  if (!this->is_dirty_()) {
-    this->parent_->set_enabled(false);
-  }
+  this->set_timeout(TAG, 3000, [this]() { this->parent_->set_enabled(false); });
 }
 
 void MiotCWBS01::sync_state_() {
-  if (!this->is_dirty_()) {
-    return;
-  }
-
-  if (!this->parent_->enabled) {
-    this->parent_->set_enabled(true);
-    return;
-  }
-
   if (this->update_state_ & UPDATE_STATE_POWER) {
     this->update_state_ &= ~UPDATE_STATE_POWER;
     MiotCWBS01Api::set_power(this->power_->state);
@@ -135,24 +114,28 @@ void MiotCWBS01::sync_state_() {
 
   if (this->update_state_ & UPDATE_STATE_MODE) {
     this->update_state_ &= ~UPDATE_STATE_MODE;
-    auto index = get_state_index(this->mode_, Mode::MODE__FIRST, Mode::MODE__LAST);
-    if (index >= 0) {
-      MiotCWBS01Api::set_mode(static_cast<Mode>(index));
+    auto mode = this->mode_->active_index();
+    if (mode.has_value()) {
+      MiotCWBS01Api::set_mode(static_cast<Mode>(*mode + Mode::MODE__FIRST));
     }
   }
 
   if (this->update_state_ & UPDATE_STATE_SCENE) {
     this->update_state_ &= ~UPDATE_STATE_SCENE;
-    auto index = get_state_index(this->scene_, Scene::SCENE__FIRST, Scene::SCENE__LAST);
-    if (index >= 0) {
-      MiotCWBS01Api::set_scene(static_cast<Scene>(index));
+    auto scene = this->scene_->active_index();
+    if (scene.has_value()) {
+      MiotCWBS01Api::set_scene(static_cast<Scene>(*scene + Scene::SCENE__FIRST));
     }
   }
 }
 
 void MiotCWBS01::set_dirty(uint32_t flag) {
   this->update_state_ |= flag;
-  App.scheduler.set_timeout(this, TAG, 500, [this]() { this->sync_state_(); });
+  if (this->parent_->enabled) {
+    this->sync_state_();
+  } else {
+    this->parent_->set_enabled(true);
+  }
 }
 
 }  // namespace miot_cwbs01
