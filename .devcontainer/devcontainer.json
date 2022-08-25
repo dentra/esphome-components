@@ -65,7 +65,9 @@
     // esphome yaml
     "esphome.esphome-vscode",
     // editorconfig
-    "editorconfig.editorconfig"
+    "editorconfig.editorconfig",
+    // fixme and todo tree
+    "Gruntfuggly.todo-tree"
   ],
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],
