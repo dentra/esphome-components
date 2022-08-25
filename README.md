@@ -9,7 +9,7 @@
 [license-shield]: https://img.shields.io/static/v1?label=License&message=MIT&color=orange&logo=license
 [license]: https://opensource.org/licenses/MIT
 
-[esphome-release-shield]: https://img.shields.io/static/v1?label=ESPHome&message=2022.5.0&color=green&logo=esphome
+[esphome-release-shield]: https://img.shields.io/static/v1?label=ESPHome&message=2022.8.0&color=green&logo=esphome
 [esphome-release]: https://GitHub.com/esphome/esphome/releases/
 
 [open-in-vscode-shield]: https://img.shields.io/static/v1?label=+&message=Open+in+VSCode&color=blue&logo=visualstudiocode
@@ -85,6 +85,9 @@ Control Electrolux Water Heater and possibly other boilers (Ballu, Zanussi) usin
 
 ## [Tion](https://github.com/dentra/esphome-tion)
 Control Tion Breezers Lite and 4S via BLE protocol.
+
+## [Crash Info](components/crash_info/)
+An ESP8266 remote crash detector.
 
 ### Your thanks
 If this project was useful to you, you can buy me a Cup of coffee via

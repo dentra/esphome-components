@@ -1,3 +1,6 @@
+# 2022-08-25
+* [+] new component crash_info
+
 # 2021-10-26
 * [*] `zmai90.yaml`: add throttle_average filter to energy_monitoring sensors
 * [-] `energy_tariffs`: remove save_to_flash_interval parameter to use preferences.flash_write_interval
