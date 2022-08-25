@@ -23,6 +23,7 @@ class CrashInfo : public Component {
   uint32_t get_max_stack_frames_size() const;
   uint32_t get_min_stack_frames_addr() const;
   uint32_t get_max_stack_frames_addr() const;
+  bool is_store_in_flash() const;
 
  protected:
   ESPPreferenceObject rtc_;

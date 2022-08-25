@@ -25,6 +25,9 @@ https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/core_dump
 #ifndef DENTRA_CRASH_INFO_MAX_STACK_FRAMES_ADDR
 #define DENTRA_CRASH_INFO_MAX_STACK_FRAMES_ADDR 0x50000000
 #endif
+#ifndef DENTRA_CRASH_INFO_STORE_IN_FLASH
+#define DENTRA_CRASH_INFO_STORE_IN_FLASH false
+#endif
 
 namespace esphome {
 namespace crash_info {
@@ -55,8 +58,11 @@ CrashInfo::CrashInfo() { g_crash_info = this; }
 uint32_t CrashInfo::get_max_stack_frames_size() const { return DENTRA_CRASH_INFO_MAX_STACK_FRAMES_SIZE; }
 uint32_t CrashInfo::get_min_stack_frames_addr() const { return DENTRA_CRASH_INFO_MIN_STACK_FRAMES_ADDR; }
 uint32_t CrashInfo::get_max_stack_frames_addr() const { return DENTRA_CRASH_INFO_MAX_STACK_FRAMES_ADDR; }
+bool CrashInfo::is_store_in_flash() const { return DENTRA_CRASH_INFO_STORE_IN_FLASH; }
 
-void CrashInfo::setup() { this->rtc_ = global_preferences->make_preference<crash_info_t>(fnv1_hash(TAG), false); }
+void CrashInfo::setup() {
+  this->rtc_ = global_preferences->make_preference<crash_info_t>(fnv1_hash(TAG), this->is_store_in_flash());
+}
 
 void CrashInfo::dump_config() {
   crash_info_t ci{};
@@ -117,6 +123,9 @@ void CrashInfo::save_crash_info(uint8_t reason, uint8_t exccause, const uint32_t
     }
   }
   this->rtc_.save(&ci);
+  if (this->is_store_in_flash()) {
+    global_preferences->sync();
+  }
 }
 
 void CrashInfo::reset() {

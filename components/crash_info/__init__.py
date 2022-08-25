@@ -21,6 +21,7 @@ CONF_MAX_STACK_FRAMES_SIZE = "max_stack_frames_size"
 CONF_MIN_STACK_FRAMES_ADDR = "min_stack_frames_addr"
 CONF_MAX_STACK_FRAMES_ADDR = "max_stack_frames_addr"
 CONF_INDICATOR = "indicator"
+CONF_STORE_IN_FLASH = "store_in_flash"
 
 crash_info_ns = cg.esphome_ns.namespace("crash_info")
 CrashInfo = crash_info_ns.class_("CrashInfo", Component)
@@ -41,6 +42,7 @@ CONFIG_SCHEMA = cv.Schema(
             device_class=DEVICE_CLASS_PROBLEM,
             entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         ),
+        cv.Optional(CONF_STORE_IN_FLASH, default=False): cv.boolean,
     }
 )
 
@@ -64,10 +66,14 @@ async def to_code(config):
     cg.add_build_flag(
         f"-DDENTRA_CRASH_INFO_MAX_STACK_FRAMES_ADDR={config[CONF_MAX_STACK_FRAMES_ADDR]}"
     )
+    cg.add_build_flag(
+        f"-DDENTRA_CRASH_INFO_STORE_IN_FLASH={str(config[CONF_STORE_IN_FLASH]).lower()}"
+    )
 
     _LOGGER.info(
-        "Crash info will take %u bytes of RTC memory%s",
+        "Crash info will take %u bytes of %s memory%s",
         ((config[CONF_MAX_STACK_FRAMES_SIZE] * 4) + 2)
         + (8 if "time" in CORE.loaded_integrations else 0),
+        "FLASH" if config[CONF_STORE_IN_FLASH] else "RTC",
         " (extended with time)" if "time" in CORE.loaded_integrations else "",
     )
