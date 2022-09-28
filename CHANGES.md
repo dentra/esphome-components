@@ -1,3 +1,6 @@
+# 2022-09-28
+* [+] new component etl
+
 # 2022-08-25
 * [+] new component crash_info
 
