@@ -82,7 +82,8 @@
   "mounts": [
     "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/.esphome,type=volume",
     "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/.pio,type=volume",
-    "source=vscode-${containerWorkspaceFolderBasename}-lib,target=${containerWorkspaceFolder}/lib/.esphome,type=volume",
-    "source=vscode-${containerWorkspaceFolderBasename}-lib-miot,target=${containerWorkspaceFolder}/lib/miot/.esphome,type=volume"
+    "source=vscode-${containerWorkspaceFolderBasename},target=/esphome/.temp,type=volume",
+    "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/lib/.esphome,type=volume",
+    "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/lib/miot/.esphome,type=volume"
   ]
 }
