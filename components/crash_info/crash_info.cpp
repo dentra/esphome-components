@@ -118,7 +118,7 @@ std::string CrashInfo::get_stack_frames() {
       s += str_snprintf("%08x", 8, ci.stack_frames[i]);
     }
   } else if (IS_CRASH_REASON(ESP.getResetInfoPtr()->reason)) {
-    s = ESP.getResetInfo();
+    s = ESP.getResetInfo().c_str();
   }
   return s;
 }
