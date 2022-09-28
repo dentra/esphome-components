@@ -22,6 +22,7 @@ CONF_MIN_STACK_FRAMES_ADDR = "min_stack_frames_addr"
 CONF_MAX_STACK_FRAMES_ADDR = "max_stack_frames_addr"
 CONF_INDICATOR = "indicator"
 CONF_STORE_IN_FLASH = "store_in_flash"
+CONF_STORE_FREE_HEAP = "store_free_heap"
 
 crash_info_ns = cg.esphome_ns.namespace("crash_info")
 CrashInfo = crash_info_ns.class_("CrashInfo", Component)
@@ -43,6 +44,7 @@ CONFIG_SCHEMA = cv.Schema(
             entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
         ),
         cv.Optional(CONF_STORE_IN_FLASH, default=False): cv.boolean,
+        cv.Optional(CONF_STORE_FREE_HEAP, default=False): cv.boolean,
     }
 )
 
@@ -57,23 +59,37 @@ async def to_code(config):
         await binary_sensor.register_binary_sensor(sens, conf)
         cg.add(var.set_indicator(sens))
 
-    cg.add_build_flag(
-        f"-DDENTRA_CRASH_INFO_MAX_STACK_FRAMES_SIZE={config[CONF_MAX_STACK_FRAMES_SIZE]}"
-    )
-    cg.add_build_flag(
-        f"-DDENTRA_CRASH_INFO_MIN_STACK_FRAMES_ADDR={config[CONF_MIN_STACK_FRAMES_ADDR]}"
-    )
-    cg.add_build_flag(
-        f"-DDENTRA_CRASH_INFO_MAX_STACK_FRAMES_ADDR={config[CONF_MAX_STACK_FRAMES_ADDR]}"
-    )
-    cg.add_build_flag(
-        f"-DDENTRA_CRASH_INFO_STORE_IN_FLASH={str(config[CONF_STORE_IN_FLASH]).lower()}"
-    )
+    max_stack_frames_size = config[CONF_MAX_STACK_FRAMES_SIZE]
+    cg.add_define("CRASH_INFO_MAX_STACK_FRAMES_SIZE", max_stack_frames_size)
+    min_stack_frames_addr = config[CONF_MIN_STACK_FRAMES_ADDR]
+    cg.add_define("CRASH_INFO_MIN_STACK_FRAMES_ADDR", min_stack_frames_addr)
+    max_stack_frames_addr = config[CONF_MAX_STACK_FRAMES_ADDR]
+    cg.add_define("CRASH_INFO_MAX_STACK_FRAMES_ADDR", max_stack_frames_addr)
 
+    if config[CONF_STORE_IN_FLASH]:
+        cg.add_define("CRASH_INFO_STORE_IN_FLASH")
+
+    num_bytes = 1 + 1 + (config[CONF_MAX_STACK_FRAMES_SIZE] * 4)
+    extended_with = []
+
+    if config[CONF_STORE_FREE_HEAP]:
+        cg.add_define("CRASH_INFO_STORE_FREE_HEAP")
+        num_bytes += 2
+        extended_with.append("free_heap")
+
+    if "time" in CORE.loaded_integrations:
+        num_bytes += 8
+        extended_with.append("time")
+
+    if len(extended_with) > 0:
+        extended_with = f" (extended with {', '.join(extended_with)})"
+    else:
+        extended_with = ""
+
+    save_type = "FLASH" if config[CONF_STORE_IN_FLASH] else "RTC"
     _LOGGER.info(
         "Crash info will take %u bytes of %s memory%s",
-        ((config[CONF_MAX_STACK_FRAMES_SIZE] * 4) + 2)
-        + (8 if "time" in CORE.loaded_integrations else 0),
-        "FLASH" if config[CONF_STORE_IN_FLASH] else "RTC",
-        " (extended with time)" if "time" in CORE.loaded_integrations else "",
+        num_bytes,
+        save_type,
+        extended_with,
     )

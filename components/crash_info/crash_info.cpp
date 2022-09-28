@@ -1,4 +1,5 @@
 #include "user_interface.h"
+#include <Esp.h>
 #include "esphome/core/log.h"
 #ifdef USE_TIME
 #include <ctime>
@@ -13,31 +14,20 @@ https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/fatal-err
 https://docs.espressif.com/projects/esp-idf/en/latest/esp32/api-guides/core_dump.html
 */
 
-// maximum number of stack frames saved to RTC.
-#ifndef DENTRA_CRASH_INFO_MAX_STACK_FRAMES_SIZE
-#define DENTRA_CRASH_INFO_MAX_STACK_FRAMES_SIZE 10
-#endif
-// minimum stack frame address.
-#ifndef DENTRA_CRASH_INFO_MIN_STACK_FRAMES_ADDR
-#define DENTRA_CRASH_INFO_MIN_STACK_FRAMES_ADDR 0x40000000
-#endif
-// maximum stack frame address.
-#ifndef DENTRA_CRASH_INFO_MAX_STACK_FRAMES_ADDR
-#define DENTRA_CRASH_INFO_MAX_STACK_FRAMES_ADDR 0x50000000
-#endif
-#ifndef DENTRA_CRASH_INFO_STORE_IN_FLASH
-#define DENTRA_CRASH_INFO_STORE_IN_FLASH false
-#endif
-
 namespace esphome {
 namespace crash_info {
 
 static const char *const TAG = "crash_info";
 
+#define IS_CRASH_REASON(rst_reason) (rst_reason >= REASON_WDT_RST && rst_reason <= REASON_SOFT_WDT_RST)
+
 struct crash_info_t {
   uint8_t reason;
   uint8_t exccause;
-  uint32_t stack_frames[DENTRA_CRASH_INFO_MAX_STACK_FRAMES_SIZE];
+  uint32_t stack_frames[CRASH_INFO_MAX_STACK_FRAMES_SIZE];
+#ifdef CRASH_INFO_STORE_FREE_HEAP
+  uint16_t free_heap;
+#endif
 #ifdef USE_TIME
   time_t time;
 #endif
@@ -55,34 +45,35 @@ extern "C" void custom_crash_callback(rst_info *rst_nfo, uint32_t stack, uint32_
 
 CrashInfo::CrashInfo() { g_crash_info = this; }
 
-uint32_t CrashInfo::get_max_stack_frames_size() const { return DENTRA_CRASH_INFO_MAX_STACK_FRAMES_SIZE; }
-uint32_t CrashInfo::get_min_stack_frames_addr() const { return DENTRA_CRASH_INFO_MIN_STACK_FRAMES_ADDR; }
-uint32_t CrashInfo::get_max_stack_frames_addr() const { return DENTRA_CRASH_INFO_MAX_STACK_FRAMES_ADDR; }
-bool CrashInfo::is_store_in_flash() const { return DENTRA_CRASH_INFO_STORE_IN_FLASH; }
-
 void CrashInfo::setup() {
   this->rtc_ = global_preferences->make_preference<crash_info_t>(fnv1_hash(TAG), this->is_store_in_flash());
 }
 
 void CrashInfo::dump_config() {
   crash_info_t ci{};
-  if (!this->rtc_.load(&ci) && ci.reason != REASON_EXCEPTION_RST) {
-    if (this->indicator_) {
-      this->indicator_->publish_state(false);
-    }
-    return;
-  }
+  bool has_crash = this->rtc_.load(&ci) && IS_CRASH_REASON(ci.reason);
 
   if (this->indicator_) {
-    this->indicator_->publish_state(true);
+    this->indicator_->publish_state(has_crash || IS_CRASH_REASON(ESP.getResetInfoPtr()->reason));
   }
 
+  if (IS_CRASH_REASON(ESP.getResetInfoPtr()->reason)) {
+    ESP_LOGD(TAG, "Reset Reason: %s", ESP.getResetReason().c_str());
+  }
+
+  if (!has_crash) {
+    return;
+  }
   ESP_LOGI(TAG, "Crash info: ");
+
 #ifdef USE_TIME
   ESP_LOGI(TAG, "  Exception cause code: %d, time: %s", ci.exccause,
            time::ESPTime::from_epoch_local(ci.time).strftime("%F %T").c_str());
 #else
   ESP_LOGI(TAG, "  Exception cause code: %d", ci.exccause);
+#endif
+#ifdef CRASH_INFO_STORE_FREE_HEAP
+  ESP_LOGI(TAG, "  Free Heap: %u", ci.free_heap);
 #endif
   ESP_LOGI(TAG, "  Stacktrace:");
   ESP_LOGV(TAG, "  Max stack frames size: %u", this->get_max_stack_frames_size());
@@ -106,10 +97,39 @@ void CrashInfo::dump_config() {
   }
 }
 
+uint16_t CrashInfo::get_free_heap() {
+#ifdef CRASH_INFO_STORE_FREE_HEAP
+  crash_info_t ci{};
+  if (this->rtc_.load(&ci)) {
+    return ci.free_heap;
+  }
+#endif
+  return 0;
+}
+
+std::string CrashInfo::get_stack_frames() {
+  std::string s;
+  crash_info_t ci{};
+  if (this->rtc_.load(&ci) && IS_CRASH_REASON(ci.reason)) {
+    for (int i = 0; i < this->get_max_stack_frames_size(); i++) {
+      if (!s.empty()) {
+        s += " ";
+      }
+      s += str_snprintf("%08x", 8, ci.stack_frames[i]);
+    }
+  } else if (IS_CRASH_REASON(ESP.getResetInfoPtr()->reason)) {
+    s = ESP.getResetInfo();
+  }
+  return s;
+}
+
 void CrashInfo::save_crash_info(uint8_t reason, uint8_t exccause, const uint32_t *stack, size_t stack_size) {
   crash_info_t ci{.reason = reason,
                   .exccause = exccause,
                   .stack_frames = {},
+#ifdef CRASH_INFO_STORE_FREE_HEAP
+                  .free_heap = static_cast<uint16_t>(ESP.getFreeHeap()),
+#endif
 #ifdef USE_TIME
                   .time = std::time(nullptr)
 #endif

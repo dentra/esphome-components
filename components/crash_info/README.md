@@ -7,7 +7,7 @@ With enabled indicator you can monitor crashes right from your Home Assistant.
 Connect to you ESP8266 and find crash backtrace information in the log.
 Copy stack frames and decode with `xtensa-lx106-elf-addr2line -aipfC -e $elf ...` command.
 
-> By default crash information stored in RTC memory and do not survive power loss, use store_in_flash to change this bahaviour.
+> By default crash information stored in RTC memory and do not survive power loss. You can change this bahaviour by store_in_flash by be carefull it is may not work properly due dynamic memory usage in this procedure.
 
 ```yaml
 # Example configuration entry.
