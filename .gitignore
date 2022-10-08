@@ -14,12 +14,17 @@
 
 /esphome
 /.pio
+/components-research
 
 /.vscode/
 
 CMakeListsPrivate.txt
 CMakeLists.txt
-compile_commands.json
-.clang_complete
-.gcc-flags.json
-.temp-clang-tidy.cpp
+/compile_commands.json
+/.clang_complete
+/.gcc-flags.json
+/.temp-clang-tidy.cpp
+/.clang-format
+/.clang-tidy
+/.editorconfig
+/.pylintrc

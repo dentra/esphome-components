@@ -102,14 +102,14 @@ void MiotLegacyBondClient::step2_() {
 void MiotLegacyBondClient::step3_() {
   this->progress_ = STEP3;
   ESP_LOGD(TAG, "Step %d running", this->progress_);
-  auto step3 = cipher::cipher(cipher::mix_a(this->parent()->address, this->product_id_), this->token_);
+  auto step3 = cipher::cipher(cipher::mix_a(this->parent()->get_address(), this->product_id_), this->token_);
   this->write_char(this->char_.auth, step3, true);
 }
 
 void MiotLegacyBondClient::step4_(const uint8_t *data, uint16_t size) {
   const auto result =
-      cipher::cipher(cipher::mix_b(this->parent()->address, this->product_id_),
-                     cipher::cipher(cipher::mix_a(this->parent()->address, this->product_id_), data, size));
+      cipher::cipher(cipher::mix_b(this->parent()->get_address(), this->product_id_),
+                     cipher::cipher(cipher::mix_a(this->parent()->get_address(), this->product_id_), data, size));
 
   const bool complete =
       this->token_.size() == result.size() && memcmp(this->token_.data(), result.data(), result.size()) == 0;

@@ -31,14 +31,14 @@ void MiotClient::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t g
                                      esp_ble_gattc_cb_param_t *param) {
   if (event == ESP_GATTC_OPEN_EVT) {
     GATTC_LOG("ESP_GATTC_OPEN_EVT", "status", param->open.status);
-    if (param->open.conn_id != this->parent()->conn_id) {
+    if (param->open.conn_id != this->parent()->get_conn_id()) {
       return;
     }
     if (param->open.status != ESP_GATT_OK) {
       GATC_ERR("open", param->open.status);
       return;
     }
-    if (memcmp(param->open.remote_bda, this->parent()->remote_bda, sizeof(esp_bd_addr_t)) != 0) {
+    if (memcmp(param->open.remote_bda, this->parent()->get_remote_bda(), sizeof(esp_bd_addr_t)) != 0) {
       GATC_ERR("open", param->open.remote_bda);
       return;
     }
@@ -48,10 +48,10 @@ void MiotClient::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t g
 
   if (event == ESP_GATTC_DISCONNECT_EVT) {
     GATTC_LOG("ESP_GATTC_DISCONNECT_EVT", "reason", param->disconnect.reason);
-    if (param->disconnect.conn_id != this->parent()->conn_id) {
+    if (param->disconnect.conn_id != this->parent()->get_conn_id()) {
       return;
     }
-    if (memcmp(param->disconnect.remote_bda, this->parent()->remote_bda, sizeof(esp_bd_addr_t)) != 0) {
+    if (memcmp(param->disconnect.remote_bda, this->parent()->get_remote_bda(), sizeof(esp_bd_addr_t)) != 0) {
       GATC_ERR("disconnect", param->disconnect.remote_bda);
       return;
     }
@@ -62,7 +62,7 @@ void MiotClient::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t g
 
   if (event == ESP_GATTC_SEARCH_CMPL_EVT) {
     GATTC_LOG("ESP_GATTC_SEARCH_CMPL_EVT", "status", param->search_cmpl.status);
-    if (param->search_cmpl.conn_id != this->parent()->conn_id) {
+    if (param->search_cmpl.conn_id != this->parent()->get_conn_id()) {
       return;
     }
     if (param->search_cmpl.status != ESP_GATT_OK) {
@@ -85,7 +85,7 @@ void MiotClient::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t g
 
   if (event == ESP_GATTC_READ_CHAR_EVT) {
     GATTC_LOG("ESP_GATTC_READ_CHAR_EVT", "handle", param->read.handle);
-    if (param->read.conn_id != this->parent()->conn_id) {
+    if (param->read.conn_id != this->parent()->get_conn_id()) {
       return;
     }
     if (param->read.status != ESP_GATT_OK) {
@@ -114,10 +114,10 @@ void MiotClient::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t g
 
   if (event == ESP_GATTC_NOTIFY_EVT) {
     GATTC_LOG("ESP_GATTC_NOTIFY_EVT", "handle", param->notify.handle);
-    if (param->notify.conn_id != this->parent()->conn_id) {
+    if (param->notify.conn_id != this->parent()->get_conn_id()) {
       return;
     }
-    if (memcmp(param->notify.remote_bda, this->parent()->remote_bda, sizeof(esp_bd_addr_t)) != 0) {
+    if (memcmp(param->notify.remote_bda, this->parent()->get_remote_bda(), sizeof(esp_bd_addr_t)) != 0) {
       GATC_ERR("notify", param->notify.remote_bda);
       return;
     }
@@ -143,7 +143,7 @@ void MiotClient::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t g
 
   if (event == ESP_GATTC_WRITE_CHAR_EVT) {
     GATTC_LOG("ESP_GATTC_WRITE_CHAR_EVT", "handle", param->write.handle);
-    if (param->write.conn_id != this->parent()->conn_id) {
+    if (param->write.conn_id != this->parent()->get_conn_id()) {
       return;
     }
     if (param->write.status != ESP_GATT_OK) {
@@ -156,7 +156,7 @@ void MiotClient::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t g
 
   if (event == ESP_GATTC_WRITE_DESCR_EVT) {
     GATTC_LOG("ESP_GATTC_WRITE_DESCR_EVT", "handle", param->write.handle);
-    if (param->write.conn_id != this->parent()->conn_id) {
+    if (param->write.conn_id != this->parent()->get_conn_id()) {
       return;
     }
     if (param->write.status != ESP_GATT_OK) {
@@ -172,7 +172,8 @@ void MiotClient::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t g
 
 bool MiotClient::register_for_notify(uint16_t handle) const {
   ESP_LOGV(TAG, "esp_ble_gattc_register_for_notify, handle=0x%X", handle);
-  auto status = esp_ble_gattc_register_for_notify(this->parent_->gattc_if, this->parent_->remote_bda, handle);
+  auto status =
+      esp_ble_gattc_register_for_notify(this->parent_->get_gattc_if(), this->parent_->get_remote_bda(), handle);
   if (status == ESP_GATT_OK) {
     return true;
   }
@@ -183,8 +184,8 @@ bool MiotClient::register_for_notify(uint16_t handle) const {
 bool MiotClient::read_char(uint16_t handle) const {
   ESP_LOGV(TAG, "esp_ble_gattc_read_char, handle=0x%X", handle);
 
-  auto status =
-      esp_ble_gattc_read_char(this->parent_->gattc_if, this->parent_->conn_id, handle, ESP_GATT_AUTH_REQ_NONE);
+  auto status = esp_ble_gattc_read_char(this->parent_->get_gattc_if(), this->parent_->get_conn_id(), handle,
+                                        ESP_GATT_AUTH_REQ_NONE);
   if (status == ESP_GATT_OK) {
     return true;
   }
@@ -203,11 +204,11 @@ bool MiotClient::write_char(uint16_t handle, const uint8_t *data, uint16_t size,
       return false;
     }
     status = esp_ble_gattc_write_char(
-        this->parent_->gattc_if, this->parent_->conn_id, handle, value->size(), value->data(),
+        this->parent_->get_gattc_if(), this->parent_->get_conn_id(), handle, value->size(), value->data(),
         need_response ? ESP_GATT_WRITE_TYPE_RSP : ESP_GATT_WRITE_TYPE_NO_RSP, ESP_GATT_AUTH_REQ_NONE);
   } else {
     status = esp_ble_gattc_write_char(
-        this->parent_->gattc_if, this->parent_->conn_id, handle, size, const_cast<uint8_t *>(data),
+        this->parent_->get_gattc_if(), this->parent_->get_conn_id(), handle, size, const_cast<uint8_t *>(data),
         need_response ? ESP_GATT_WRITE_TYPE_RSP : ESP_GATT_WRITE_TYPE_NO_RSP, ESP_GATT_AUTH_REQ_NONE);
   }
 
