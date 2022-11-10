@@ -13,7 +13,7 @@ CONFIG_SCHEMA = cv.All(
 @coroutine_with_priority(200.0)
 async def to_code(config):
     cg.add_library(
-        "Embedded Template Library", None, "https://github.com/ETLCPP/etl@20.35.0"
+        "Embedded Template Library", None, "https://github.com/ETLCPP/etl#20.35.1"
     )
     # cg.add_library("etlcpp/Embedded Template Library", "20.32.1")
     cg.add_build_flag("-D PROFILE_GCC_GENERIC")
