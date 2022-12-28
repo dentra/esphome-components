@@ -10,4 +10,4 @@ CONFIG_SCHEMA = cv.Schema({})
 
 @coroutine_with_priority(200.0)
 async def to_code(config):
-    cg.add_library("etlcpp/Embedded Template Library")
+    cg.add_library("etlcpp/Embedded Template Library", "20.35.8")
