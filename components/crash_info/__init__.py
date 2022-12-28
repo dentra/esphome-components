@@ -23,6 +23,9 @@ CONF_MAX_STACK_FRAMES_ADDR = "max_stack_frames_addr"
 CONF_INDICATOR = "indicator"
 CONF_STORE_IN_FLASH = "store_in_flash"
 CONF_STORE_FREE_HEAP = "store_free_heap"
+CONF_FRAMES_IN_LINE = "frames_in_line"
+
+MAX_STACK_FRAMES = 120
 
 crash_info_ns = cg.esphome_ns.namespace("crash_info")
 CrashInfo = crash_info_ns.class_("CrashInfo", Component)
@@ -31,13 +34,13 @@ CONFIG_SCHEMA = cv.Schema(
     {
         cv.GenerateID(): cv.declare_id(CrashInfo),
         cv.Optional(CONF_MAX_STACK_FRAMES_SIZE, default=10): cv.All(
-            cv.positive_int, cv.int_range(4, 60)
+            cv.positive_int, cv.int_range(4, MAX_STACK_FRAMES)
         ),
         cv.Optional(CONF_MIN_STACK_FRAMES_ADDR, default=0x40000000): cv.All(
-            cv.positive_int, cv.int_range(1, 0x70000000)
+            cv.positive_int, cv.int_range(min=1, max=0x70000000)
         ),
         cv.Optional(CONF_MAX_STACK_FRAMES_ADDR, default=0x50000000): cv.All(
-            cv.positive_int, cv.int_range(1, 0x70000000)
+            cv.positive_int, cv.int_range(min=1, max=0x70000000)
         ),
         cv.Optional(CONF_INDICATOR): binary_sensor.binary_sensor_schema(
             device_class=DEVICE_CLASS_PROBLEM,
@@ -45,6 +48,9 @@ CONFIG_SCHEMA = cv.Schema(
         ),
         cv.Optional(CONF_STORE_IN_FLASH, default=False): cv.boolean,
         cv.Optional(CONF_STORE_FREE_HEAP, default=False): cv.boolean,
+        cv.Optional(CONF_FRAMES_IN_LINE, default=4): cv.All(
+            cv.positive_int, cv.int_range(min=1, max=MAX_STACK_FRAMES)
+        ),
     }
 )
 
@@ -65,6 +71,8 @@ async def to_code(config):
     cg.add_define("CRASH_INFO_MIN_STACK_FRAMES_ADDR", min_stack_frames_addr)
     max_stack_frames_addr = config[CONF_MAX_STACK_FRAMES_ADDR]
     cg.add_define("CRASH_INFO_MAX_STACK_FRAMES_ADDR", max_stack_frames_addr)
+    frames_in_line = config[CONF_FRAMES_IN_LINE]
+    cg.add_define("CRASH_INFO_FRAMES_IN_LINE", frames_in_line)
 
     if config[CONF_STORE_IN_FLASH]:
         cg.add_define("CRASH_INFO_STORE_IN_FLASH")

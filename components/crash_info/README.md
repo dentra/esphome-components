@@ -28,6 +28,8 @@ crash_info:
     name: $name Crash state
   # Optional, boolean. Store backtrace in FLASH or RTC. Default: false.
   store_in_flash: false
+  # Optional, uint. Break line after this number of frames. Default: 4
+  frames_in_line: 4
 
 # Add button to reset state of crash.
 button:

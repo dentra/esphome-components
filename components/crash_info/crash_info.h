@@ -2,6 +2,7 @@
 
 #include "esphome/core/component.h"
 #include "esphome/core/preferences.h"
+#include "esphome/core/defines.h"
 #include "esphome/components/binary_sensor/binary_sensor.h"
 
 // maximum number of stack frames saved to RTC or FLASH.
@@ -15,6 +16,10 @@
 // maximum stack frame address.
 #ifndef CRASH_INFO_MAX_STACK_FRAMES_ADDR
 #define CRASH_INFO_MAX_STACK_FRAMES_ADDR 0x50000000
+#endif
+// number of frames to show in line
+#ifndef CRASH_INFO_FRAMES_IN_LINE
+#define CRASH_INFO_FRAMES_IN_LINE 4
 #endif
 
 namespace esphome {
@@ -36,6 +41,7 @@ class CrashInfo : public Component {
   uint32_t get_max_stack_frames_size() const { return CRASH_INFO_MAX_STACK_FRAMES_SIZE; }
   uint32_t get_min_stack_frames_addr() const { return CRASH_INFO_MIN_STACK_FRAMES_ADDR; }
   uint32_t get_max_stack_frames_addr() const { return CRASH_INFO_MAX_STACK_FRAMES_ADDR; }
+  size_t get_frames_in_line() const { return CRASH_INFO_FRAMES_IN_LINE; }
 
   bool is_store_in_flash() const {
 #ifdef CRASH_INFO_STORE_IN_FLASH

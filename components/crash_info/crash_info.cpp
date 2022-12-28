@@ -87,7 +87,7 @@ void CrashInfo::dump_config() {
       break;
     }
     s.clear();
-    for (int j = 0; j < 4 && i < this->get_max_stack_frames_size(); j++, i++) {
+    for (int j = 0; j < this->get_frames_in_line() && i < this->get_max_stack_frames_size(); j++, i++) {
       if (ci.stack_frames[i] == 0) {
         break;
       }
