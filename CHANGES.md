@@ -1,8 +1,14 @@
+# 2022-12-28
+* [+] new component `otax`
+* [*] `crash_info`: add frames_in_line config parameter
+* [*] `etl`: use registry instead of git
+* [*] update esphome to 2022.12.3
+
 # 2022-09-28
-* [+] new component etl
+* [+] new component `etl`
 
 # 2022-08-25
-* [+] new component crash_info
+* [+] new component `crash_info`
 
 # 2021-10-26
 * [*] `zmai90.yaml`: add throttle_average filter to energy_monitoring sensors
@@ -59,9 +65,9 @@
 * [*] fix math errors in energy monitoring
 
 # 2021-09-09
-* [+] miot: add automatic bindkey extraction from Xiaomi Cloud
+* [+] `miot`: add automatic bindkey extraction from Xiaomi Cloud
 
 # 2021-08-31
-* [+] miot: add miot explorer component
-* [+] miot: add legacy ecrypted mibeacons support
-* [+] miot: add Xiaomi Mi Temperature and Humidity Monitor 2 (LYWSD03MMC)
+* [+] `miot`: add miot explorer component
+* [+] `miot`: add legacy ecrypted mibeacons support
+* [+] `miot`: add Xiaomi Mi Temperature and Humidity Monitor 2 (LYWSD03MMC)
