@@ -11,7 +11,7 @@ from esphome.components import miot, miot_client, text_sensor, ble_client
 CODEOWNERS = ["@dentra"]
 AUTO_LOAD = ["miot", "miot_client", "text_sensor", "ble_client"]
 
-ICON_VERSION = "cellphone-arrow-down"
+ICON_VERSION = "mdi:cellphone-arrow-down"
 
 miot_ylxx0xyl_ns = cg.esphome_ns.namespace("miot_ylxx0xyl")
 MiotYLxx0xYLPair = miot_ylxx0xyl_ns.class_(
@@ -56,7 +56,7 @@ async def to_code(config):
     cg.add(var.set_auth_client(auth))
 
     blec = await cg.get_variable(config[ble_client.CONF_BLE_CLIENT_ID])
-    cg.add(var.set_address(blec.address))
+    cg.add(var.set_address(blec.get_address()))
 
     if CONF_VERSION in config:
         sens = cg.new_Pvariable(config[CONF_VERSION][CONF_ID])
