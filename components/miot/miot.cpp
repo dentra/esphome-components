@@ -139,21 +139,29 @@ bool MiBeaconTracker::parse_mibeacon_(const esp32_ble_tracker::ESPBTDevice &devi
     }
   }
 
-  delete encrypted_obj;
-
 #if ESPHOME_LOG_LEVEL >= ESPHOME_LOG_LEVEL_DEBUG
   if (!processed) {
     ESP_LOGD(TAG, "Got MiBeacon: %s", format_hex_pretty(raw).c_str());
     const int rssi = device.get_rssi();
     ESP_LOGD(TAG, "  %s [%04X]%s %s RSSI=%d %s", device.get_name().c_str(), mib.product_id,
              mib.is_encrypted() ? " (encrypted)" : "", device.address_str().c_str(), rssi, get_signal_bars(rssi));
-    if (!mib.is_encrypted() && mib.has_object()) {
-      ESP_LOGD(TAG, "  Object:");
-      ESP_LOGD(TAG, "    ID  : %04X", mib.object.id);
-      ESP_LOGD(TAG, "    data: %s", format_hex_pretty(mib.object.data.data(), mib.object.data.size()).c_str());
+    if (mib.has_object()) {
+      BLEObject *obj = nullptr;
+      if (encrypted_obj != nullptr) {
+        obj = encrypted_obj;
+      } else if (!mib.is_encrypted()) {
+        obj = &mib.object;
+      }
+      if (obj != nullptr) {
+        ESP_LOGD(TAG, "  Object:");
+        ESP_LOGD(TAG, "    ID  : %04X", obj->id);
+        ESP_LOGD(TAG, "    data: %s", format_hex_pretty(obj->data.data(), obj->data.size()).c_str());
+      }
     }
   }
 #endif
+
+  delete encrypted_obj;
 
   return true;
 }
@@ -189,8 +197,14 @@ bool MiotListener::have_bindkey() const {
 }
 
 bool MiotListener::process_unhandled_(const miot::BLEObject &obj) {
+  std::string s;
+  if (obj.data.size() == 1) {
+    s = str_sprintf("%u (0x%x)", obj.data[0], obj.data[0]);
+  } else {
+    s = format_hex_pretty(obj.data);
+  }
   ESP_LOGW(TAG, "%12" PRIX64 " [%04X] Unhandled object attribute: %04X, value: %s", this->address_,
-           this->get_product_id(), obj.id, format_hex_pretty(obj.data).c_str());
+           this->get_product_id(), obj.id, s.c_str());
   return false;
 }
 

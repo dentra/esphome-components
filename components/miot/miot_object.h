@@ -243,6 +243,12 @@ struct BLEObject {
    * @return humidity percentage, %
    */
   optional<float> get_miaomiaoce_humidity() const;
+
+  /**
+   * Value for MIID_MIAOMIAOCE_SENSOR_HT_O2_HUMIDITY.
+   * @return humidity percentage, %
+   */
+  optional<float> get_miaomiaoce_sensor_ht_o2_humidity() const;
 };
 
 }  // namespace miot

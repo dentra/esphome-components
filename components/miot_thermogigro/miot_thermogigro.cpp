@@ -7,6 +7,7 @@ namespace miot_thermogigro {
 static const char *const TAG = "miot_thermogigro";
 
 constexpr uint16_t PRODUCT_ID_XMWSDJ04MMC = 0x1203;
+constexpr uint16_t PRODUCT_ID_LYWSD02MMC = 0x16E4;
 
 void MiotThermoGigro::dump_config() {
   this->dump_config_(TAG);
@@ -41,9 +42,9 @@ void MiotThermoGigro::process_temperature_humidity_(const miot::BLEObject &obj) 
 }
 
 void MiotThermoGigro::process_miaomiaoce_temperature_(const miot::BLEObject &obj) {
-  if (this->product_id_ != PRODUCT_ID_XMWSDJ04MMC) {
-    return;
-  }
+  // if (this->product_id_ != PRODUCT_ID_XMWSDJ04MMC) {
+  //   return;
+  // }
   const auto temperature = obj.get_miaomiaoce_temperature();
   if (temperature.has_value()) {
     this->publish_state(*temperature);
@@ -51,11 +52,23 @@ void MiotThermoGigro::process_miaomiaoce_temperature_(const miot::BLEObject &obj
 }
 
 void MiotThermoGigro::process_miaomiaoce_humidity_(const miot::BLEObject &obj) {
-  if (this->product_id_ != PRODUCT_ID_XMWSDJ04MMC) {
-    return;
-  }
+  // if (this->product_id_ != PRODUCT_ID_XMWSDJ04MMC) {
+  //   return;
+  // }
   if (this->humidity_ != nullptr) {
     const auto humidity = obj.get_miaomiaoce_humidity();
+    if (humidity.has_value()) {
+      this->humidity_->publish_state(*humidity);
+    }
+  }
+}
+
+void MiotThermoGigro::process_miaomiaoce_humidity_o2_(const miot::BLEObject &obj) {
+  // if (this->product_id_ != PRODUCT_ID_LYWSD02MMC) {
+  //   return;
+  // }
+  if (this->humidity_ != nullptr) {
+    const auto humidity = obj.get_miaomiaoce_sensor_ht_o2_humidity();
     if (humidity.has_value()) {
       this->humidity_->publish_state(*humidity);
     }
@@ -89,6 +102,10 @@ bool MiotThermoGigro::process_object_(const miot::BLEObject &obj) {
 
     case miot::MIID_MIAOMIAOCE_HUMIDITY:
       this->process_miaomiaoce_humidity_(obj);
+      break;
+
+    case miot::MIID_MIAOMIAOCE_SENSOR_HT_O2_HUMIDITY:
+      this->process_miaomiaoce_humidity_o2_(obj);
       break;
 
     default:

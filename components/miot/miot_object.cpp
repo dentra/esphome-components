@@ -84,7 +84,7 @@ optional<float> BLEObject::get_temperature() const {
   CHECK_MIID(MIID_TEMPERATURE);
   const auto temperature = this->get_int16();
   if (!temperature.has_value()) {
-    return temperature;
+    return {};
   }
   const float res = *temperature * 0.1f;
   ESP_LOGD(TAG, "Temperature %.1f °C", res);
@@ -95,7 +95,7 @@ optional<float> BLEObject::get_humidity() const {
   CHECK_MIID(MIID_HUMIDITY);
   const auto humidity = this->get_uint16();
   if (!humidity.has_value()) {
-    return humidity;
+    return {};
   }
   const float res = *humidity * 0.1f;
   ESP_LOGD(TAG, "Humidity %.1f %%", res);
@@ -227,7 +227,7 @@ optional<float> BLEObject::get_miaomiaoce_temperature() const {
   CHECK_MIID(MIID_MIAOMIAOCE_TEMPERATURE);
   const auto temperature = this->get_float();
   if (!temperature.has_value()) {
-    return temperature;
+    return {};
   }
   const float res = *temperature;
   ESP_LOGD(TAG, "Temperature %.1f °C", res);
@@ -238,7 +238,18 @@ optional<float> BLEObject::get_miaomiaoce_humidity() const {
   CHECK_MIID(MIID_MIAOMIAOCE_HUMIDITY);
   const auto humidity = this->get_float();
   if (!humidity.has_value()) {
-    return humidity;
+    return {};
+  }
+  const float res = *humidity;
+  ESP_LOGD(TAG, "Humidity %.1f %%", res);
+  return res;
+}
+
+optional<float> BLEObject::get_miaomiaoce_sensor_ht_o2_humidity() const {
+  CHECK_MIID(MIID_MIAOMIAOCE_SENSOR_HT_O2_HUMIDITY);
+  const auto humidity = this->get_uint8();
+  if (!humidity.has_value()) {
+    return {};
   }
   const float res = *humidity;
   ESP_LOGD(TAG, "Humidity %.1f %%", res);

@@ -29,6 +29,7 @@ class MiotThermoGigro : public miot::MiotComponent, public sensor::Sensor {
   void process_temperature_humidity_(const miot::BLEObject &obj);
   void process_miaomiaoce_temperature_(const miot::BLEObject &obj);
   void process_miaomiaoce_humidity_(const miot::BLEObject &obj);
+  void process_miaomiaoce_humidity_o2_(const miot::BLEObject &obj);
 };
 
 }  // namespace miot_thermogigro
