@@ -19,7 +19,7 @@ static const char *const TAG = "miot";
 // Unicode: U+2588, UTF-8: E2 96 88
 #define UNI_FULL_BLOCK "\xe2\x96\x88"
 
-const char *const get_signal_bars(int rssi) {
+const char *get_signal_bars(int rssi) {
   if (rssi >= -50) {
     return ESPHOME_LOG_COLOR(ESPHOME_LOG_COLOR_GREEN) UNI_LOWER_ONE_QUARTER_BLOCK UNI_LOWER_HALF_BLOCK
         UNI_LOWER_THREE_QUARTERS_BLOCK UNI_FULL_BLOCK ESPHOME_LOG_RESET_COLOR;
