@@ -8,6 +8,7 @@ This component possibly should work with any Xiaomi or sub-brands (Mijia, Yeelig
 * Xiaomi MiaoMiaoce Smart Clock Temperature Fnd Humidity Meter E-Inc (MHO-C303)
 * Xiaomi MiaoMiaoce Digital Bluetooth Thermometer Hygrometer (MHO-C401)
 * Xiaomi MiaoMiaoce Digital Temperature and Humidity Monitor (XMWSDJ04MMC)
+* Mijia Smart Temperature and Humidity Monitor 3 (MJWSD05MMC)
 
 and others... Please let me know your device to add to this list.
 
