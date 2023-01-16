@@ -44,7 +44,7 @@
         "when": "$(basename).py"
       },
       "**/__pycache__": true,
-      "**/.esphome": true,
+      "**/.esphome": false,
       ".pio": true
     },
     "files.associations": {
@@ -83,7 +83,7 @@
     "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/.esphome,type=volume",
     "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/.pio,type=volume",
     "source=vscode-${containerWorkspaceFolderBasename},target=/esphome/.temp,type=volume",
-    "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/lib/.esphome,type=volume",
-    "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/lib/miot/.esphome,type=volume"
+    "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/config/.esphome,type=volume",
+    "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/lib/.esphome,type=volume"
   ]
 }
