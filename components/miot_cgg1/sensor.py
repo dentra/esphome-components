@@ -1,51 +1,16 @@
 import logging
-import esphome.codegen as cg
-import esphome.config_validation as cv
-from esphome.components import sensor
-from esphome.const import (
-    CONF_HUMIDITY,
-    DEVICE_CLASS_HUMIDITY,
-    DEVICE_CLASS_TEMPERATURE,
-    STATE_CLASS_MEASUREMENT,
-    UNIT_CELSIUS,
-    UNIT_PERCENT,
-)
-from .. import miot  # pylint: disable=relative-beyond-top-level
+from ..miot_th import sensor as miot_th
+from esphome.const import CONF_PLATFORM
 
 _LOGGER = logging.getLogger(__name__)
 
 CODEOWNERS = ["@dentra"]
-AUTO_LOAD = ["miot"]
-
-miot_cgg1_ns = cg.esphome_ns.namespace("miot_cgg1")
-MiotCGG1 = miot_cgg1_ns.class_("MiotCGG1", miot.MiotComponent, sensor.Sensor)
-
-CONFIG_SCHEMA = (
-    sensor.sensor_schema(
-        MiotCGG1,
-        unit_of_measurement=UNIT_CELSIUS,
-        accuracy_decimals=1,
-        device_class=DEVICE_CLASS_TEMPERATURE,
-        state_class=STATE_CLASS_MEASUREMENT,
-    )
-    .extend(
-        {
-            cv.Optional(CONF_HUMIDITY): sensor.sensor_schema(
-                unit_of_measurement=UNIT_PERCENT,
-                accuracy_decimals=1,
-                device_class=DEVICE_CLASS_HUMIDITY,
-                state_class=STATE_CLASS_MEASUREMENT,
-            ),
-        },
-    )
-    .extend(miot.MIOT_BLE_DEVICE_SCHEMA)
-)
+AUTO_LOAD = ["miot_th"] + miot_th.AUTO_LOAD
+CONFIG_SCHEMA = miot_th.CONFIG_SCHEMA
 
 
 async def to_code(config):
     """Code generation entry point"""
-    _LOGGER.warning("miot_cgg1 is deprecated, please use miot_thermogigro instead.")
-    var = await miot.new_sensor_device(config)
-    if CONF_HUMIDITY in config:
-        sens = await sensor.new_sensor(config[CONF_HUMIDITY])
-        cg.add(var.set_humidity(sens))
+    platform = config[CONF_PLATFORM]
+    _LOGGER.warning("%s was deprecated, please use miot_th instead.", platform)
+    await miot_th.to_code(config)

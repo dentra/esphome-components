@@ -214,8 +214,8 @@ const WaterBoil *BLEObject::get_water_boil() const {
   return water_boil;
 }
 
-optional<uint8_t> BLEObject::get_miaomiaoce_battery_level() const {
-  CHECK_MIID(MIID_MIAOMIAOCE_BATTERY);
+optional<uint8_t> BLEObject::get_miaomiaoce_battery_level_1003() const {
+  CHECK_MIID(MIID_MIAOMIAOCE_BATTERY_1003);
   auto battery_level = this->get_uint8();
   if (battery_level.has_value()) {
     ESP_LOGD(TAG, "Battery level: %" PRIu8 " %%", *battery_level);
@@ -223,8 +223,8 @@ optional<uint8_t> BLEObject::get_miaomiaoce_battery_level() const {
   return battery_level;
 }
 
-optional<float> BLEObject::get_miaomiaoce_temperature() const {
-  CHECK_MIID(MIID_MIAOMIAOCE_TEMPERATURE);
+optional<float> BLEObject::get_miaomiaoce_temperature_1001() const {
+  CHECK_MIID(MIID_MIAOMIAOCE_TEMPERATURE_1001);
   const auto temperature = this->get_float();
   if (!temperature.has_value()) {
     return {};
@@ -234,8 +234,8 @@ optional<float> BLEObject::get_miaomiaoce_temperature() const {
   return res;
 }
 
-optional<float> BLEObject::get_miaomiaoce_humidity() const {
-  CHECK_MIID(MIID_MIAOMIAOCE_HUMIDITY);
+optional<float> BLEObject::get_miaomiaoce_humidity_1008() const {
+  CHECK_MIID(MIID_MIAOMIAOCE_HUMIDITY_1008);
   const auto humidity = this->get_float();
   if (!humidity.has_value()) {
     return {};
@@ -245,8 +245,8 @@ optional<float> BLEObject::get_miaomiaoce_humidity() const {
   return res;
 }
 
-optional<float> BLEObject::get_miaomiaoce_sensor_ht_o2_humidity() const {
-  CHECK_MIID(MIID_MIAOMIAOCE_SENSOR_HT_O2_HUMIDITY);
+optional<float> BLEObject::get_miaomiaoce_humidity_1002() const {
+  CHECK_MIID(MIID_MIAOMIAOCE_HUMIDITY_1002);
   const auto humidity = this->get_uint8();
   if (!humidity.has_value()) {
     return {};

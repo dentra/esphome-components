@@ -615,7 +615,7 @@ enum MIID : uint16_t {
   // Battery: range [0,100], accuracy 1, %
   //
   // https://miot-spec.org/miot-spec-v2/spec/property?type=urn:miot-spec-v2:property:battery-level:00000014
-  MIID_MIAOMIAOCE_BATTERY = 0x4803,
+  MIID_MIAOMIAOCE_BATTERY_1003 = 0x4803,
 
   // MiaoMiaoce Low Battery.
   MIID_MIAOMIAOCE_LOW_BATTERY = 0x4A01,
@@ -626,8 +626,10 @@ enum MIID : uint16_t {
   //
   // Temperature, range [-30, 100], accuracy 0.1, C
   //
-  // https://miot-spec.org/miot-spec-v2/spec/property?type=urn:miot-spec-v2:property:temperature:00000020
-  MIID_MIAOMIAOCE_TEMPERATURE = 0x4C01,
+  // https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.t9
+  // https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.o2
+  // https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.t6
+  MIID_MIAOMIAOCE_TEMPERATURE_1001 = 0x4C01,
 
   // MiaoMiaoce miaomiaoce.sensor_ht.t6 Humidity.
   //
@@ -635,15 +637,18 @@ enum MIID : uint16_t {
   //
   // Relative Humidity, range [0, 100], accuracy 0.1, %
   //
-  // https://miot-spec.org/miot-spec-v2/spec/property?type=urn:miot-spec-v2:property:relative-humidity:0000000C
-  MIID_MIAOMIAOCE_HUMIDITY = 0x4C08,
+  // https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.t6
+  MIID_MIAOMIAOCE_HUMIDITY_1008 = 0x4C08,
 
   // MiaoMiaoce miaomiaoce.sensor_ht.o2 humidity.
   //
   // uint8_t humidity;
   //
   // Relative Humidity, range [0, 100], accuracy 1.0, %
-  MIID_MIAOMIAOCE_SENSOR_HT_O2_HUMIDITY = 0x4C02,
+  //
+  // https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.t9
+  // https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.o2
+  MIID_MIAOMIAOCE_HUMIDITY_1002 = 0x4C02,
 };
 
 // Frame Control.

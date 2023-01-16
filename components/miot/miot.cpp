@@ -19,23 +19,17 @@ static const char *const TAG = "miot";
 // Unicode: U+2588, UTF-8: E2 96 88
 #define UNI_FULL_BLOCK "\xe2\x96\x88"
 
-const char *get_signal_bars(int rssi) {
+static inline const char *get_signal_bars(int rssi) {
   if (rssi >= -50) {
-    return ESPHOME_LOG_COLOR(ESPHOME_LOG_COLOR_GREEN) UNI_LOWER_ONE_QUARTER_BLOCK UNI_LOWER_HALF_BLOCK
-        UNI_LOWER_THREE_QUARTERS_BLOCK UNI_FULL_BLOCK ESPHOME_LOG_RESET_COLOR;
+    return "excellent";
   }
   if (rssi >= -65) {
-    return ESPHOME_LOG_COLOR(ESPHOME_LOG_COLOR_YELLOW)
-        UNI_LOWER_ONE_QUARTER_BLOCK UNI_LOWER_HALF_BLOCK UNI_LOWER_THREE_QUARTERS_BLOCK ESPHOME_LOG_COLOR(
-            ESPHOME_LOG_COLOR_GRAY) UNI_FULL_BLOCK ESPHOME_LOG_RESET_COLOR;
+    return "good";
   }
   if (rssi >= -85) {
-    return ESPHOME_LOG_COLOR(ESPHOME_LOG_COLOR_YELLOW)
-        UNI_LOWER_ONE_QUARTER_BLOCK UNI_LOWER_HALF_BLOCK ESPHOME_LOG_COLOR(ESPHOME_LOG_COLOR_GRAY)
-            UNI_LOWER_THREE_QUARTERS_BLOCK UNI_FULL_BLOCK ESPHOME_LOG_RESET_COLOR;
+    return "normal";
   }
-  return ESPHOME_LOG_COLOR(ESPHOME_LOG_COLOR_RED) UNI_LOWER_ONE_QUARTER_BLOCK ESPHOME_LOG_COLOR(ESPHOME_LOG_COLOR_GRAY)
-      UNI_LOWER_HALF_BLOCK UNI_LOWER_THREE_QUARTERS_BLOCK UNI_FULL_BLOCK ESPHOME_LOG_RESET_COLOR;
+  return "poor";
 }
 
 bool MiBeaconTracker::parse_device(const esp32_ble_tracker::ESPBTDevice &device) {
@@ -143,7 +137,7 @@ bool MiBeaconTracker::parse_mibeacon_(const esp32_ble_tracker::ESPBTDevice &devi
   if (!processed) {
     ESP_LOGD(TAG, "Got MiBeacon: %s", format_hex_pretty(raw).c_str());
     const int rssi = device.get_rssi();
-    ESP_LOGD(TAG, "  %s [%04X]%s %s RSSI=%d %s", device.get_name().c_str(), mib.product_id,
+    ESP_LOGD(TAG, "  %s [%04X]%s %s RSSI=%d (%s)", device.get_name().c_str(), mib.product_id,
              mib.is_encrypted() ? " (encrypted)" : "", device.address_str().c_str(), rssi, get_signal_bars(rssi));
     if (mib.has_object()) {
       BLEObject *obj = nullptr;
@@ -233,9 +227,9 @@ bool MiotComponent::process_default_(const miot::BLEObject &obj) {
       }
       break;
     }
-    case MIID_MIAOMIAOCE_BATTERY: {
+    case MIID_MIAOMIAOCE_BATTERY_1003: {
       if (this->battery_level_ || this->battery_voltage_) {
-        auto battery_level = obj.get_miaomiaoce_battery_level();
+        auto battery_level = obj.get_miaomiaoce_battery_level_1003();
         if (battery_level.has_value()) {
           if (this->battery_level_) {
             this->battery_level_->publish_state(*battery_level);

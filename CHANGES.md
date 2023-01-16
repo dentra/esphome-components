@@ -1,3 +1,8 @@
+# 2023-01-16
+* [+] new component `miot_th`
+* [+] `miot_th`: add support `MJWSD05MMC`
+* [*] deprecate `miot_thermogigro`, now use `miot_th`
+
 # 2022-12-28
 * [+] new component `otax`
 * [*] `crash_info`: add frames_in_line config parameter

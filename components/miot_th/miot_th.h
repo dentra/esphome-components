@@ -5,14 +5,14 @@
 #include "../miot/miot.h"
 
 namespace esphome {
-namespace miot_thermogigro {
+namespace miot_th {
 
-class MiotThermoGigro : public miot::MiotComponent, public sensor::Sensor {
+class MiotTH : public miot::MiotComponent, public sensor::Sensor {
  public:
   void dump_config() override;
 
   uint16_t get_product_id() const override { return this->product_id_; }
-  const char *get_product_code() const override { return "universal thermo gigro"; }
+  const char *get_product_code() const override { return "Universal TH"; }
 
   void set_humidity(sensor::Sensor *humidity) { this->humidity_ = humidity; }
 
@@ -27,10 +27,10 @@ class MiotThermoGigro : public miot::MiotComponent, public sensor::Sensor {
   void process_temperature_(const miot::BLEObject &obj);
   void process_humidity_(const miot::BLEObject &obj);
   void process_temperature_humidity_(const miot::BLEObject &obj);
-  void process_miaomiaoce_temperature_(const miot::BLEObject &obj);
-  void process_miaomiaoce_humidity_(const miot::BLEObject &obj);
-  void process_miaomiaoce_humidity_o2_(const miot::BLEObject &obj);
+  void process_miaomiaoce_temperature_1001_(const miot::BLEObject &obj);
+  void process_miaomiaoce_humidity_1008_(const miot::BLEObject &obj);
+  void process_miaomiaoce_humidity_1002_(const miot::BLEObject &obj);
 };
 
-}  // namespace miot_thermogigro
+}  // namespace miot_th
 }  // namespace esphome

@@ -230,25 +230,25 @@ struct BLEObject {
    * Value for MIID_MIAOMIAOCE_BATTERY.
    * @return battery level in %
    */
-  optional<uint8_t> get_miaomiaoce_battery_level() const;
+  optional<uint8_t> get_miaomiaoce_battery_level_1003() const;
 
   /**
    * Value for MIID_MIAOMIAOCE_TEMPERATURE.
    * @return temperature.
    */
-  optional<float> get_miaomiaoce_temperature() const;
+  optional<float> get_miaomiaoce_temperature_1001() const;
 
   /**
    * Value for MIID_MIAOMIAOCE_HUMIDITY.
    * @return humidity percentage, %
    */
-  optional<float> get_miaomiaoce_humidity() const;
+  optional<float> get_miaomiaoce_humidity_1008() const;
 
   /**
-   * Value for MIID_MIAOMIAOCE_SENSOR_HT_O2_HUMIDITY.
+   * Value for MIID_MIAOMIAOCE_HUMIDITY_1002.
    * @return humidity percentage, %
    */
-  optional<float> get_miaomiaoce_sensor_ht_o2_humidity() const;
+  optional<float> get_miaomiaoce_humidity_1002() const;
 };
 
 }  // namespace miot
