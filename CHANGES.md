@@ -1,3 +1,7 @@
+# 2023-02-12
+* [+] new component `vport`
+* [+] new component `esp32_usb_dis`
+
 # 2023-01-16
 * [+] new component `miot_th`
 * [+] `miot_th`: add support `MJWSD05MMC`
