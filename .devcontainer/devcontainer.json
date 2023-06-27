@@ -3,11 +3,13 @@
   "build": {
     "args": {
       // ESPHome version
-      "esphome_version": "2022.12.8",
+      "esphome_version": "2023.6.2",
       // additional APT dependicies
       "apt_deps": "bash-completion less",
       // additional PIP dependicies
-      "pip_deps": ""
+      "pip_deps": "",
+      // workspace dir
+      "workspace_dir": "${containerWorkspaceFolder}"
     }
   },
   "runArgs": [
@@ -46,13 +48,20 @@
             "when": "$(basename).py"
           },
           "**/__pycache__": true,
-          "**/.esphome": false,
+          "config/.esphome": true,
+          "lib/.esphome": true,
           ".pio": true
+        },
+        "files.watcherExclude": {
+          "**/.git/objects/**": true,
+          "**/.git/subtree-cache/**": true,
+          ".platformio/**": true
         },
         "files.associations": {
           "**/.vscode/*.json": "jsonc"
         },
-        "C_Cpp.clang_format_path": "/usr/bin/clang-format-11"
+        "C_Cpp.clang_format_path": "/usr/bin/clang-format-11",
+        "C_Cpp.default.browse.databaseFilename": "${workspaceFolder}/.esphome/vscode/c_cpp_browse.db"
       },
       // Add the IDs of extensions you want installed when the container is created.
       "extensions": [
@@ -85,9 +94,9 @@
   "remoteUser": "vscode",
   "mounts": [
     "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/.esphome,type=volume",
-    "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/.pio,type=volume",
-    "source=vscode-${containerWorkspaceFolderBasename},target=/esphome/.temp,type=volume",
     "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/config/.esphome,type=volume",
-    "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/lib/.esphome,type=volume"
+    "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/lib/.esphome,type=volume",
+    "source=vscode-${containerWorkspaceFolderBasename},target=/esphome/.temp,type=volume",
+    "source=vscode-platformio,target=${containerWorkspaceFolder}/.platformio,type=volume"
   ]
 }

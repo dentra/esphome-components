@@ -22,17 +22,12 @@ indent_style = space
 indent_size = 2
 
 # YAML
-[*.yaml]
+[*.{yaml,yml}]
 indent_style = space
 indent_size = 2
-quote_type = single
+quote_type = double
 
 # JSON
 [*.json]
 indent_style = space
 indent_size = 2
-
-# Shell script
-[*.sh]
-indent_style = space
-indent_size = 4

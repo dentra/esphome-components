@@ -1,0 +1,28 @@
+# platformio env
+pio_env=esp32-arduino
+
+# project specific defines
+defines=(
+    TION_ESPHOME
+    TION_ENABLE_HEARTBEAT
+    TION_ENABLE_PRESETS
+    TION_ENABLE_SCHEDULER
+    TION_ENABLE_DIAGNOSTIC
+    USE_VPORT_BLE
+    USE_VPORT_UART
+)
+
+# project specific libraries
+lib_deps=(
+  "etlcpp/Embedded Template Library"
+  "ESP8266Audio"
+)
+
+# project additional includes
+includes=(
+)
+
+# project external components
+external_components=(
+)
+

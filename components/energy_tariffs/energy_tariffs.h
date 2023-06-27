@@ -63,7 +63,7 @@ class EnergyTariffs : public Component {
 
   void process_(float total);
 
-  EnergyTariff *get_tariff_(const time::ESPTime &time) const;
+  EnergyTariff *get_tariff_(const ESPTime &time) const;
 };  // class EnergyTariffs
 
 }  // namespace energy_tariffs

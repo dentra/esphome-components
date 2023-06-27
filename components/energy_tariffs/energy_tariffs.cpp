@@ -49,7 +49,7 @@ void EnergyTariffs::loop() {
   if (this->time_offset_ && this->time_offset_->has_state()) {
     // sync time with mains
     time_t ts = time.timestamp + this->time_offset_->state;
-    time = time::ESPTime::from_epoch_local(ts);
+    time = ESPTime::from_epoch_local(ts);
   }
 
   auto ct = this->get_tariff_(time);
@@ -88,7 +88,7 @@ void EnergyTariffs::process_(float total) {
   }
 }
 
-EnergyTariff *EnergyTariffs::get_tariff_(const time::ESPTime &time) const {
+EnergyTariff *EnergyTariffs::get_tariff_(const ESPTime &time) const {
   EnergyTariff *def{};
   for (auto t : this->tariffs_) {
     if (t->is_default()) {

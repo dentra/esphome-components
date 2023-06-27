@@ -45,7 +45,7 @@ class EnergyTariff : public Sensor,
 
   bool is_default() const { return this->time_.empty(); }
 
-  bool time_in_range(const time::ESPTime &time) const {
+  bool time_in_range(const ESPTime &time) const {
     for (auto const &range : this->time_) {
       if (time_in_range_(range.min, range.max, time)) {
         return true;
@@ -64,7 +64,7 @@ class EnergyTariff : public Sensor,
   std::string service;
 
   // Return true if time in the range [min, max]
-  static bool time_in_range_(uint16_t min, uint16_t max, const time::ESPTime &time) {
+  static bool time_in_range_(uint16_t min, uint16_t max, const ESPTime &time) {
     auto x = time.hour * 60 + time.minute;
     return time_in_range_(min, max, x);
   }

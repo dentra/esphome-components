@@ -157,7 +157,7 @@ bool MiotCWBS01Api::request_state() const {
   return this->send_command_(COMMAND_REQUEST_STATE, nullptr, 0);
 }
 
-bool MiotCWBS01Api::sync_time(const esphome::time::ESPTime &tm) const {
+bool MiotCWBS01Api::sync_time(const ESPTime &tm) const {
   ESP_LOGD(TAG, "Sync time %04u-%02u-%02u %02u:%02u:%02u", tm.year, tm.month, tm.day_of_month, tm.hour, tm.minute,
            tm.second);
   if (!tm.is_valid()) {
