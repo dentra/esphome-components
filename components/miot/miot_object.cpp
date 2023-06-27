@@ -256,5 +256,14 @@ optional<float> BLEObject::get_miaomiaoce_humidity_1002() const {
   return res;
 }
 
+optional<uint8_t> BLEObject::get_consumable() const {
+  CHECK_MIID(MIID_CONSUMABLE);
+  auto consumable = this->get_uint8();
+  if (consumable.has_value()) {
+    ESP_LOGD(TAG, "Consumable: %" PRIu8 " %%", *consumable);
+  }
+  return consumable;
+}
+
 }  // namespace miot
 }  // namespace esphome

@@ -27,6 +27,8 @@ bool MiotExplorer::process_mibeacon(const miot::MiBeacon &mib) {
 bool MiotExplorer::process_object_(const miot::BLEObject &obj) {
   switch (obj.id) {
     case miot::MIID_BATTERY:
+    case miot::MIID_CONSUMABLE:
+    case miot::MIID_MIAOMIAOCE_BATTERY_1003:
       this->process_default_(obj);
       break;
     case miot::MIID_PAIRING_EVENT:
@@ -82,9 +84,8 @@ void MiotExplorer::process_string_(miot::MIID miid, const std::string &name, con
     sens = static_cast<TextSensor *>(it->second);
   } else {
     sens = new TextSensor();
-    char tmp[16] = {};
-    sprintf(tmp, " [%04X] ", miid);
-    sens->set_name(this->get_name() + tmp + name);
+    auto full = str_sprintf("%s [%04X] %s", this->get_name().c_str(), miid, name.c_str());
+    sens->set_name(strdup(full.c_str()));
     App.register_text_sensor(sens);
     this->sensors_[miid] = sens;
   }

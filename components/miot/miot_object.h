@@ -249,6 +249,12 @@ struct BLEObject {
    * @return humidity percentage, %
    */
   optional<float> get_miaomiaoce_humidity_1002() const;
+
+  /**
+   * Value for MIID_CONSUMABLE.
+   * @return consumable percentage, %
+   */
+  optional<uint8_t> get_consumable() const;
 };
 
 }  // namespace miot
