@@ -10,12 +10,14 @@ substitutions:
   dp_voltage: "20"
 
 esphome:
-  platform: ESP8266
-  board: esp01_1m
   name: $node_name
   project:
     name: "dentra.zmai90v2"
     version: "2022.6.0"
+
+esp8266:
+  board: esp01_1m
+  restore_from_flash: true
 
 preferences:
   flash_write_interval: 30min
