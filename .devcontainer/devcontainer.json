@@ -60,7 +60,7 @@
         "files.associations": {
           "**/.vscode/*.json": "jsonc"
         },
-        "C_Cpp.clang_format_path": "/usr/bin/clang-format-11",
+        "C_Cpp.clang_format_path": "/usr/bin/clang-format-13",
         "C_Cpp.default.browse.databaseFilename": "${workspaceFolder}/.esphome/vscode/c_cpp_browse.db"
       },
       // Add the IDs of extensions you want installed when the container is created.
@@ -96,7 +96,6 @@
     "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/.esphome,type=volume",
     "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/config/.esphome,type=volume",
     "source=vscode-${containerWorkspaceFolderBasename},target=${containerWorkspaceFolder}/lib/.esphome,type=volume",
-    "source=vscode-${containerWorkspaceFolderBasename},target=/esphome/.temp,type=volume",
     "source=vscode-platformio,target=${containerWorkspaceFolder}/.platformio,type=volume"
   ]
 }
