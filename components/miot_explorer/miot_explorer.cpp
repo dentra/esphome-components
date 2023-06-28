@@ -12,6 +12,7 @@ void MiotExplorer::dump_config() {
   this->dump_config_(TAG);
   ESP_LOGCONFIG(TAG, "Product ID: %04X", this->product_id_);
   LOG_TEXT_SENSOR("", "Explorer", this);
+  LOG_SENSOR("  ", "Consumable", this->consumable_);
 }
 
 bool MiotExplorer::process_mibeacon(const miot::MiBeacon &mib) {
