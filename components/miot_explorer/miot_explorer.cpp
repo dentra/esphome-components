@@ -27,10 +27,20 @@ bool MiotExplorer::process_mibeacon(const miot::MiBeacon &mib) {
 bool MiotExplorer::process_object_(const miot::BLEObject &obj) {
   switch (obj.id) {
     case miot::MIID_BATTERY:
-    case miot::MIID_CONSUMABLE:
     case miot::MIID_MIAOMIAOCE_BATTERY_1003:
       this->process_default_(obj);
       break;
+    case miot::MIID_CONSUMABLE: {
+      auto consumable = obj.get_consumable();
+      if (consumable.has_value()) {
+        if (this->consumable_) {
+          this->consumable_->publish_state(*obj.get_consumable());
+        } else {
+          this->process_string_(obj.id, "Consumable", to_string(*obj.get_consumable()));
+        }
+      }
+      break;
+    }
     case miot::MIID_PAIRING_EVENT:
       this->process_pairing_event_(obj.id, "Pairing object", obj.get_pairing_object());
       break;

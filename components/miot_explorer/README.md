@@ -18,11 +18,14 @@ text_sensor:
     # String, (Optional), device bind key
     bindkey: "device-bind-key"
     # String, (Required), the name of sensor
-    name: "$name"
+    name: None # use esphome.friendly_name
     # Sensor (Optional), Humidity, %
     battery_level:
-      name: "$name Battery Level"
+      name: "Battery Level"
     # Sensor (Optional), Battey Voltage, V
     battery_voltage:
-      name: "$name Battery Voltage"
+      name: "Battery Voltage"
+    # additional optional sensors:
+    consumable:
+      name: "Consumable"
 ```

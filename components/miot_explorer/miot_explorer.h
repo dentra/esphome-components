@@ -18,9 +18,12 @@ class MiotExplorer : public miot::MiotComponent, public text_sensor::TextSensor 
 
   bool process_mibeacon(const miot::MiBeacon &mib) override;
 
+  void set_consumable(sensor::Sensor *consumable) { this->consumable_ = consumable; }
+
  protected:
   uint16_t product_id_;
   std::map<miot::MIID, EntityBase *> sensors_ = {};
+  sensor::Sensor *consumable_{};
 
   bool process_object_(const miot::BLEObject &obj) override;
   void process_string_(miot::MIID miid, const std::string &name, const std::string &data);
@@ -37,4 +40,3 @@ class MiotExplorer : public miot::MiotComponent, public text_sensor::TextSensor 
 
 }  // namespace miot_explorer
 }  // namespace esphome
-
