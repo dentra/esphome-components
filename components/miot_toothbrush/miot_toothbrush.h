@@ -21,10 +21,13 @@ class MiotToothbrush : public miot::MiotComponent, public sensor::Sensor {
   }
 
   void set_consumable_level(sensor::Sensor *consumable_level) { this->consumable_level_ = consumable_level; }
+  void set_brushing_time(sensor::Sensor *brushing_time) { this->brushing_time_ = brushing_time; }
 
  protected:
   uint16_t product_id_ = {};
-  sensor::Sensor *consumable_level_{nullptr};
+  sensor::Sensor *consumable_level_{};
+  sensor::Sensor *brushing_time_{};
+  time_t brushing_start_{};
 
   bool process_object_(const miot::BLEObject &obj) override;
 
