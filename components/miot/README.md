@@ -35,7 +35,7 @@ miot:
       lambda: // empty action
 ```
 
-You can use automation to operate with [BLEObject](miot.h#L15) via `x` variable in lambda.
+You can use automation to operate with [BLEObject](miot_object.h#L86) via `x` variable in lambda.
 
 ```yaml
 external_components:
