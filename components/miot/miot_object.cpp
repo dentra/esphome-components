@@ -265,5 +265,39 @@ optional<uint8_t> BLEObject::get_consumable() const {
   return consumable;
 }
 
+optional<ToothbrushEvent> BLEObject::get_toothbrush_event() const {
+  CHECK_MIID(MIID_XIAOBEI_TOOTHBRUSH_EVENT);
+
+  struct ToothbrushEventStart {
+    ToothbrushEvent::Type type;
+    time_t timestamp;
+  } PACKED;
+
+  ToothbrushEvent toothbrush_event{};
+  if (this->data.size() == sizeof(ToothbrushEventStart)) {
+    auto toothbrush_start_event = this->get_typed<ToothbrushEventStart>();
+    toothbrush_event.type = toothbrush_start_event->type;
+    toothbrush_event.timestamp = toothbrush_start_event->timestamp;
+  } else if (this->data.size() == sizeof(ToothbrushEvent)) {
+    auto toothbrush_end_event = this->get_typed<ToothbrushEvent>();
+    if (toothbrush_end_event) {
+      toothbrush_event.type = toothbrush_end_event->type;
+      toothbrush_event.timestamp = toothbrush_end_event->timestamp;
+      toothbrush_event.score = toothbrush_end_event->score;
+    }
+  } else {
+    ESP_LOGD(TAG, "Toothbrush unknown event: %s", format_hex_pretty(this->data.data(), this->data.size()).c_str());
+    return {};
+  }
+
+  if (toothbrush_event.type == ToothbrushEvent::BRUSHING_START) {
+    ESP_LOGD(TAG, "Toothbrush start event: timestamp=%d", toothbrush_event.timestamp);
+  } else {
+    ESP_LOGD(TAG, "Toothbrush end event: timestamp=%d, score=%u", toothbrush_event.timestamp, toothbrush_event.score);
+  }
+
+  return toothbrush_event;
+}
+
 }  // namespace miot
 }  // namespace esphome

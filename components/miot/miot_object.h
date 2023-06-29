@@ -83,6 +83,19 @@ struct WaterBoil {
   float get_temperature() const { return temperature; };
 } PACKED;
 
+// Object returned by MIID_XIAOBEI_TOOTHBRUSH_EVENT.
+struct ToothbrushEvent {
+  enum Type : uint8_t { BRUSHING_START = 0, BRUSHING_END = 1 };
+  // Types of:
+  //  0: Start of brushing
+  //  1: End of brushing
+  Type type;
+  // Timestamp: UTC time
+  time_t timestamp;
+  // Score (optional): This parameter can be added to the end of brushing event: the score of this brushing, 0~100
+  uint8_t score;
+} PACKED;
+
 struct BLEObject {
   BLEObject() : id(MIID_UNINITIALIZED) {}
   BLEObject(const uint8_t *encrypted_begin, const uint8_t *encrypted_end)
@@ -255,6 +268,12 @@ struct BLEObject {
    * @return consumable percentage, %
    */
   optional<uint8_t> get_consumable() const;
+
+  /**
+   * Value for MIID_XIAOBEI_TOOTHBRUSH_EVENT
+   * @return toothbrush_event
+   */
+  optional<ToothbrushEvent> get_toothbrush_event() const;
 };
 
 }  // namespace miot
