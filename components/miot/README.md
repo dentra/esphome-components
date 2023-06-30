@@ -51,7 +51,12 @@ miot:
     debug: true
     then:
       lambda: |-
-        ESP_LOGW("main", "on_miot_advertise, miid: %d", x.id);
+        ESP_LOGW("miot_event", "miid: 0x%04x, data: %s", x.id, format_hex_pretty(x.data.data(), x.data.size()).c_str());
 ```
 
 > Also you colud use [MIOT Explorer](../miot_explorer/) to grab sensors information.
+
+
+## Adding new device to component
+
+Configure [miot](../miot/) compoent and send me evets from your toothbrush.

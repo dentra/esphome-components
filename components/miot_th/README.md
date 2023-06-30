@@ -46,3 +46,16 @@ sensor:
     name: "$name RSSI"
 ```
 
+## Adding new device to component
+
+Configure [miot](../miot/) compoent and send me evets from your toothbrush.
+
+```yaml
+miot:
+...
+  on_miot_advertise:
+    then:
+      lambda: |-
+        ESP_LOGW("miot_event", "miid: 0x%04x, data: %s", x.id, format_hex_pretty(x.data.data(), x.data.size()).c_str());
+...
+```

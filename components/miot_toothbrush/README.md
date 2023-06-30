@@ -35,7 +35,7 @@ binary_sensor:
 
 ## Adding new device to component
 
-Configure [miot](../miot) compoent and send me evets from your toothbrush.
+Configure [miot](../miot/) compoent and send me evets from your toothbrush.
 
 ```yaml
 miot:
