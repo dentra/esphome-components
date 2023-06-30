@@ -270,7 +270,7 @@ optional<ToothbrushEvent> BLEObject::get_toothbrush_event() const {
 
   struct ToothbrushEventStart {
     ToothbrushEvent::Type type;
-    time_t timestamp;
+    uint32_t timestamp;
   } PACKED;
 
   ToothbrushEvent toothbrush_event{};

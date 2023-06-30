@@ -90,8 +90,8 @@ struct ToothbrushEvent {
   //  0: Start of brushing
   //  1: End of brushing
   Type type;
-  // Timestamp: UTC time
-  time_t timestamp;
+  // Timestamp: UTC time (time_t)
+  uint32_t timestamp;
   // Score (optional): This parameter can be added to the end of brushing event: the score of this brushing, 0~100
   uint8_t score;
 } PACKED;
