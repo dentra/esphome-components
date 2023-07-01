@@ -13,6 +13,7 @@ from esphome.const import (
     STATE_CLASS_MEASUREMENT,
     UNIT_VOLT_AMPS,
     UNIT_VOLT_AMPS_REACTIVE,
+    UNIT_DEGREES,
 )
 
 CODEOWNERS = ["@dentra"]
@@ -21,7 +22,7 @@ CONF_APPARENT_POWER = "apparent_power"
 CONF_REACTIVE_POWER = "reactive_power"
 CONF_WAIT_TIME = "wait_time"
 
-UNIT_POWER_FACTOR = "Cos φ"
+UNIT_POWER_FACTOR = UNIT_DEGREES  # "Cos φ"
 
 energy_monitoring_ns = cg.esphome_ns.namespace("energy_monitoring")
 
