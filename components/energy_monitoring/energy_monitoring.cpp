@@ -60,6 +60,13 @@ void EnergyMonitoring::setup() {
       });
     }
   }
+
+  if (this->power_factor_) {
+    auto power_factor_unit = this->power_factor_->get_unit_of_measurement();
+    if (!power_factor_unit.empty() && power_factor_unit[0] == '%') {
+      this->power_factor_->set_accuracy_decimals(0);
+    }
+  }
 }
 
 void EnergyMonitoring::loop() {
@@ -115,6 +122,10 @@ void EnergyMonitoring::process_power_(float power, float apparent, float current
 
   if (this->power_factor_) {
     auto factor = this->calc_power_factor_(power, apparent);
+    auto power_factor_unit = this->power_factor_->get_unit_of_measurement();
+    if (!power_factor_unit.empty() && power_factor_unit[0] == '%') {
+      factor *= 100;
+    }
     this->power_factor_->publish_state(factor);
   }
 }
@@ -128,8 +139,8 @@ inline bool should_calc_reactive_power(float power, float apparent, float curren
   if (!(current > 0.005)) {
     return false;
   }
-  uint32_t difference = ((uint32_t)(apparent * 100) - (uint32_t)(power * 100)) / 10;
-  return (difference > 15) || (difference > (uint32_t)(apparent * 100 / 1000));
+  uint32_t difference = ((uint32_t) (apparent * 100) - (uint32_t) (power * 100)) / 10;
+  return (difference > 15) || (difference > (uint32_t) (apparent * 100 / 1000));
 }
 
 // Reactive Power (VAr)

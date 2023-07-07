@@ -13,7 +13,7 @@ from esphome.const import (
     STATE_CLASS_MEASUREMENT,
     UNIT_VOLT_AMPS,
     UNIT_VOLT_AMPS_REACTIVE,
-    UNIT_DEGREES,
+    UNIT_PERCENT,
 )
 
 CODEOWNERS = ["@dentra"]
@@ -22,7 +22,7 @@ CONF_APPARENT_POWER = "apparent_power"
 CONF_REACTIVE_POWER = "reactive_power"
 CONF_WAIT_TIME = "wait_time"
 
-UNIT_POWER_FACTOR = UNIT_DEGREES  # "Cos φ"
+# UNIT_POWER_FACTOR = UNIT_PERCENT  # "Cos φ"
 
 energy_monitoring_ns = cg.esphome_ns.namespace("energy_monitoring")
 
@@ -48,7 +48,6 @@ CONFIG_SCHEMA = cv.Schema(
             icon=ICON_FLASH,
         ),
         cv.Optional(CONF_POWER_FACTOR): sensor.sensor_schema(
-            unit_of_measurement=UNIT_POWER_FACTOR,
             accuracy_decimals=2,
             device_class=DEVICE_CLASS_POWER_FACTOR,
             state_class=STATE_CLASS_MEASUREMENT,

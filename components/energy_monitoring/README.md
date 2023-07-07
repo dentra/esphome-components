@@ -57,6 +57,8 @@ sensor:
       name: "$name Reactive Power"
     power_factor:
       name: "$name Power Factor"
+      # Supports None or "%" for unit_of_measurement, default: None
+      # unit_of_measurement: "%"
   - platform: "template"
     id: voltage
     lambda: return 230.0;
