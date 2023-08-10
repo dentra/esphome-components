@@ -3,11 +3,11 @@
   "build": {
     "args": {
       // ESPHome version
-      "esphome_version": "2023.6.2",
+      "esphome_version": "2023.7.1",
       // additional APT dependicies
       "apt_deps": "bash-completion less",
       // additional PIP dependicies
-      "pip_deps": "",
+      "pip_deps": "aiohttp",
       // workspace dir
       "workspace_dir": "${containerWorkspaceFolder}"
     }

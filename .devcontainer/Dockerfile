@@ -27,9 +27,8 @@ RUN useradd -m -s /bin/bash -G sudo vscode \
  && echo "vscode ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/vscode \
  && chmod 0440 /etc/sudoers.d/vscode
 
-RUN mv /root/.platformio /home/vscode && chown -R vscode:vscode /home/vscode/.platformio /esphome /piolibs
-
 ENV PLATFORMIO_CORE_DIR="$pio_dir"
 RUN mkdir -p "$pio_dir"
 ENV WORKSPACE_DIR=${workspace_dir}
 
+RUN mv /root/.platformio /home/vscode && chown -R vscode:vscode /home/vscode/.platformio /esphome /piolibs "$pio_dir"
