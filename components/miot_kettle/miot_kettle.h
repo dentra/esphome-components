@@ -7,20 +7,13 @@
 namespace esphome {
 namespace miot_kettle {
 
+// Known product ID: 0x045C - V-SK152
 class MiotKettle : public miot::MiotComponent, public binary_sensor::BinarySensor {
  public:
-  // Known ID: 0x045C - V-SK152
-  uint16_t get_product_id() const override { return this->product_id_; }
-  const char *get_product_code() const override { return "universal kettle"; }
-
   void dump_config() override;
-
   void set_temperature(sensor::Sensor *temperature) { this->temperature_ = temperature; }
 
-  bool process_mibeacon(const miot::MiBeacon &mib);
-
  protected:
-  uint16_t product_id_ = {};
   sensor::Sensor *temperature_{nullptr};
 
   bool process_object_(const miot::BLEObject &obj) override;

@@ -11,15 +11,9 @@ class MiotTH : public miot::MiotComponent, public sensor::Sensor {
  public:
   void dump_config() override;
 
-  uint16_t get_product_id() const override { return this->product_id_; }
-  const char *get_product_code() const override { return "Universal TH"; }
-
   void set_humidity(sensor::Sensor *humidity) { this->humidity_ = humidity; }
 
-  bool process_mibeacon(const miot::MiBeacon &mib) override;
-
  protected:
-  uint16_t product_id_ = {};
   sensor::Sensor *humidity_{nullptr};
 
   bool process_object_(const miot::BLEObject &obj) override;

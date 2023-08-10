@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <vector>
+#include <cinttypes>
 
 #include "esphome/core/component.h"
 #include "esphome/components/esp32_ble_tracker/esp32_ble_tracker.h"
@@ -17,21 +18,26 @@ namespace miot {
 #define MIOT_ADDR_STR ESP_BD_ADDR_STR
 #define MIOT_ADDR_HEX_REVERSE(addr) addr[5], addr[4], addr[3], addr[2], addr[1], addr[0]
 
+#define _MIOT_LOG(log_fn, tag, format, mac_addr, ...) log_fn(tag, "%12" PRIX64 " " format, mac_addr, ##__VA_ARGS__)
+#define MIOT_LOGV(tag, format, mac_addr, ...) _MIOT_LOG(ESP_LOGV, tag, format, mac_addr, ##__VA_ARGS__)
+#define MIOT_LOGD(tag, format, mac_addr, ...) _MIOT_LOG(ESP_LOGD, tag, format, mac_addr, ##__VA_ARGS__)
+#define MIOT_LOGW(tag, format, mac_addr, ...) _MIOT_LOG(ESP_LOGW, tag, format, mac_addr, ##__VA_ARGS__)
+
 using bindkey_t = uint8_t[16];
 
 struct MiBeacon {
-  MiBeacon() : frame_control({}), product_id(0), frame_counter(0){};
+  MiBeacon() {}
   MiBeacon(const RawMiBeaconHeader *hdr)
       : frame_control(hdr->frame_control), product_id(hdr->product_id), frame_counter(hdr->frame_counter) {}
-  FrameControl frame_control;
-  uint16_t product_id;
-  uint8_t frame_counter;
-  uint64_t mac_address = {};
-  Capability capability = {};
-  IOCapability io_capability = {};
-  BLEObject object = {};
-  uint32_t random_number = {};
-  uint32_t message_integrity_check = {};
+  FrameControl frame_control{};
+  uint16_t product_id{};
+  uint8_t frame_counter{};
+  uint64_t mac_address{};
+  Capability capability{};
+  IOCapability io_capability{};
+  BLEObject object{};
+  uint32_t random_number{};
+  uint32_t message_integrity_check{};
   uint8_t version() const { return frame_control.version; }
   bool has_object() const { return frame_control.object_include; }
   bool has_address() const { return frame_control.mac_include; }
@@ -50,7 +56,7 @@ class MiBeaconTracker : public esp32_ble_tracker::ESPBTDeviceListener, public Co
   void register_listener(MiotListener *listener) { this->listeners_.push_back(listener); }
 
  protected:
-  std::vector<MiotListener *> listeners_ = {};
+  std::vector<MiotListener *> listeners_{};
 
   bool parse_mibeacon_(const esp32_ble_tracker::ESPBTDevice &device, const std::vector<uint8_t> &data) const;
 };
@@ -62,16 +68,17 @@ class MiotListener {
 
   const uint8_t *get_bindkey() const { return this->bindkey_; }
   void set_bindkey(const bindkey_t bindkey) { memcpy(this->bindkey_, bindkey, sizeof(bindkey_t)); }
-  bool have_bindkey() const;
+  bool has_bindkey() const;
 
-  virtual uint16_t get_product_id() const = 0;
+  uint16_t get_product_id() const { return this->product_id_; }
 
   virtual bool process_mibeacon(const MiBeacon &mib);
 
  protected:
-  uint64_t address_ = {};
-  bindkey_t bindkey_ = {};
-  uint8_t frame_counter_ = {};
+  uint64_t address_{};
+  bindkey_t bindkey_{};
+  uint8_t frame_counter_{};
+  uint16_t product_id_{};
 
   bool process_unhandled_(const miot::BLEObject &obj);
   virtual bool process_object_(const BLEObject &obj) = 0;
@@ -81,7 +88,6 @@ class MiotComponent : public Component, public MiotListener {
  public:
   float get_setup_priority() const override { return setup_priority::DATA; }
 
-  virtual const char *get_product_code() const = 0;
   void set_battery_level(sensor::Sensor *battery_level) { this->battery_level_ = battery_level; }
   void set_battery_voltage(sensor::Sensor *battery_voltage) { this->battery_voltage_ = battery_voltage; }
 
@@ -89,7 +95,7 @@ class MiotComponent : public Component, public MiotListener {
   sensor::Sensor *battery_level_{};
   sensor::Sensor *battery_voltage_{};
 
-  void dump_config_(const char *TAG) const;
+  void dump_config_(const char *TAG, const char *product_code) const;
 
   bool process_default_(const miot::BLEObject &obj);
 };

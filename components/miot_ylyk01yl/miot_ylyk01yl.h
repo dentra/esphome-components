@@ -9,8 +9,7 @@ namespace miot_ylyk01yl {
 
 class MiotYLYK01YL : public miot::MiotComponent {
  public:
-  uint16_t get_product_id() const override { return PRODUCT_ID_YLYK01YL; }
-  const char *get_product_code() const override { return "YLYK01YL"; }
+  MiotYLYK01YL() { this->product_id_ = PRODUCT_ID_YLYK01YL; }
 
   void dump_config() override;
 

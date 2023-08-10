@@ -6,17 +6,11 @@ namespace esphome {
 namespace miot {
 
 /**
- * Decrypt MiBeacon version 4 and 5.
+ * Decrypt MiBeacon.
  *
  * @return true on success
  */
-bool decrypt_mibeacon45(const MiotListener *listener, MiBeacon &mib);
-/**
- * Decrypt MiBeacon version 2 and 3.
- *
- * @return true on success
- */
-bool decrypt_mibeacon23(const MiotListener *listener, MiBeacon &mib);
+bool decrypt_mibeacon(MiBeacon &mib, const uint8_t *bindkey);
 
 }  // namespace miot
 }  // namespace esphome

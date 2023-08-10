@@ -10,8 +10,7 @@ namespace miot_ylai003 {
 
 class MiotYLAI003 : public miot::MiotComponent {
  public:
-  uint16_t get_product_id() const override { return PRODUCT_ID_YLAI003; }
-  const char *get_product_code() const override { return "YLAI003"; }
+  MiotYLAI003() { this->product_id_ = PRODUCT_ID_YLAI003; }
 
   void dump_config() override;
 

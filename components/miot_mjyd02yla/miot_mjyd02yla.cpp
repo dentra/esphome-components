@@ -9,7 +9,7 @@ static const char *const TAG = "miot_mjyd02yla";
 constexpr uint32_t LIGHT_ILLUMINANCE = 0x64;
 
 void MiotMJYD02YLA::dump_config() {
-  this->dump_config_(TAG);
+  this->dump_config_(TAG, "MJYD02YL-A");
   LOG_BINARY_SENSOR("  ", "Motion", this);
   LOG_BINARY_SENSOR("  ", "Light", this->light_);
   LOG_SENSOR("  ", "Idle Time", this->idle_time_);

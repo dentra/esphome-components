@@ -6,7 +6,7 @@ namespace miot_xmmfo1jqd {
 
 static const char *const TAG = "miot_xmmfo1jqd";
 
-void MiotXMMFO1JQD::dump_config() { this->dump_config_(TAG); }
+void MiotXMMFO1JQD::dump_config() { this->dump_config_(TAG, "XMMFO1JQD"); }
 
 bool MiotXMMFO1JQD::process_object_(const miot::BLEObject &obj) {
   switch (obj.id) {

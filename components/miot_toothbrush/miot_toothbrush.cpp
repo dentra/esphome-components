@@ -7,7 +7,7 @@ namespace miot_toothbrush {
 static const char *const TAG = "miot_toothbrush";
 
 void MiotToothbrush::dump_config() {
-  this->dump_config_(TAG);
+  this->dump_config_(TAG, "Toothbrush");
   LOG_BINARY_SENSOR("", "Brush occupancy", this);
   LOG_SENSOR("  ", "Score", this->score_);
   LOG_SENSOR("  ", "Consumable Level", this->consumable_level_);

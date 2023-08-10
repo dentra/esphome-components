@@ -7,7 +7,7 @@ namespace miot_rtcgq02lm {
 static const char *const TAG = "miot_rtcgq2lm";
 
 void MiotRTCGQ02LM::dump_config() {
-  this->dump_config_(TAG);
+  this->dump_config_(TAG, "RTCGQ02LM");
   LOG_BINARY_SENSOR("  ", "Motion", this);
   LOG_BINARY_SENSOR("  ", "Light", this->light_);
   LOG_BINARY_SENSOR("  ", "Timeout", this->timeout_);

@@ -9,7 +9,7 @@ namespace miot_explorer {
 static const char *const TAG = "miot_explorer";
 
 void MiotExplorer::dump_config() {
-  this->dump_config_(TAG);
+  this->dump_config_(TAG, "Explorer");
   ESP_LOGCONFIG(TAG, "Product ID: %04X", this->product_id_);
   LOG_TEXT_SENSOR("", "Explorer", this);
   LOG_SENSOR("  ", "Consumable", this->consumable_);
@@ -18,9 +18,7 @@ void MiotExplorer::dump_config() {
 bool MiotExplorer::process_mibeacon(const miot::MiBeacon &mib) {
   if (this->product_id_ == 0) {
     this->product_id_ = mib.product_id;
-    char tmp[6] = {};
-    sprintf(tmp, "%04X", this->product_id_);
-    this->publish_state(tmp);
+    this->publish_state(str_sprintf("%04X", this->product_id_));
   }
   return MiotListener::process_mibeacon(mib);
 }
@@ -135,35 +133,28 @@ void MiotExplorer::process_bool_(miot::MIID miid, const std::string &name, const
 
 void MiotExplorer::process_float_(miot::MIID miid, const std::string &name, const optional<float> &value) {
   if (value.has_value()) {
-    char tmp[16] = {};
-    sprintf(tmp, "%.1f", *value);
-    this->process_string_(miid, name, std::string(tmp));
+    this->process_string_(miid, name, str_sprintf("%.1f", *value));
   }
 }
 
 void MiotExplorer::process_temperature_humidity_(miot::MIID miid, const std::string &name,
                                                  const miot::TemperatureHumidity *th) {
   if (th != nullptr) {
-    char tmp[16] = {};
-    sprintf(tmp, "%.1f / %.1f", th->get_temperature(), th->get_humidity());
-    this->process_string_(miid, name, std::string(tmp));
+    this->process_string_(miid, name, str_sprintf("%.1f / %.1f", th->get_temperature(), th->get_humidity()));
   }
 }
 
 void MiotExplorer::process_button_event_(miot::MIID miid, const std::string &name,
                                          const miot::ButtonEvent *button_event) {
   if (button_event != nullptr) {
-    char tmp[64] = {};
-    miot::ButtonEvent::str(tmp, *button_event);
-    this->process_string_(miid, name, std::string(tmp));
+    this->process_string_(miid, name, button_event->str());
   }
 }
 
 void MiotExplorer::process_water_boil_(miot::MIID miid, const std::string &name, const miot::WaterBoil *water_boil) {
   if (water_boil != nullptr) {
-    char tmp[16] = {};
-    sprintf(tmp, "%s / %.1f", ONOFF(water_boil->get_power()), water_boil->get_temperature());
-    this->process_string_(miid, name, std::string(tmp));
+    auto str = str_sprintf("%s / %.1f", ONOFF(water_boil->get_power()), water_boil->get_temperature());
+    this->process_string_(miid, name, str);
   }
 }
 

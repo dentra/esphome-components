@@ -29,12 +29,12 @@ class MiotYLxx0xYLNode : public miot_client::MiotClient, public miot_client::Aut
   struct {
     uint16_t ver;
     uint16_t key;
-  } char_ = {};
+  } char_{};
 
   YLxx0xYLPublisher *publisher_;
 
   // void (MiotYLxx0xYLNode::*step)();
-  // uint16_t step_handle_ = {};
+  // uint16_t step_handle_ {};
   // void do_step_(uint16_t handle);
 
   void on_read_ver_(const uint8_t *data, int size);

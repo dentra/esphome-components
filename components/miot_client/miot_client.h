@@ -117,8 +117,8 @@ class MiotClient : public ble_client::BLEClientNode {
   }
 
  protected:
-  bool debug_ = {};
-  AuthClient *auth_ = {};
+  bool debug_{};
+  AuthClient *auth_{};
   bool is_encrypted_(uint16_t handle) const { return this->auth_ != nullptr && this->auth_->is_encrypted(handle); }
 };
 

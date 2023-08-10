@@ -10,8 +10,7 @@ namespace miot_rtcgq02lm {
 
 class MiotRTCGQ02LM : public miot::MiotComponent, public binary_sensor::BinarySensor {
  public:
-  uint16_t get_product_id() const override { return 0x0A8D; }
-  const char *get_product_code() const override { return "RTCGQ02LM"; }
+  MiotRTCGQ02LM() { this->product_id_ = 0x0A8D; }
 
   void dump_config() override;
 

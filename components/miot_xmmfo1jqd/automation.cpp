@@ -12,7 +12,7 @@ bool MiotXMMFO1JQDTrigger::process_object_(const miot::BLEObject &obj) {
       const auto button_event = obj.get_typed<miot::ButtonEvent>();
       if (button_event != nullptr) {
         if (this->type_ == button_event->type && this->index_ == button_event->button.index) {
-          miot::ButtonEvent::dump(TAG, *button_event);
+          button_event->dump(TAG);
           this->trigger();
           return true;
         }

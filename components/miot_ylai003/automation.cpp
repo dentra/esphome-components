@@ -15,7 +15,7 @@ bool MiotYLAI003Trigger::process_object_(const miot::BLEObject &obj) {
           ESP_LOGW(TAG, "Unknown button index detected: %u", button_event->button.index);
         }
         if (this->type_ == button_event->type) {
-          miot::ButtonEvent::dump(TAG, *button_event);
+          button_event->dump(TAG);
           this->trigger();
           return true;
         }

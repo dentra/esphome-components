@@ -7,16 +7,9 @@ namespace miot_kettle {
 static const char *const TAG = "miot_kettle";
 
 void MiotKettle::dump_config() {
-  this->dump_config_(TAG);
+  this->dump_config_(TAG, "Kettle");
   LOG_BINARY_SENSOR("  ", "Water Boil Power", this);
   LOG_SENSOR(" ", "Water Boil Temperature", this->temperature_);
-}
-
-bool MiotKettle::process_mibeacon(const miot::MiBeacon &mib) {
-  if (this->product_id_ == 0) {
-    this->product_id_ = mib.product_id;
-  }
-  return MiotComponent::process_mibeacon(mib);
 }
 
 void MiotKettle::process_water_boil_(const miot::BLEObject &obj) {

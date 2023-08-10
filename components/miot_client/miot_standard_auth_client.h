@@ -29,32 +29,32 @@ class MiotStandardAuthClient : public MiotClient, public AuthClient {
     uint16_t version;
     uint16_t ctrlp;
     uint16_t auth;
-  } char_ = {};
+  } char_{};
 
   AuthFrame::Cmd state_{AuthFrame::CMD_PASS_THROUGH};
 
   struct LoadCtx {
-    uint8_t app_random_data[16] = {};
-    uint8_t dev_random_data[16] = {};
-    uint8_t app_confirmation_data[32] = {};
-    uint8_t dev_confirmation_data[32] = {};
-    uint8_t exp_confirmation_data[32] = {};
-    uint16_t max_rx_frames = {};
+    uint8_t app_random_data[16]{};
+    uint8_t dev_random_data[16]{};
+    uint8_t app_confirmation_data[32]{};
+    uint8_t dev_confirmation_data[32]{};
+    uint8_t exp_confirmation_data[32]{};
+    uint16_t max_rx_frames{};
   };
 
-  LoadCtx *load_ctx_ = {};
+  LoadCtx *load_ctx_{};
 
-  uint8_t token_[12] = {};
-  uint8_t beakonkey_[16] = {};
+  uint8_t token_[12]{};
+  uint8_t beakonkey_[16]{};
   struct {
     uint8_t dev_key[16];
     uint8_t app_key[16];
     uint32_t dev_iv;
     uint32_t app_iv;
     uint8_t unknown[24];
-  } PACKED session_ctx_ = {};
+  } PACKED session_ctx_{};
 
-  uint16_t auth_seq_ = {};
+  uint16_t auth_seq_{};
 
   void process_ctrlp_(const OpCode opcode);
   void process_auth_(const AuthFrame &frame, uint16_t frame_size);

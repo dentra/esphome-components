@@ -6,7 +6,7 @@ namespace miot_ylai003 {
 
 static const char *const TAG = "miot_ylai003";
 
-void MiotYLAI003::dump_config() { this->dump_config_(TAG); }
+void MiotYLAI003::dump_config() { this->dump_config_(TAG, "YLAI003"); }
 
 bool MiotYLAI003::process_object_(const miot::BLEObject &obj) {
   switch (obj.id) {

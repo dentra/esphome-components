@@ -12,21 +12,11 @@ class MiotToothbrush : public miot::MiotComponent, public binary_sensor::BinaryS
  public:
   void dump_config() override;
 
-  uint16_t get_product_id() const override { return this->product_id_; }
-  const char *get_product_code() const override { return "Universal Toothbrush"; }
-  bool process_mibeacon(const miot::MiBeacon &mib) override {
-    if (this->product_id_ == 0) {
-      this->product_id_ = mib.product_id;
-    }
-    return MiotComponent::process_mibeacon(mib);
-  }
-
- void set_score(sensor::Sensor *score) { this->score_ = score; }
+  void set_score(sensor::Sensor *score) { this->score_ = score; }
   void set_consumable_level(sensor::Sensor *consumable_level) { this->consumable_level_ = consumable_level; }
   void set_brushing_time(sensor::Sensor *brushing_time) { this->brushing_time_ = brushing_time; }
 
  protected:
-  uint16_t product_id_ = {};
   sensor::Sensor *score_{};
   sensor::Sensor *consumable_level_{};
   sensor::Sensor *brushing_time_{};

@@ -22,8 +22,8 @@ namespace miot {
 // by the Mijia BLE gateway, MiBeacon containing Object needs to be resent multiple times. Specific reference to the
 // Mijia BLE MiBeacon protocol.
 enum MIID : uint16_t {
-  // Uninitialized.
-  MIID_UNINITIALIZED = 0xFFFF,
+  // Unknown.
+  MIID_UNKNOWN = 0x0000,
 
   /// General events.
 

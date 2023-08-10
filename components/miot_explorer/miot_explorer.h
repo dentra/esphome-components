@@ -13,16 +13,12 @@ class MiotExplorer : public miot::MiotComponent, public text_sensor::TextSensor 
  public:
   void dump_config() override;
 
-  uint16_t get_product_id() const override { return product_id_; }
-  const char *get_product_code() const override { return "Explorer"; }
-
   bool process_mibeacon(const miot::MiBeacon &mib) override;
 
   void set_consumable(sensor::Sensor *consumable) { this->consumable_ = consumable; }
 
  protected:
-  uint16_t product_id_;
-  std::map<miot::MIID, EntityBase *> sensors_ = {};
+  std::map<miot::MIID, EntityBase *> sensors_{};
   sensor::Sensor *consumable_{};
 
   bool process_object_(const miot::BLEObject &obj) override;

@@ -10,8 +10,7 @@ namespace miot_xmmfo1jqd {
 
 class MiotXMMFO1JQD : public miot::MiotComponent {
  public:
-  uint16_t get_product_id() const override { return PRODUCT_ID_XMMFO1JQD; }
-  const char *get_product_code() const override { return "XMMFO1JQD"; }
+  MiotXMMFO1JQD() { this->product_id_ = PRODUCT_ID_XMMFO1JQD; }
 
   void dump_config() override;
 

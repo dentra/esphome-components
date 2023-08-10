@@ -79,7 +79,7 @@ void ZMAi90v1::loop() {
     this->button_->publish_state(!this->button_pin_->digital_read());
   }
 
-  zmai90_data_t data = {};
+  zmai90_data_t data{};
 
   while (this->available() >= sizeof(zmai90_data_t)) {
     if (!this->read_array(reinterpret_cast<uint8_t *>(&data), sizeof(zmai90_data_t))) {

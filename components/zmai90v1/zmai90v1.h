@@ -13,7 +13,7 @@ struct zmai90_data_t {
   template<size_t DIV> struct field_t {
     uint8_t data[4];
     float value(float mul) {
-      float res = {};
+      float res{};
       for (size_t i = 0; i < sizeof(data); i++) {
         res += (data[i] & 0x0f) * mul;
         mul *= 10.f;
@@ -70,17 +70,17 @@ class ZMAi90v1 : public PollingComponent, public switch_::Switch, public uart::U
 
  protected:
   ZMAi90v1RestoreMode restore_mode_{RESTORE_MODE_ALWAYS_ON};
-  GPIOPin *switch_pin_ = {};
-  GPIOPin *button_pin_ = {};
-  binary_sensor::BinarySensor *button_ = {};
-  sensor::Sensor *energy_ = {};
-  sensor::Sensor *voltage_ = {};
-  sensor::Sensor *current_ = {};
-  sensor::Sensor *active_power_ = {};
-  sensor::Sensor *reactive_power_ = {};
-  sensor::Sensor *apparent_power_ = {};
-  sensor::Sensor *frequency_ = {};
-  sensor::Sensor *power_factor_ = {};
+  GPIOPin *switch_pin_{};
+  GPIOPin *button_pin_{};
+  binary_sensor::BinarySensor *button_{};
+  sensor::Sensor *energy_{};
+  sensor::Sensor *voltage_{};
+  sensor::Sensor *current_{};
+  sensor::Sensor *active_power_{};
+  sensor::Sensor *reactive_power_{};
+  sensor::Sensor *apparent_power_{};
+  sensor::Sensor *frequency_{};
+  sensor::Sensor *power_factor_{};
 
   uint8_t calc_crc_(const void *data, size_t size);
   uint8_t check_crc_(const zmai90_data_t &data) { return this->calc_crc_(&data, sizeof(data) - 1) == data.checksum; }

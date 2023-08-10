@@ -7,7 +7,7 @@ namespace miot_cgpr1 {
 static const char *const TAG = "miot_cgpr1";
 
 void MiotCGPR1::dump_config() {
-  this->dump_config_(TAG);
+  this->dump_config_(TAG, "CGPR1");
   LOG_BINARY_SENSOR("  ", "Motion", this);
   LOG_BINARY_SENSOR("  ", "Light", this->light_);
   LOG_SENSOR("  ", "Idle Time", this->idle_time_);

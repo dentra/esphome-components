@@ -5,7 +5,7 @@
 #if ESPHOME_LOG_LEVEL >= ESPHOME_LOG_LEVEL_DEBUG
 #define CHECK_MIID(miid) \
   if (this->id != miid) { \
-    ESP_LOGW(TAG, "BLEObject.id = %04X does not match " #miid " [%04X]", this->id, miid); \
+    ESP_LOGW(TAG, "BLEObject.id %04X does not match %04X (" #miid ")", this->id, miid); \
     return {}; \
   }
 #else
@@ -112,76 +112,60 @@ const TemperatureHumidity *BLEObject::get_temperature_humidity() const {
   return th;
 }
 
-void ButtonEvent::str(char *tmp, const ButtonEvent &button_event) {
-  switch (button_event.type) {
+std::string ButtonEvent::str() const {
+  switch (this->type) {
     case ButtonEvent::BUTTON_CLICK:
-      sprintf(tmp, "Button click: %u", button_event.button.index);
-      break;
+      return str_sprintf("Button click: %u", this->button.index);
     case ButtonEvent::BUTTON_DOUBLE_CLICK:
-      sprintf(tmp, "Button double click: %u", button_event.button.index);
-      break;
+      return str_sprintf("Button double click: %u", this->button.index);
+
     case ButtonEvent::BUTTON_LONG_PRESS:
-      sprintf(tmp, "Button long press: %u", button_event.button.index);
-      break;
+      return str_sprintf("Button long press: %u", this->button.index);
+
     case ButtonEvent::KNOB: {
-      uint8_t value = button_event.knob.short_press();
+      uint8_t value = this->knob.short_press();
       if (value != 0) {
-        sprintf(tmp, "Rotating knob short press, value: %" PRIu8, value);
-        break;
+        return str_sprintf("Rotating knob short press, value: %" PRIu8, value);
       }
-      value = button_event.knob.long_press();
+      value = this->knob.long_press();
       if (value != 0) {
-        sprintf(tmp, "Rotating knob long press, value: %" PRIu8, value);
-        break;
+        return str_sprintf("Rotating knob long press, value: %" PRIu8, value);
       }
-      sprintf(tmp, "Rotating knob unknown event: index=%" PRIu8 ", value:=%" PRIu8, button_event.knob.index,
-              button_event.knob.value);
-      break;
+      return str_sprintf("Rotating knob unknown event: index=%" PRIu8 ", value:=%" PRIu8, this->knob.index,
+                         this->knob.value);
     }
     case ButtonEvent::DIMMER: {
-      uint8_t value = button_event.dimmer.left();
+      uint8_t value = this->dimmer.left();
       if (value != 0) {
-        sprintf(tmp, "Dimmer rotate left value: %" PRIu8, value);
-        break;
+        return str_sprintf("Dimmer rotate left value: %" PRIu8, value);
       }
-      value = button_event.dimmer.right();
+      value = this->dimmer.right();
       if (value != 0) {
-        sprintf(tmp, "Dimmer rotate right value: %" PRIu8, value);
-        break;
+        return str_sprintf("Dimmer rotate right value: %" PRIu8, value);
       }
-      value = button_event.dimmer.left_pressed();
+      value = this->dimmer.left_pressed();
       if (value != 0) {
-        sprintf(tmp, "Dimmer rotate left (pressed) value: %" PRIu8, value);
-        break;
+        return str_sprintf("Dimmer rotate left (pressed) value: %" PRIu8, value);
       }
-      value = button_event.dimmer.right_pressed();
+      value = this->dimmer.right_pressed();
       if (value != 0) {
-        sprintf(tmp, "Dimmer rotate right (pressed) value: %" PRIu8, value);
-        break;
+        return str_sprintf("Dimmer rotate right (pressed) value: %" PRIu8, value);
       }
-      sprintf(tmp, "Dimmer unknown event: index=%" PRIi8 ", value:=%" PRIi8, button_event.dimmer.index,
-              button_event.dimmer.value);
-      break;
+      return str_sprintf("Dimmer unknown event: index=%" PRIi8 ", value:=%" PRIi8, this->dimmer.index,
+                         this->dimmer.value);
     }
     default:
-      sprintf(tmp, "Button unknown event %02" PRIx8 ": %04X", button_event.type, button_event.button.index);
-      break;
+      return str_sprintf("Button unknown event %02" PRIx8 ": %04X", this->type, this->button.index);
   }
 }
 
-void ButtonEvent::dump(const char *TAG, const ButtonEvent &button_event) {
-#if ESPHOME_LOG_LEVEL >= ESPHOME_LOG_LEVEL_DEBUG
-  char tmp[64];
-  ButtonEvent::str(tmp, button_event);
-  ESP_LOGD(TAG, tmp);
-#endif
-}
+void ButtonEvent::dump(const char *TAG) const { ESP_LOGD(TAG, this->str().c_str()); }
 
 const ButtonEvent *BLEObject::get_button_event() const {
   CHECK_MIID(MIID_BUTTON_EVENT);
   const auto button_event = this->get_typed<ButtonEvent>();
   if (button_event != nullptr) {
-    ButtonEvent::dump(TAG, *button_event);
+    button_event->dump(TAG);
   }
   return button_event;
 }

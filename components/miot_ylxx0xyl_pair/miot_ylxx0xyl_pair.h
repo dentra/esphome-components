@@ -15,7 +15,6 @@ class MiotYLxx0xYLPair : public Component,
   float get_setup_priority() const override { return setup_priority::LATE; }
   void dump_config() override;
 
-  uint16_t get_product_id() const override { return this->product_id_; }
   void set_product_id(uint16_t product_id) { this->product_id_ = product_id; }
 
   void set_auth_client(miot_client::MiotLegacyBondClient *auth) { this->auth_ = auth; }
@@ -31,9 +30,8 @@ class MiotYLxx0xYLPair : public Component,
   bool process_mibeacon(const miot::MiBeacon &mib) override;
 
  protected:
-  text_sensor::TextSensor *version_ = {};
-  uint16_t product_id_ = {};
-  miot_client::MiotLegacyBondClient *auth_ = {};
+  text_sensor::TextSensor *version_ {};
+  miot_client::MiotLegacyBondClient *auth_ {};
   void process_pairing_(const miot::BLEObject &obj);
   bool process_object_(const miot::BLEObject &obj) override { return false; };
 };

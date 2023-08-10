@@ -10,7 +10,7 @@ constexpr uint16_t PRODUCT_ID_XMWSDJ04MMC = 0x1203;
 constexpr uint16_t PRODUCT_ID_LYWSD02MMC = 0x16E4;
 
 void MiotTH::dump_config() {
-  this->dump_config_(TAG);
+  this->dump_config_(TAG, "TH");
   LOG_SENSOR("  ", "Temperature", this);
   LOG_SENSOR("  ", "Humidity", this->humidity_);
 }
@@ -64,13 +64,6 @@ void MiotTH::process_miaomiaoce_humidity_1002_(const miot::BLEObject &obj) {
       this->humidity_->publish_state(*humidity);
     }
   }
-}
-
-bool MiotTH::process_mibeacon(const miot::MiBeacon &mib) {
-  if (this->product_id_ == 0) {
-    this->product_id_ = mib.product_id;
-  }
-  return MiotComponent::process_mibeacon(mib);
 }
 
 bool MiotTH::process_object_(const miot::BLEObject &obj) {

@@ -7,7 +7,7 @@ namespace miot_sjws01lm {
 static const char *const TAG = "miot_sjws01lm";
 
 void MiotSJWS01LM::dump_config() {
-  this->dump_config_(TAG);
+  this->dump_config_(TAG, "SJWS01LM");
   LOG_BINARY_SENSOR("  ", "Flooding", this);
 }
 

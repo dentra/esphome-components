@@ -62,14 +62,13 @@ struct ButtonEvent {
 
   /**
    * Helper method for debugging purpose.
-   * @param buf output buffer
    * @param button_event button event object
    */
-  static void str(char *buf, const ButtonEvent &button_event);
+  std::string str() const;
   /**
    * Helper method for logging purpose.
    */
-  static void dump(const char *TAG, const ButtonEvent &button_event);
+  void dump(const char *TAG) const;
 } PACKED;
 
 // Object returned by MIID_WATER_BOIL.
@@ -97,13 +96,13 @@ struct ToothbrushEvent {
 } PACKED;
 
 struct BLEObject {
-  BLEObject() : id(MIID_UNINITIALIZED) {}
+  BLEObject() : id(MIID_UNKNOWN) {}
   BLEObject(const uint8_t *encrypted_begin, const uint8_t *encrypted_end)
-      : id(MIID_UNINITIALIZED), data(encrypted_begin, encrypted_end) {}
+      : id(MIID_UNKNOWN), data(encrypted_begin, encrypted_end) {}
   BLEObject(RawBLEObject *obj) : id(obj->id), data(obj->data, obj->data + obj->data_len) {}
 
   MIID id;
-  // sensor data or whole encrypted data when id==MIID_UNINITIALIZED
+  // sensor data or whole encrypted data when id==MIID_UNKNOWN
   std::vector<uint8_t> data;
 
   // get 8 bit value as boolean.

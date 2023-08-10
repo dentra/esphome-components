@@ -72,19 +72,19 @@ class MiotCWBS01 : public miot_client::MiotClient,
     uint16_t version;
     uint16_t stdio_rx;
     uint16_t stdio_tx;
-  } char_ = {};
+  } char_{};
 
   uint32_t update_state_{};
 
   time::RealTimeClock *rtc_{};
   text_sensor::TextSensor *version_{};
-  switch_::Switch *power_ = {};
-  switch_::Switch *cycle_ = {};
-  select::Select *mode_ = {};
-  select::Select *scene_ = {};
-  sensor::Sensor *battery_level_ = {};
-  binary_sensor::BinarySensor *charging_ = {};
-  binary_sensor::BinarySensor *error_ = {};
+  switch_::Switch *power_{};
+  switch_::Switch *cycle_{};
+  select::Select *mode_{};
+  select::Select *scene_{};
+  sensor::Sensor *battery_level_{};
+  binary_sensor::BinarySensor *charging_{};
+  binary_sensor::BinarySensor *error_{};
 
   void sync_state_();
   bool is_dirty_() const { return this->update_state_ != 0; }

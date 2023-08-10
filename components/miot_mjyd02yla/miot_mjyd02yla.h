@@ -10,8 +10,7 @@ namespace miot_mjyd02yla {
 
 class MiotMJYD02YLA : public miot::MiotComponent, public binary_sensor::BinarySensor {
  public:
-  uint16_t get_product_id() const override { return 0x07F6; }
-  const char *get_product_code() const override { return "MJYD02YL-A"; }
+  MiotMJYD02YLA() { this->product_id_ = 0x07F6; }
 
   void dump_config() override;
 

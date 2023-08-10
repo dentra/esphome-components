@@ -10,8 +10,7 @@ namespace miot_ylkg0xyl {
 
 class MiotYLKG0XYL : public miot::MiotComponent {
  public:
-  uint16_t get_product_id() const override { return PRODUCT_ID_YLKG0xYL; }
-  const char *get_product_code() const override { return "YLKG07YL/YLKG08YL"; }
+  MiotYLKG0XYL() { this->product_id_ = PRODUCT_ID_YLKG0xYL; }
 
   void dump_config() override;
 

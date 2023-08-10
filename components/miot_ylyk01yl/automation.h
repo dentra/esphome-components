@@ -9,9 +9,9 @@ namespace miot_ylyk01yl {
 
 class MiotYLYK01YLTrigger : public Trigger<>, public miot::MiotListener {
  public:
-  explicit MiotYLYK01YLTrigger(miot::ButtonEvent::Type type, uint16_t index) : type_(type), index_(index) {}
-
-  uint16_t get_product_id() const override { return PRODUCT_ID_YLYK01YL; }
+  explicit MiotYLYK01YLTrigger(miot::ButtonEvent::Type type, uint16_t index) : type_(type), index_(index) {
+    this->product_id_ = PRODUCT_ID_YLYK01YL;
+  }
 
  protected:
   miot::ButtonEvent::Type type_;

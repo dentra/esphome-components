@@ -11,13 +11,7 @@ bool MiotAdvertiseTrigger::process_mibeacon(const MiBeacon &mib) {
   if (this->debug_) {
     dump(TAG, mib);
   }
-  if (this->product_id_ != 0) {
-    return MiotListener::process_mibeacon(mib);
-  }
-  this->product_id_ = mib.product_id;
-  bool result = MiotListener::process_mibeacon(mib);
-  this->product_id_ = 0;
-  return result;
+  return MiotListener::process_mibeacon(mib);
 }
 
 }  // namespace miot

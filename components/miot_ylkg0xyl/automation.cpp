@@ -12,7 +12,7 @@ bool MiotYLKG0XYLTrigger::process_object_(const miot::BLEObject &obj) {
       if (button_event != nullptr) {
         uint8_t value = this->process_button_event_(*button_event);
         if (value != 0) {
-          miot::ButtonEvent::dump(TAG, *button_event);
+          button_event->dump(TAG);
           this->trigger(value);
           return true;
         }

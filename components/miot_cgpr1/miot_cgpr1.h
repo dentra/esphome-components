@@ -11,8 +11,7 @@ namespace miot_cgpr1 {
 
 class MiotCGPR1 : public miot::MiotComponent, public binary_sensor::BinarySensor {
  public:
-  uint16_t get_product_id() const override { return 0x0A83; }
-  const char *get_product_code() const override { return "CGPR1"; }
+  MiotCGPR1() { this->product_id_ = 0x0A83; }
 
   void dump_config() override;
 
@@ -22,10 +21,10 @@ class MiotCGPR1 : public miot::MiotComponent, public binary_sensor::BinarySensor
   void set_detect_no_motion_asap(bool detect_no_motion_asap) { this->detect_no_motion_asap_ = detect_no_motion_asap; }
 
  protected:
-  binary_sensor::BinarySensor *light_{nullptr};
-  sensor::Sensor *idle_time_{nullptr};
-  sensor::Sensor *illuminance_{nullptr};
-  bool detect_no_motion_asap_ = {};
+  binary_sensor::BinarySensor *light_{};
+  sensor::Sensor *idle_time_{};
+  sensor::Sensor *illuminance_{};
+  bool detect_no_motion_asap_{};
 
   bool process_object_(const miot::BLEObject &obj) override;
 

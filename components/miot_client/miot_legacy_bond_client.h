@@ -40,17 +40,17 @@ class MiotLegacyBondClient : public MiotClient, public AuthClient {
   bool is_auth_complete() const override { return is_established(); };
 
  protected:
-  uint16_t product_id_ = {};
+  uint16_t product_id_{};
   struct {
     uint16_t ctrlp;
     uint16_t auth;
     uint16_t ver;
-  } char_ = {};
+  } char_{};
   std::array<uint8_t, 12> token_;
   enum { NONE = 0, STEP1 = 1, STEP2 = 2, STEP3 = 3, STEP4 = 4, STEP5 = 5, STEP6 = 6 } progress_ = NONE;
 
   // void (MiotYLxx0xYLNode::*step)();
-  // uint16_t step_handle_ = {};
+  // uint16_t step_handle_{};
   // void do_step_(uint16_t handle);
   void step1_();
   void step2_();
