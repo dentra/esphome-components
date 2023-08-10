@@ -12,14 +12,9 @@ static const char *const GAP = "  ";
 void EnergyTariff::dump_config() {
   LOG_SENSOR(GAP, "Energy Tariff", this);
   ESP_LOGCONFIG(TAG, "    Default: %s", this->is_default() ? "true" : "false");
-
   for (auto const &t : this->time_) {
     ESP_LOGCONFIG(TAG, "    Time: %02d:%02d-%02d:%02d", t.min / 60, t.min % 60, t.max / 60, t.max % 60);
   }
-  if (!std::isnan(this->initial_value_)) {
-    ESP_LOGCONFIG(TAG, "    Initial value: %.2f", this->initial_value_);
-  }
-
   ESP_LOGCONFIG(TAG, "    State: %.2f", this->state);
 }
 
@@ -30,7 +25,7 @@ void EnergyTariff::setup() {
   if (this->rtc_.load(&loaded)) {
     this->publish_state_and_save(loaded);
   } else {
-    this->publish_state_and_save(std::isnan(this->initial_value_) ? 0.0f : this->initial_value_);
+    this->publish_state_and_save(0.0f);
   }
 
 #ifdef USE_API

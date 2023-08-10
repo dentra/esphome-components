@@ -16,14 +16,14 @@ external_components:
     id: tariffs
     total: total
     time_offset:
-      name: "$name Time Offset"
+      name: "Time Offset"
     tariffs:
-      - name: "$name Peak Tariff"
+      - name: "Peak Tariff"
         id: peak
         icon: "mdi:weather-sunny"
         service: peak_set
         initial_value: 10.0
-      - name: "$name Off-Peak Tariff"
+      - name: "Off-Peak Tariff"
         id: offpeak
         icon: "mdi:weather-night"
         time: "23:00-07:00"
@@ -38,6 +38,13 @@ external_components:
           id(current_tariff).publish_state("unknown");
     on_before_tariff:
       - uart.write: [0x55, 0xaa, 0x00, 0x08, 0x00, 0x00, 0x07]
+
+text_sensor:
+  - platform: "template"
+    id: current_tariff
+    name: "Current Tariff"
+    icon: "mdi:theme-light-dark"
+    entity_category: diagnostic
 ```
 
 ## Configuration variables:
@@ -55,8 +62,7 @@ Provide energy consumption for specified time period.
 
 ### Configuration variables:
 * **time** (List): The list of time periods in `HH:MM-HH:MM` format.
-* **initial_value** (*Optional*, float): The initial value of the sensor.
-* **service** (*Optional*, string): The name of service published to `Home Assistant`.
+* **service** (*Optional*, string): The name of service to correct value published to `Home Assistant`.
 * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
 
 ## Lambda calls
@@ -100,3 +106,22 @@ From [lambdas](https://esphome.io/guides/automations.html#config-lambda), you ca
 
 ## energy_tariffs.on_before_tariff
 > Description will be provided soon...
+
+## Correct values without Home Assitant service
+```yaml
+number:
+  - platform: template
+    name: peak set
+    min_value: 0
+    max_value: 999999
+    step: 0.01
+    set_action:
+      lambda: id(peak).publish_state_and_save(x);
+  - platform: template
+    name: off-peak set
+    min_value: 0
+    max_value: 999999
+    step: 0.01
+    set_action:
+      lambda: id(offpeak).publish_state_and_save(x);
+```
