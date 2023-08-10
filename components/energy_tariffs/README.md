@@ -22,6 +22,7 @@ external_components:
         id: peak
         icon: "mdi:weather-sunny"
         service: peak_set
+        initial_value: 10.0
       - name: "$name Off-Peak Tariff"
         id: offpeak
         icon: "mdi:weather-night"
@@ -54,6 +55,7 @@ Provide energy consumption for specified time period.
 
 ### Configuration variables:
 * **time** (List): The list of time periods in `HH:MM-HH:MM` format.
+* **initial_value** (*Optional*, float): The initial value of the sensor.
 * **service** (*Optional*, string): The name of service published to `Home Assistant`.
 * Any options from [Sensor](https://esphome.io/components/sensor/index.html#config-sensor).
 

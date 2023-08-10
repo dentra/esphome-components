@@ -16,7 +16,11 @@ void EnergyTariff::dump_config() {
   for (auto const &t : this->time_) {
     ESP_LOGCONFIG(TAG, "    Time: %02d:%02d-%02d:%02d", t.min / 60, t.min % 60, t.max / 60, t.max % 60);
   }
-  ESP_LOGCONFIG(TAG, "    State: %f", this->state);
+  if (!std::isnan(this->initial_value_)) {
+    ESP_LOGCONFIG(TAG, "    Initial value: %.2f", this->initial_value_);
+  }
+
+  ESP_LOGCONFIG(TAG, "    State: %.2f", this->state);
 }
 
 void EnergyTariff::setup() {
@@ -26,18 +30,18 @@ void EnergyTariff::setup() {
   if (this->rtc_.load(&loaded)) {
     this->publish_state_and_save(loaded);
   } else {
-    this->publish_state_and_save(0);
+    this->publish_state_and_save(std::isnan(this->initial_value_) ? 0.0f : this->initial_value_);
   }
 
 #ifdef USE_API
-  if (!this->service.empty()) {
-    this->register_service(&EnergyTariff::publish_state_and_save, this->service, {"value"});
+  if (!this->service_.empty()) {
+    this->register_service(&EnergyTariff::publish_state_and_save, this->service_, {"value"});
   }
 #endif
 }
 
 void EnergyTariff::publish_state_and_save(float state) {
-  ESP_LOGD(TAG, "'%s': Setting new state to %f", this->get_name().c_str(), state);
+  ESP_LOGD(TAG, "'%s': Setting new state to %.2f", this->get_name().c_str(), state);
   this->publish_state(state);
   this->rtc_.save(&state);
 }

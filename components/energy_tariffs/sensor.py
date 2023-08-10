@@ -12,6 +12,7 @@ from esphome.const import (
     CONF_TOTAL,
     CONF_TRIGGER_ID,
     CONF_SERVICE,
+    CONF_INITIAL_VALUE,
     CONF_UNIT_OF_MEASUREMENT,
     DEVICE_CLASS_ENERGY,
     ENTITY_CATEGORY_CONFIG,
@@ -125,6 +126,7 @@ TARIFF_SCHEMA = sensor.sensor_schema(
             cv.ensure_list(validate_tariff_time), cv.Length(min=1, max=3)
         ),
         cv.Optional(CONF_SERVICE): cv.valid_name,
+        cv.Optional(CONF_INITIAL_VALUE): cv.positive_float,
     }
 )
 
@@ -220,6 +222,8 @@ async def to_code(config):
         cg.add(var.add_tariff(sens))
         if CONF_SERVICE in conf:
             cg.add(sens.set_service(conf[CONF_SERVICE]))
+        if CONF_INITIAL_VALUE in conf:
+            cg.add(sens.set_initial_value(conf[CONF_INITIAL_VALUE]))
 
     for conf in config.get(CONF_ON_TARIFF, []):
         trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)
