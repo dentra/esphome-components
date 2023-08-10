@@ -1,6 +1,6 @@
 substitutions:
-  name: "ZMAi-90"
-  node_name: zmai90
+  friendly_name: "Energy Meter"
+  node_name: "energy-meter"
 
   # ZMAi-90 TuyaMCU datapoints
   dp_switch: "1"
@@ -11,9 +11,10 @@ substitutions:
 
 esphome:
   name: $node_name
+  friendly_name: $friendly_name
   project:
     name: "dentra.zmai90v2"
-    version: "2022.6.0"
+    version: "2023.6.0"
 
 esp8266:
   board: esp01_1m
@@ -24,6 +25,7 @@ preferences:
 
 external_components:
   - source: github://dentra/esphome-components
+    refresh: 0s
 
 backup:
 
@@ -32,7 +34,7 @@ wifi:
   password: !secret wifi_password
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "$name Fallback Hotspot"
+    ssid: "$friendly_name Hotspot"
     password: !secret wifi_ap_password
   fast_connect: true
 
@@ -49,6 +51,7 @@ web_server:
 time:
   platform: homeassistant
   id: g_time
+  timezone: UTC-3
 # Uncomment next 4 lines if you want to force update values from Tuya MCU every 10 seconds
 #    on_time:
 #      seconds: 9,19,29,39,49,59
@@ -73,20 +76,20 @@ switch:
   # Uncomment next 5 lines to expose main switch to HA
   #  - platform: "tuya"
   #    id: sw_power
-  #    name: "$name"
+  #    name: None
   #    switch_datapoint: $dp_switch
   #    icon: "mdi:power"
   # Uncomment next 5 lines if you want a switch to query the device working status by forces update values from Tuya MCU
   # - platform: "uart"
   #   id: sw_tuya_query_status
   #   data: [0x55, 0xaa, 0x00, 0x08, 0x00, 0x00, 0x07]
-  #   name: "$name Force update"
+  #   name: "Force update"
   #   icon: mdi:reload
 
 text_sensor:
   - platform: "template"
     id: current_tariff
-    name: "$name Current Tariff"
+    name: "Current Tariff"
     icon: "mdi:theme-light-dark"
     entity_category: diagnostic
 
@@ -95,7 +98,7 @@ sensor:
   # total
   - platform: "tuya"
     id: total
-    name: "$name Energy Total"
+    name: "Total"
     sensor_datapoint: $dp_total
     accuracy_decimals: 3
     filters:
@@ -103,14 +106,14 @@ sensor:
     unit_of_measurement: "kWh"
     icon: "mdi:sigma"
     device_class: "energy"
-    # i am not interesting in total but tariffs, so you can comment or set it to false if you want internal total sensor
-    internal: true
+
     state_class: total_increasing
+    entity_category: diagnostic
 
   # active power
   - platform: "tuya"
     id: power
-    name: "$name Active Power"
+    name: "Active Power"
     sensor_datapoint: $dp_power
     accuracy_decimals: 1
     filters:
@@ -123,7 +126,7 @@ sensor:
   # current
   - platform: "tuya"
     id: current
-    name: "${name} Current"
+    name: "Current"
     sensor_datapoint: $dp_current
     accuracy_decimals: 3
     filters:
@@ -136,7 +139,7 @@ sensor:
   # voltage
   - platform: "tuya"
     id: voltage
-    name: "$name Voltage"
+    name: "Voltage"
     sensor_datapoint: $dp_voltage
     accuracy_decimals: 1
     filters:
@@ -152,17 +155,19 @@ sensor:
     voltage: voltage
     current: current
     apparent_power:
-      name: "$name Apparent Power"
+      name: "Apparent Power"
       filters:
         - throttle_average: 60s
         - filter_out: nan
     reactive_power:
-      name: "$name Reactive Power"
+      name: "Reactive Power"
       filters:
         - throttle_average: 60s
         - filter_out: nan
     power_factor:
-      name: "$name Power Factor"
+      name: "Power Factor"
+      # icon: "mdi:angle-acute"
+      # unit_of_measurement: "%"
       filters:
         - throttle_average: 60s
         - filter_out: nan
@@ -172,19 +177,20 @@ sensor:
     total: total
     energy_today:
       id: today
-      name: "$name Energy Today"
+      name: "Energy Today"
 
   - platform: "energy_tariffs"
     id: tariffs
     total: total
     time_offset:
-      name: "$name Time Offset"
+      name: "Time Offset"
+      id: time_offset
     tariffs:
-      - name: "$name Peak Tariff"
+      - name: "Peak Tariff"
         id: peak
         icon: "mdi:weather-sunny"
         service: peak_set
-      - name: "$name Off-Peak Tariff"
+      - name: "Off-Peak Tariff"
         id: offpeak
         icon: "mdi:weather-night"
         time: "23:00-07:00"
@@ -201,8 +207,8 @@ sensor:
       - uart.write: [0x55, 0xaa, 0x00, 0x08, 0x00, 0x00, 0x07]
 
   - platform: uptime
-    name: "$name Uptime"
+    name: "Uptime"
     device_class: duration
 
   - platform: wifi_signal
-    name: "$name WiFi Signal"
+    name: "WiFi Signal"
