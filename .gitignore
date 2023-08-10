@@ -30,3 +30,6 @@ CMakeLists.txt
 /.clang-tidy
 /.editorconfig
 /.pylintrc
+/pylintrc
+/.clang-tidy
+
