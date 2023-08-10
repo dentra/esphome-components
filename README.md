@@ -10,7 +10,7 @@
 [license-shield]: https://img.shields.io/static/v1?label=License&message=MIT&color=orange&logo=license
 [license]: https://opensource.org/licenses/MIT
 
-[esphome-release-shield]: https://img.shields.io/static/v1?label=ESPHome&message=2023.6&color=green&logo=esphome
+[esphome-release-shield]: https://img.shields.io/static/v1?label=ESPHome&message=2023.7&color=green&logo=esphome
 [esphome-release]: https://GitHub.com/esphome/esphome/releases/
 
 [open-in-vscode-shield]: https://img.shields.io/static/v1?label=+&message=Open+in+VSCode&color=blue&logo=visualstudiocode
@@ -53,7 +53,7 @@ Save your config back to firmware and download it.
 Turn your ZMAi-90 on V9821 chip into ESPHome device.
 
 ## [MIOT Platform](components/miot/)
-The MIOT Platform is alternative implementation of Xiaomi BLE protocol.
+The MIOT Platform is alternative implementation of ESPHome Xiaomi BLE protocol.
 At this moment there are list of supported device:
  * [Xiaomi Mi Smart Home Door/Window Sensor 2 (MCCGQ02HL)](components/miot_mccgq02hl/)
  * [Xiaomi Flood Sensor (SJWS01LM)](components/miot_sjws01lm/)
@@ -87,10 +87,10 @@ MIOT Platform based component to explore new BLE devices from Xiaomi ecosystem.
 Obtain beakonkey for Yeelight Remote (YLYK01YL), Dimmer (YLKG07YL/YLKG08YL), Bathroom Heater Remote (YLYB01YL-BHFRC), Fan Remote (YLYK01YL-VENFAN) and Ventilator Fan Remote (YLYK01YL-FANCL).
 
 ## [Electrolux Water Heater](https://github.com/dentra/esphome-ewh)
-Control Electrolux Water Heater and possibly other boilers (Ballu, Zanussi) using uart protocol.
+Control Electrolux/Ballu/Zanussi Water Heater using uart protocol.
 
 ## [Tion](https://github.com/dentra/esphome-tion)
-Control Tion Breezers Lite and 4S via BLE protocol.
+Control Tion Breezers Lite, 4S and 3S via BLE and UART protocol.
 
 ## [Crash Info](components/crash_info/)
 An ESP8266 remote crash detector.
