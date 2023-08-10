@@ -1,6 +1,6 @@
 substitutions:
-  friendly_name: "Energy Meter"
-  node_name: "energy-meter"
+  friendly_name: "ZMAi-90"
+  node_name: "zmai90"
 
   # ZMAi-90 TuyaMCU datapoints
   dp_switch: "1"
