@@ -5,7 +5,7 @@ from esphome import core
 from esphome.cpp_generator import MockObjClass
 from esphome.const import CONF_ID
 
-AUTO_LOAD = ["etl"]
+AUTO_LOAD = ["etl", "ble_client"]
 
 IS_PLATFORM_COMPONENT = True
 
