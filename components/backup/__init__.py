@@ -4,9 +4,9 @@ from pathlib import Path
 import logging
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.config import strip_default_ids
+from esphome.config import read_config, strip_default_ids
 from esphome.cpp_generator import ArrayInitializer
-from esphome.yaml_util import dump, load_yaml
+from esphome.yaml_util import dump
 from esphome.core import CORE, coroutine_with_priority, ID
 from esphome.components import web_server_base
 from esphome.components.web_server_base import CONF_WEB_SERVER_BASE_ID
@@ -47,7 +47,7 @@ CONFIG_SCHEMA = cv.Schema(
 
 
 def _dump_config():
-    return dump(strip_default_ids(load_yaml(CORE.config_path)))
+    return dump(strip_default_ids(read_config({})))
 
 
 @coroutine_with_priority(40.0)
