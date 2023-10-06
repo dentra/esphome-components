@@ -3,7 +3,7 @@
   "build": {
     "args": {
       // ESPHome version
-      "esphome_version": "2023.7.1",
+      "esphome_version": "2023.9.1",
       // additional APT dependicies
       "apt_deps": "bash-completion less",
       // additional PIP dependicies
@@ -34,6 +34,7 @@
         "python.languageServer": "Pylance",
         "python.formatting.provider": "black",
         "yaml.customTags": [
+          "!extend scalar",
           "!secret scalar",
           "!lambda scalar",
           "!include_dir_named scalar",

@@ -2,9 +2,9 @@
 
 set -e
 
-function info { echo -e "\e[32m[info] $*\e[39m"; }
-function warn { echo -e "\e[33m[warn] $*\e[39m"; }
-function error { echo -e "\e[31m[error] $*\e[39m"; exit 1; }
+function info { echo -e "\033[32m[info] $*\033[39m"; }
+function warn { echo -e "\033[33m[warn] $*\033[39m"; }
+function error { echo -e "\033[31m[error] $*\033[39m"; exit 1; }
 
 source $(dirname $0)/post-create-env
 
@@ -57,11 +57,11 @@ ext_compo() {
 }
 
 # take ownership of mounted folders
-files=(.esphome .pio .platformio)
+files=(.esphome .pio)
 for f in "${files[@]}" ; do
   if [ ! -d "$f" ]; then
     mkdir "$f"
-  else
+  elif [ $USER == "vscode" ]; then
     sudo chown -R vscode:vscode "$f"
   fi
 done
@@ -83,6 +83,7 @@ sedi "/sdkconfig_path/s/.temp/.esphome/" "$pio_ini"
 
 
 sedi "s/-DESPHOME_LOG_LEVEL/\${prj.build_flags}\n    -DESPHOME_LOG_LEVEL/" "$pio_ini"
+sedi "s/src_filter =/build_unflags =\n    \${prj.build_unflags}\nsrc_filter =/" "$pio_ini"
 sedi "s/esphome\/noise-c@/\${prj.lib_deps}\n    esphome\/noise-c@/" "$pio_ini"
 
 echo "" >> "$pio_ini"
@@ -98,6 +99,9 @@ done
 for d in "${external_components[@]}" ; do
   ext_compo $d
 done
+echo "    -std=gnu++2a" >> "$pio_ini"
+echo "build_unflags =" >> "$pio_ini"
+echo "    -std=gnu++11" >> "$pio_ini"
 echo "lib_deps =" >> "$pio_ini"
 for d in "${lib_deps[@]}" ; do
   echo "    $d" >> "$pio_ini"
@@ -108,21 +112,15 @@ sedi "s/include_dir = ./include_dir = .\nlibdeps_dir=.esphome\/libdeps\nbuild_di
 
 cpp_json=.vscode/c_cpp_properties.json
 
-# export PLATFORMIO_CORE_DIR=".platformio"
-export PLATFORMIO_LIB_DIR="/none"
-export PLATFORMIO_GLOBALLIB_DIR=""
+if [ $USER == "vscode" ]; then
+  # export PLATFORMIO_CORE_DIR=".platformio"
+  export PLATFORMIO_LIB_DIR="/none"
+  export PLATFORMIO_GLOBALLIB_DIR=""
+fi
 
-# if [ "$(find /esphome/.temp/platformio/* -maxdepth 0 -type d 2>/dev/null|wc -l)" -lt "1" ]; then
-  info "Updating vscode cpp environment to $pio_env..."
-  pio init --ide vscode --silent -e $pio_env
-  # sedi "/\\/workspaces\/esphome\/include/d" $cpp_json
-  # rm -rf CMakeLists.txt components/CMakeLists.txt
-# else
-  # echo "Cpp environment already configured. To reconfigure it you could run one the following commands:"
-  # echo "  pio init --ide vscode -e esp8266-arduino"
-  # echo "  pio init --ide vscode -e esp32-arduino"
-  # echo "  pio init --ide vscode -e esp32-idf"
-# fi
+
+info "Updating vscode cpp environment to $pio_env..."
+pio init --ide vscode --silent -e $pio_env
 rmdir .pio
 
 # additionally remove annoying pio ide recomendations
