@@ -5,7 +5,7 @@ from esphome import core
 from esphome.cpp_generator import MockObjClass
 from esphome.const import CONF_ID
 
-AUTO_LOAD = ["etl", "ble_client"]
+AUTO_LOAD = ["etl"]
 
 IS_PLATFORM_COMPONENT = True
 
@@ -13,7 +13,7 @@ CONF_VPORT_ID = "vport_id"
 CONF_VPORT_IO_ID = "vport_io_id"
 CONF_PERSISTENT_CONNECTION = "persistent_connection"
 CONF_DISABLE_SCAN = "disable_scan"
-
+CONF_COMMAND_INTERVAL = "command_interval"
 
 vport_ns = cg.esphome_ns.namespace("vport")
 VPort = vport_ns.class_("VPort")
@@ -29,6 +29,7 @@ def vport_schema(
     vport_class: MockObjClass,
     io_class: MockObjClass,
     default_update_interval=None,
+    default_command_interval="100ms",
 ):
     if not vport_class.inherits_from(VPort):
         raise cv.Invalid("Not a VPort Component")
@@ -36,6 +37,9 @@ def vport_schema(
         {
             cv.GenerateID(): cv.declare_id(vport_class),
             cv.GenerateID(CONF_VPORT_IO_ID): cv.declare_id(io_class),
+            cv.Optional(
+                CONF_COMMAND_INTERVAL, default=default_command_interval
+            ): cv.update_interval,
         }
     )
     if default_update_interval is None:
@@ -48,7 +52,7 @@ def vport_schema(
 def vport_ble_schema(
     vport_class: MockObjClass,
     io_class: MockObjClass,
-    default_update_interval="60s",
+    default_update_interval=None,
 ):
     return (
         vport_schema(vport_class, io_class, default_update_interval)
@@ -67,7 +71,7 @@ def vport_uart_schema(
     io_class: MockObjClass,
     default_update_interval=None,
 ):
-    return vport_schema(vport_class, io_class, default_update_interval).extend(
+    return vport_schema(vport_class, io_class, default_update_interval, "20ms").extend(
         uart.UART_DEVICE_SCHEMA
     )
 
@@ -98,7 +102,10 @@ async def setup_vport_ble(config):
 
     var = cg.new_Pvariable(config[CONF_ID], vio)
     await cg.register_component(var, config)
+
     cg.add(var.set_persistent_connection(config[CONF_PERSISTENT_CONNECTION]))
+    cg.add(var.set_command_interval(config[CONF_COMMAND_INTERVAL]))
+
     # FIXME reimplement and add again
     # cg.add(var.set_disable_scan(config[CONF_DISABLE_SCAN]))
     return var
@@ -109,11 +116,12 @@ async def setup_vport_uart(config):
     vio = cg.new_Pvariable(config[CONF_VPORT_IO_ID], urt)
     var = cg.new_Pvariable(config[CONF_ID], vio)
     await cg.register_component(var, config)
+    cg.add(var.set_command_interval(config[CONF_COMMAND_INTERVAL]))
     return var
 
 
 async def to_code(config):
     if "uart" in core.CORE.config:
         cg.add_build_flag("-DUSE_VPORT_UART")
-    if "esp32_ble_tracker" in core.CORE.config:
+    if "ble_client" in core.CORE.config:
         cg.add_build_flag("-DUSE_VPORT_BLE")

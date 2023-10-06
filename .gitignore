@@ -1,7 +1,7 @@
 .DS_Store
 
 /.esphome/
-/.platformio/
+/.platformio
 /config/
 **/.pioenvs/
 **/.piolibdeps/
