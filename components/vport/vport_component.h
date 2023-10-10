@@ -4,10 +4,15 @@
 
 #include "esphome/core/component.h"
 #include "esphome/core/helpers.h"
+#include "esphome/core/defines.h"
 
 #include "etl/circular_buffer.h"
 
 #include "vport.h"
+
+#ifndef USE_VPORT_COMMAND_QUEUE_SIZE
+#define USE_VPORT_COMMAND_QUEUE_SIZE 10
+#endif
 
 namespace esphome {
 namespace vport {
@@ -41,7 +46,7 @@ template<class impl_t> class VPortQComponent : public impl_t {
 
  protected:
   uint32_t command_interval_{};
-  etl::circular_buffer<std::vector<uint8_t>, 10> awaited_;
+  etl::circular_buffer<std::vector<uint8_t>, USE_VPORT_COMMAND_QUEUE_SIZE> awaited_;
 
   void enqueue_(const frame_spec_t &frame, size_t size) {
     const auto *data = reinterpret_cast<const uint8_t *>(&frame);

@@ -14,6 +14,7 @@ CONF_VPORT_IO_ID = "vport_io_id"
 CONF_PERSISTENT_CONNECTION = "persistent_connection"
 CONF_DISABLE_SCAN = "disable_scan"
 CONF_COMMAND_INTERVAL = "command_interval"
+CONF_COMMAND_QUEUE_SIZE = "command_queue_size"
 
 vport_ns = cg.esphome_ns.namespace("vport")
 VPort = vport_ns.class_("VPort")
@@ -40,6 +41,7 @@ def vport_schema(
             cv.Optional(
                 CONF_COMMAND_INTERVAL, default=default_command_interval
             ): cv.update_interval,
+            cv.Optional(CONF_COMMAND_QUEUE_SIZE, default=10): cv.int_range(2, 100),
         }
     )
     if default_update_interval is None:
@@ -117,6 +119,7 @@ async def setup_vport_uart(config):
     var = cg.new_Pvariable(config[CONF_ID], vio)
     await cg.register_component(var, config)
     cg.add(var.set_command_interval(config[CONF_COMMAND_INTERVAL]))
+    cg.add_define("USE_VPORT_COMMAND_QUEUE_SIZE", config[CONF_COMMAND_QUEUE_SIZE])
     return var
 
 
