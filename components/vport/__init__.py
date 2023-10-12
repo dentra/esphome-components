@@ -26,6 +26,12 @@ VPORT_CLIENT_SCHEMA = cv.Schema(
 )
 
 
+# def _add_command_queue_size(config):
+#     var: core.ID = config[CONF_ID]
+#     var.type = var.type.template(config[CONF_COMMAND_QUEUE_SIZE])
+#     return config
+
+
 def vport_schema(
     vport_class: MockObjClass,
     io_class: MockObjClass,
@@ -44,6 +50,7 @@ def vport_schema(
             cv.Optional(CONF_COMMAND_QUEUE_SIZE, default=10): cv.int_range(2, 100),
         }
     )
+    # schema = schema.add_extra(_add_command_queue_size)
     if default_update_interval is None:
         schema = schema.extend(cv.COMPONENT_SCHEMA)
     else:
@@ -106,7 +113,10 @@ async def setup_vport_ble(config):
     await cg.register_component(var, config)
 
     cg.add(var.set_persistent_connection(config[CONF_PERSISTENT_CONNECTION]))
+
     cg.add(var.set_command_interval(config[CONF_COMMAND_INTERVAL]))
+    # FIXME queue size configured for all components, but not concrete
+    cg.add_define("USE_VPORT_COMMAND_QUEUE_SIZE", config[CONF_COMMAND_QUEUE_SIZE])
 
     # FIXME reimplement and add again
     # cg.add(var.set_disable_scan(config[CONF_DISABLE_SCAN]))
@@ -118,8 +128,11 @@ async def setup_vport_uart(config):
     vio = cg.new_Pvariable(config[CONF_VPORT_IO_ID], urt)
     var = cg.new_Pvariable(config[CONF_ID], vio)
     await cg.register_component(var, config)
+
     cg.add(var.set_command_interval(config[CONF_COMMAND_INTERVAL]))
+    # FIXME queue size configured for all components, but not concrete
     cg.add_define("USE_VPORT_COMMAND_QUEUE_SIZE", config[CONF_COMMAND_QUEUE_SIZE])
+
     return var
 
 

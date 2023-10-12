@@ -17,6 +17,14 @@
 namespace esphome {
 namespace vport {
 
+// interface impl_t {
+//   using io_type = io_t;
+//   using frame_spec_type = frame_spec_t;
+//   // free connection.
+//   void q_free_connection_();
+//   // make a new connection. return true when connection already estabilished.
+//   bool q_make_connection_();
+// }
 template<class impl_t> class VPortQComponent : public impl_t {
   using io_t = typename impl_t::io_type;
   using frame_spec_t = typename impl_t::frame_spec_type;
@@ -26,11 +34,14 @@ template<class impl_t> class VPortQComponent : public impl_t {
  public:
   VPortQComponent(io_t *io) : impl_t(io) {}
 
-  void write(const frame_spec_t &frame, size_t size) override { this->enqueue_(frame, size); }
+  void write(const frame_spec_t &frame, size_t size) override {
+    const auto *data = reinterpret_cast<const uint8_t *>(&frame);
+    this->awaited_.push(std::vector<uint8_t>(data, data + size));
+  }
 
   void call_setup() override {
     this->setup();
-    if (this->command_interval_) {
+    if (this->command_interval_ > 0) {
       this->set_interval(COMMAND_NAME, this->command_interval_, [this]() { this->dequeue_(); });
     }
   }
@@ -42,29 +53,21 @@ template<class impl_t> class VPortQComponent : public impl_t {
     }
   }
 
-  void set_command_interval(uint32_t interval) { this->command_interval_ = interval; }
+  void set_command_interval(uint32_t command_interval) { this->command_interval_ = command_interval; }
 
  protected:
   uint32_t command_interval_{};
   etl::circular_buffer<std::vector<uint8_t>, USE_VPORT_COMMAND_QUEUE_SIZE> awaited_;
 
-  void enqueue_(const frame_spec_t &frame, size_t size) {
-    const auto *data = reinterpret_cast<const uint8_t *>(&frame);
-    this->awaited_.push(std::vector<uint8_t>(data, data + size));
-  }
-
   void dequeue_() {
     if (this->awaited_.empty()) {
-      impl_t::schedule_disconnect();
+      impl_t::q_free_connection_();
       return;
     }
 
-    if (!impl_t::is_connected()) {
-      impl_t::connect();
+    if (!impl_t::q_make_connection_()) {
       return;
     }
-
-    impl_t::cancel_disconnect();
 
     const auto &el = this->awaited_.front();
     const auto *frame = reinterpret_cast<const frame_spec_t *>(el.data());

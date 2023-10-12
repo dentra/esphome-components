@@ -33,14 +33,12 @@ class VPortUARTComponentImpl : public VPortIO<io_t, frame_spec_t>, public compon
   void loop() override { this->io_->poll(); }
 
   // required by VPortQComponent
-
-  void schedule_disconnect() {}
-  void cancel_disconnect() {}
-  bool is_connected() const { return true; }
-  void connect() {}
-  void disconnect() {}
   using io_type = io_t;
   using frame_spec_type = frame_spec_t;
+
+ protected:
+  void q_free_connection_() {}
+  bool q_make_connection_() { return true; }
 };
 
 template<class io_t, class frame_spec_t, class component_t = Component>

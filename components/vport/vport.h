@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <vector>
+#include "esphome/core/defines.h"
 
 namespace esphome {
 namespace vport {
@@ -9,9 +10,9 @@ namespace vport {
 #define VPORT_LOG(port_name) \
   ESP_LOGCONFIG(TAG, "Virtual %s port:", port_name); \
   if (this->command_interval_ == 0) { \
-    ESP_LOGCONFIG(TAG, "  Command interval: %" PRIu32 " ms", this->command_interval_); \
-  } else { \
     ESP_LOGCONFIG(TAG, "  Command interval: disabled"); \
+  } else { \
+    ESP_LOGCONFIG(TAG, "  Command interval: %" PRIu32 " ms", this->command_interval_); \
   }
 
 // TODO implement

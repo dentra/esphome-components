@@ -52,7 +52,7 @@ class VPortBLENode : public ble_client::BLEClientNode {
   bool disable_scan_{};
 };
 
-/// interface BleIO {
+/// interface io_t {
 ///   using on_frame_type = etl::delegate<void(const frame_spec_t &frame, size_t size)>;
 ///   void set_on_frame(on_frame_type &&reader);
 ///   using on_ready_type = etl::delegate<void()>;
@@ -78,21 +78,6 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
   void set_persistent_connection(bool persistent_connection) { this->persistent_connection_ = persistent_connection; }
   bool is_persistent_connection() const { return this->persistent_connection_; }
 
-  void schedule_disconnect() {
-    if (this->is_persistent_connection() && this->is_connected()) {
-      this->set_timeout(SCHEDULER_NAME, SCHEDULER_TIMEOUT, [this]() { this->disconnect(); });
-    }
-  }
-  void cancel_disconnect() {
-    if (this->is_persistent_connection()) {
-      this->cancel_timeout(SCHEDULER_NAME);
-    }
-  }
-
-  bool is_connected() const { return this->io_->is_connected(); }
-  void connect() { this->io_->connect(); }
-  void disconnect() { this->io_->disconnect(); }
-
   using io_type = io_t;
   using frame_spec_type = frame_spec_t;
 
@@ -101,12 +86,33 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
 
   void on_ready_() {
     this->fire_ready();
-    this->schedule_disconnect();
+    this->q_free_connection_();
   }
 
   void on_frame_(const frame_spec_t &frame, size_t size) {
     this->fire_frame(frame, size);
-    this->schedule_disconnect();
+    this->q_free_connection_();
+  }
+
+  void q_free_connection_() {
+    if (this->is_persistent_connection()) {
+      return;
+    }
+    if (!this->io_->is_connected()) {
+      return;
+    }
+    this->set_timeout(SCHEDULER_NAME, SCHEDULER_TIMEOUT, [this]() { this->io_->disconnect(); });
+  }
+
+  bool q_make_connection_() {
+    if (!this->io_->is_connected()) {
+      this->io_->connect();
+      return false;
+    }
+    if (!this->is_persistent_connection()) {
+      this->cancel_timeout(SCHEDULER_NAME);
+    }
+    return true;
   }
 };
 
