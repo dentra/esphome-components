@@ -24,13 +24,16 @@ class VPortUARTComponentImpl : public VPortIO<io_t, frame_spec_t>, public compon
   explicit VPortUARTComponentImpl(io_t *io) : VPortIO<io_t, frame_spec_t>(io) {}
 
   void call_setup() override {
-    this->setup();
+    component_t::call_setup();
     if (!this->is_failed()) {
       this->defer([this] { this->fire_ready(); });
     }
   }
 
-  void loop() override { this->io_->poll(); }
+  void call_loop() override {
+    component_t::call_loop();
+    this->io_->poll();
+  }
 
   // required by VPortQComponent
   using io_type = io_t;

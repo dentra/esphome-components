@@ -1,6 +1,7 @@
 #pragma once
 #ifdef USE_VPORT_BLE
 
+#include <type_traits>
 #include "esphome/components/ble_client/ble_client.h"
 #include "vport_component.h"
 
@@ -60,6 +61,7 @@ class VPortBLENode : public ble_client::BLEClientNode {
 ///   void write(const uint8_t *data, size_t size);
 /// };
 template<class io_t, class frame_spec_t, class component_t>
+
 class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public component_t {
   static_assert(std::is_base_of<Component, component_t>::value, "component_t must derived from Component class");
 

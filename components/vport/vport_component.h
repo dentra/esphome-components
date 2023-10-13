@@ -29,10 +29,13 @@ template<class impl_t> class VPortQComponent : public impl_t {
   using io_t = typename impl_t::io_type;
   using frame_spec_t = typename impl_t::frame_spec_type;
 
+  // static constexpr const char *TAG = "vport_component";
   static constexpr const char *COMMAND_NAME = "command";
 
  public:
   VPortQComponent(io_t *io) : impl_t(io) {}
+
+  void set_command_interval(uint32_t command_interval) { this->command_interval_ = command_interval; }
 
   void write(const frame_spec_t &frame, size_t size) override {
     const auto *data = reinterpret_cast<const uint8_t *>(&frame);
@@ -40,26 +43,24 @@ template<class impl_t> class VPortQComponent : public impl_t {
   }
 
   void call_setup() override {
-    this->setup();
+    impl_t::call_setup();
     if (this->command_interval_ > 0) {
-      this->set_interval(COMMAND_NAME, this->command_interval_, [this]() { this->dequeue_(); });
+      this->set_interval(COMMAND_NAME, this->command_interval_, [this]() { this->q_process_(); });
     }
   }
 
   void call_loop() override {
-    this->loop();
+    impl_t::call_loop();
     if (this->command_interval_ == 0) {
-      this->dequeue_();
+      this->q_process_();
     }
   }
-
-  void set_command_interval(uint32_t command_interval) { this->command_interval_ = command_interval; }
 
  protected:
   uint32_t command_interval_{};
   etl::circular_buffer<std::vector<uint8_t>, USE_VPORT_COMMAND_QUEUE_SIZE> awaited_;
 
-  void dequeue_() {
+  void q_process_() {
     if (this->awaited_.empty()) {
       impl_t::q_free_connection_();
       return;
