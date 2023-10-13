@@ -37,8 +37,8 @@ class VPortBLENode : public ble_client::BLEClientNode {
   virtual bool ble_reg_for_notify() const { return true; }
 
   bool is_connected() const { return this->node_state == esp32_ble_tracker::ClientState::ESTABLISHED; }
-  void connect() { this->parent()->set_enabled(true); }
-  void disconnect() { this->parent()->set_enabled(false); }
+  void connect();
+  void disconnect();
 
   void set_disable_scan(bool disable_scan) { this->disable_scan_ = disable_scan; }
 

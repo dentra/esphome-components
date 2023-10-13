@@ -84,12 +84,23 @@ void VPortBLENode::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
   }
 
   if (event == ESP_GATTC_DISCONNECT_EVT) {
+    ESP_LOGV(TAG, "Disconnected. Status: %d, reason: %d", param->close.status, param->close.reason);
+    this->node_state = esp32_ble_tracker::ClientState::IDLE;
     if (this->disable_scan_) {
       esp32_ble_tracker::global_esp32_ble_tracker->start_scan();
     }
   }
 
 #ifdef ESPHOME_LOG_HAS_VERBOSE
+  if (event == ESP_GATTC_OPEN_EVT) {
+    if (param->open.status == ESP_GATT_OK) {
+      ESP_LOGI(TAG, "Connected successfully");
+    } else {
+      ESP_LOGW(TAG, "Connection fails. Status: %d", param->open.status);
+    }
+    return;
+  }
+
   if (event == ESP_GATTC_REG_FOR_NOTIFY_EVT) {
     ESP_LOGV(TAG, "[%s] Registring for notify complete", ble_client->address_str().c_str());
     return;
@@ -125,6 +136,16 @@ bool VPortBLENode::write_ble_data(const uint8_t *data, uint16_t size) const {
 #endif
   return esp_ble_gattc_write_char(ble_client->get_gattc_if(), ble_client->get_conn_id(), this->char_tx_, size,
                                   const_cast<uint8_t *>(data), write_type, ESP_GATT_AUTH_REQ_NONE) == ESP_OK;
+}
+
+void VPortBLENode::connect() {
+  ESP_LOGD(TAG, "Enabling connection");
+  this->parent()->set_enabled(true);
+}
+
+void VPortBLENode::disconnect() {
+  ESP_LOGD(TAG, "Disabling connection");
+  this->parent()->set_enabled(false);
 }
 
 }  // namespace vport
