@@ -88,6 +88,7 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
 
  protected:
   bool persistent_connection_{};
+  bool disconnect_scheduled_{};
 
   void on_ready_() {
     this->fire_ready();
@@ -107,7 +108,13 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
       return;
     }
     ESP_LOGV("vport_ble", "Disconnecting...");
-    this->set_timeout(SCHEDULER_NAME, SCHEDULER_TIMEOUT, [this]() { this->io_->disconnect(); });
+    if (!this->disconnect_scheduled_) {
+      this->disconnect_scheduled_ = true;
+      this->set_timeout(SCHEDULER_NAME, SCHEDULER_TIMEOUT, [this]() {
+        this->io_->disconnect();
+        this->disconnect_scheduled_ = false;
+      });
+    }
   }
 
   bool q_make_connection_() {
@@ -117,6 +124,7 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
       return false;
     }
     if (!this->is_persistent_connection()) {
+      this->disconnect_scheduled_ = false;
       this->cancel_timeout(SCHEDULER_NAME);
     }
     return true;
