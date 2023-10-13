@@ -107,8 +107,8 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
     if (!this->io_->is_connected()) {
       return;
     }
-    ESP_LOGV("vport_ble", "Disconnecting...");
     if (!this->disconnect_scheduled_) {
+      ESP_LOGV("vport_ble", "Disconnecting...");
       this->disconnect_scheduled_ = true;
       this->set_timeout(SCHEDULER_NAME, SCHEDULER_TIMEOUT, [this]() {
         this->io_->disconnect();
