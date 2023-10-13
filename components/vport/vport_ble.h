@@ -2,7 +2,10 @@
 #ifdef USE_VPORT_BLE
 
 #include <type_traits>
+
 #include "esphome/components/ble_client/ble_client.h"
+#include "esphome/core/log.h"
+
 #include "vport_component.h"
 
 namespace esphome {
@@ -108,6 +111,7 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
 
   bool q_make_connection_() {
     if (!this->io_->is_connected()) {
+      ESP_LOGV("vport_ble", "Trying connect...");
       this->io_->connect();
       return false;
     }

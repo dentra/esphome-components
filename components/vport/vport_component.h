@@ -5,6 +5,7 @@
 #include "esphome/core/component.h"
 #include "esphome/core/helpers.h"
 #include "esphome/core/defines.h"
+#include "esphome/core/log.h"
 
 #include "etl/circular_buffer.h"
 
@@ -69,6 +70,8 @@ template<class impl_t> class VPortQComponent : public impl_t {
     if (!impl_t::q_make_connection_()) {
       return;
     }
+
+    ESP_LOGV("vport_component", "Processing queue: %zu of %zu", this->awaited_.size(), this->awaited_.max_size());
 
     const auto &el = this->awaited_.front();
     const auto *frame = reinterpret_cast<const frame_spec_t *>(el.data());
