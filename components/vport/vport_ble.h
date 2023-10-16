@@ -40,6 +40,7 @@ class VPortBLENode : public ble_client::BLEClientNode {
   virtual bool ble_reg_for_notify() const { return true; }
 
   bool is_connected() const { return this->node_state == esp32_ble_tracker::ClientState::ESTABLISHED; }
+  bool is_connecting() const { return !this->is_connected() && this->parent_->enabled; }
   void connect();
   void disconnect();
 
@@ -70,7 +71,7 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
 
   using super_t = VPortIO<io_t, frame_spec_t>;
 
-  static constexpr const char *SCHEDULER_NAME = "scheduler";
+  static constexpr const char *SCHEDULER_NAME = "vport_ble_queue";
   static constexpr uint32_t SCHEDULER_TIMEOUT = 3000;
 
  public:
@@ -108,7 +109,6 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
       return;
     }
     if (!this->disconnect_scheduled_) {
-      ESP_LOGV("vport_ble", "Disconnecting...");
       this->disconnect_scheduled_ = true;
       this->set_timeout(SCHEDULER_NAME, SCHEDULER_TIMEOUT, [this]() {
         this->io_->disconnect();
@@ -119,8 +119,9 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
 
   bool q_make_connection_() {
     if (!this->io_->is_connected()) {
-      ESP_LOGV("vport_ble", "Connecting...");
-      this->io_->connect();
+      if (!this->io_->is_connecting()) {
+        this->io_->connect();
+      }
       return false;
     }
     if (!this->is_persistent_connection()) {

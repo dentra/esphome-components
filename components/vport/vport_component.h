@@ -30,7 +30,6 @@ template<class impl_t> class VPortQComponent : public impl_t {
   using io_t = typename impl_t::io_type;
   using frame_spec_t = typename impl_t::frame_spec_type;
 
-  // static constexpr const char *TAG = "vport_component";
   static constexpr const char *COMMAND_NAME = "command";
 
  public:
@@ -71,7 +70,7 @@ template<class impl_t> class VPortQComponent : public impl_t {
       return;
     }
 
-    ESP_LOGV("vport_component", "Processing queue: %zu of %zu", this->awaited_.size(), this->awaited_.max_size());
+    ESP_LOGV("vport_queue", "Processing: %zu of %zu", this->awaited_.size(), this->awaited_.max_size());
 
     const auto &el = this->awaited_.front();
     const auto *frame = reinterpret_cast<const frame_spec_t *>(el.data());
