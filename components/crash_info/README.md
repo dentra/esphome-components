@@ -3,6 +3,8 @@
 An ESP8266 remote crash detector.
 With enabled indicator you can monitor crashes right from your Home Assistant.
 
+> For ESP-IDF please use [coredump](../coredump/) component.
+
 ## Advanced usage
 Connect to you ESP8266 and find crash backtrace information in the log.
 Copy stack frames and decode with `xtensa-lx106-elf-addr2line -aipfC -e $elf ...` command.

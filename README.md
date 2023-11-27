@@ -10,7 +10,7 @@
 [license-shield]: https://img.shields.io/static/v1?label=License&message=MIT&color=orange&logo=license
 [license]: https://opensource.org/licenses/MIT
 
-[esphome-release-shield]: https://img.shields.io/static/v1?label=ESPHome&message=2023.7&color=green&logo=esphome
+[esphome-release-shield]: https://img.shields.io/static/v1?label=ESPHome&message=2023.11&color=green&logo=esphome
 [esphome-release]: https://GitHub.com/esphome/esphome/releases/
 
 [open-in-vscode-shield]: https://img.shields.io/static/v1?label=+&message=Open+in+VSCode&color=blue&logo=visualstudiocode
@@ -94,6 +94,13 @@ Control Tion Breezers Lite, 4S and 3S via BLE and UART protocol.
 
 ## [Crash Info](components/crash_info/)
 An ESP8266 remote crash detector.
+
+## [Partitions](components/partitions/)
+Control partitions table from your yaml-configuration.
+
+## [Coredump](components/coredump/)
+Configure storage and downloading ESP-IDF core dump.
+
 
 ### Your thanks
 If this project was useful to you, you can buy me a Cup of coffee via

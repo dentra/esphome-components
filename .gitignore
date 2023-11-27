@@ -16,9 +16,10 @@
 
 /esphome
 /.pio
-/components-research
-
+/.venv
+/.build/
 /.vscode/
+/components-research
 
 CMakeListsPrivate.txt
 CMakeLists.txt
@@ -31,5 +32,5 @@ CMakeLists.txt
 /.editorconfig
 /.pylintrc
 /pylintrc
-/.clang-tidy
+
 

@@ -1,3 +1,7 @@
+# 2023-11-27
+* [+] new component `partitions`
+* [+] new component `coredump`
+
 # 2023-02-12
 * [+] new component `vport`
 * [+] new component `esp32_usb_dis`
