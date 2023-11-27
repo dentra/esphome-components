@@ -1,0 +1,14 @@
+from esphome.components import esp32
+
+DOMAIN = esp32.CONF_PARTITIONS
+
+CONF_PARTITION_NAME = "name"
+CONF_PARTITION_TYPE = "type"
+CONF_PARTITION_SUBTYPE = "subtype"
+CONF_PARTITION_OFFSET = "offset"
+CONF_PARTITION_SIZE = "size"
+CONF_PARTITION_FLAGS = "flags"
+
+PARTITION_APP = "app"
+
+PARTITIONS_FILENAME = f"{DOMAIN}_user.csv"
