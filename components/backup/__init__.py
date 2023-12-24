@@ -1,6 +1,7 @@
 from io import BytesIO
 from gzip import GzipFile
 from pathlib import Path
+import copy
 import logging
 import esphome.codegen as cg
 import esphome.config_validation as cv
@@ -47,7 +48,8 @@ CONFIG_SCHEMA = cv.Schema(
 
 
 def _dump_config():
-    return dump(strip_default_ids(read_config({})))
+    config = copy.deepcopy(CORE.config) if CORE.config else read_config({})
+    return dump(strip_default_ids(config))
 
 
 @coroutine_with_priority(40.0)
