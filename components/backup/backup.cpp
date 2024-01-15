@@ -2,7 +2,6 @@
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
 #include "esphome/core/util.h"
-#include "esphome/components/json/json_util.h"
 
 #include <cstdlib>
 
@@ -36,7 +35,7 @@ void Backup::handleRequest(AsyncWebServerRequest *request) {
   if (this->using_auth() && !request->authenticate(this->username_, this->password_)) {
     return request->requestAuthentication();
   }
-  auto *response = request->beginResponse_P(200, "plain/text;charset=UTF-8", this->data_, this->size_);
+  auto *response = request->beginResponse_P(200, "plain/text;charset=UTF-8", ESPHOME_BACKUP_DATA, ESPHOME_BACKUP_SIZE);
   response->addHeader("Content-Encoding", "gzip");
   request->send(response);
 }

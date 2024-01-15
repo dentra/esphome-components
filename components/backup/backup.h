@@ -6,6 +6,9 @@
 
 #include <vector>
 
+extern const uint8_t ESPHOME_BACKUP_DATA[] PROGMEM;
+extern const size_t ESPHOME_BACKUP_SIZE;
+
 namespace esphome {
 namespace backup {
 
@@ -17,13 +20,7 @@ class Backup : public Component, public AsyncWebHandler {
   void dump_config() override;
   float get_setup_priority() const override { return setup_priority::WIFI - 1.0f; }
 
-  void set_config(const uint8_t *data, size_t size) {
-    this->data_ = data;
-    this->size_ = size;
-  }
-
   void set_username(const char *username) { this->username_ = username; }
-
   void set_password(const char *password) { this->password_ = password; }
 
   bool using_auth() { return this->username_ != nullptr && this->password_ != nullptr; }

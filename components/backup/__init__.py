@@ -1,10 +1,9 @@
-from io import BytesIO
-from gzip import GzipFile
-from pathlib import Path
+import gzip
 import logging
+from copy import deepcopy
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.config import read_config, strip_default_ids
+from esphome.config import strip_default_ids
 from esphome.cpp_generator import ArrayInitializer
 from esphome.yaml_util import dump
 from esphome.core import CORE, coroutine_with_priority, ID
@@ -12,17 +11,15 @@ from esphome.components import web_server_base
 from esphome.components.web_server_base import CONF_WEB_SERVER_BASE_ID
 from esphome.const import (
     CONF_AUTH,
-    CONF_FORCE_UPDATE,
     CONF_ID,
     CONF_PASSWORD,
-    CONF_RAW_DATA_ID,
     CONF_USERNAME,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
 CODEOWNERS = ["@dentra"]
-AUTO_LOAD = ["web_server_base", "web_server"]
+AUTO_LOAD = ["web_server_base"]
 
 CONF_BACKUP = "backup"
 
@@ -41,14 +38,14 @@ CONFIG_SCHEMA = cv.Schema(
                 cv.Required(CONF_PASSWORD): cv.string_strict,
             }
         ),
-        cv.Optional(CONF_FORCE_UPDATE, default=False): cv.boolean,
     }
 ).extend(cv.COMPONENT_SCHEMA)
 
 
 def _dump_config():
-    return dump(strip_default_ids(read_config({})))
-
+    cfg = deepcopy(CORE.config)
+    cfg = strip_default_ids(cfg)
+    return dump(cfg, True)
 
 @coroutine_with_priority(40.0)
 async def to_code(config):
@@ -65,27 +62,13 @@ async def to_code(config):
             if password:
                 cg.add(var.set_password(password))
 
-    gz_io = BytesIO()
-    with GzipFile(
-        fileobj=gz_io,
-        mode="wb",
-        compresslevel=9,
-        mtime=None
-        if config[CONF_FORCE_UPDATE]
-        else Path(CORE.config_path).stat().st_mtime,
-    ) as f:
-        f.write(bytes(_dump_config(), encoding="utf8"))
+    tx_config = _dump_config()
+    print(tx_config)
+    gz_config = gzip.compress(tx_config.encode("utf-8"))
+    arr_size = len(gz_config)
+    arr_data = ', '.join(f"0x{x:02x}" for x in gz_config)
 
-    gz_config = gz_io.getvalue()
+    cg.add_global(cg.RawExpression(f"const uint8_t ESPHOME_BACKUP_DATA[{arr_size}] PROGMEM = {{{arr_data}}}"))
+    cg.add_global(cg.RawExpression(f"const size_t ESPHOME_BACKUP_SIZE = {arr_size}"))
 
-    arr = cg.progmem_array(
-        ID(
-            "backup_data_43c31a8938664f3a97597d916cb5c2ba",
-            is_declaration=True,
-            type=cg.uint8,
-        ),
-        ArrayInitializer(*[o for o in gz_config]),
-    )
-    cg.add(var.set_config(arr, len(gz_config)))
-
-    _LOGGER.info(f"Backup config will take: {len(gz_config)} bytes")
+    _LOGGER.info("Backup config will take: %u bytes", arr_size)
