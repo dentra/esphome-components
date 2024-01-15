@@ -9,7 +9,7 @@
 namespace esphome {
 namespace backup {
 
-class Backup : public Component {
+class Backup : public Component, public AsyncWebHandler {
  public:
   explicit Backup(web_server_base::WebServerBase *base) : base_(base) {}
 
@@ -27,6 +27,9 @@ class Backup : public Component {
   void set_password(const char *password) { this->password_ = password; }
 
   bool using_auth() { return this->username_ != nullptr && this->password_ != nullptr; }
+
+  bool canHandle(AsyncWebServerRequest *request) override;
+  void handleRequest(AsyncWebServerRequest *request) override;
 
  protected:
   web_server_base::WebServerBase *base_;
