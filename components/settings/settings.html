@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name=viewport content="width=device-width,initial-scale=1,user-scalable=no">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.classless.min.css">
+  <script>
+    function ee(e, id) {
+      return e.getElementById(id)
+    }
+
+    function ed(id) {
+      return ee(document, id)
+    }
+
+    function get(url, cb) {
+      var r = new XMLHttpRequest()
+      r.open('GET', url)
+      r.setRequestHeader('X-Requested-With', 'XMLHttpRequest')
+      r.onload = () => {
+        cb.call(r, JSON.parse(r.response))
+      };
+      r.send()
+      return r
+    }
+
+    /**
+      * @param {Node} the node
+      * @param {Object} the object with substitutions
+      */
+    function applyNodeSubstitutions(node, substitutions) {
+      applySubstitutions = (text, substitutions) => {
+        for (const substitution in substitutions) {
+          const search = "$" + substitution
+          const replace = substitutions[substitution]
+          while (text.includes(search)) {
+            text = text.replace(search, replace);
+          }
+        }
+        return text
+      }
+      node.innerHTML = applySubstitutions(node.innerHTML, substitutions)
+      return node
+    }
+
+    function constructSections(source) {
+      const defaults = {
+        type: "text",
+        value: "",
+        min: "",
+        max: "",
+        help: "",
+        step: "0.1"
+      }
+
+      const types = {
+        1: "int", 2: "int", 3: "int", 4: "int", 5: "int", 6: "int", 7: "int", 8: "int",
+        9: "str", 10: "bool", 11: "float", 12: "float",
+        13: "password", 14: "mac", 15: "int", 16: "timeout"
+      }
+
+      const sections = new Map()
+      sections.set("", []) // empty section is always first
+      for (const val of source) {
+        const section = val.section || ""
+        for (const def in defaults) {
+          if (!(def in val)) {
+            val[def] = defaults[def]
+          }
+        }
+        val.type = types[val.type]
+        if ((val.name || "").length == 0) {
+          val.name = val.key
+        }
+        help = val.help || ""
+        if (help.length > 0 && !help.endsWith(".")) {
+          val.help = help + "."
+        }
+
+        var current = sections.get(section)
+        if (!current) {
+          current = []
+          sections.set(section, current)
+        }
+        current.push(val)
+      }
+
+      return sections
+    }
+
+    function updateInput(val) {
+      const inp = ed("$" + val.key)
+      inp.addEventListener("input", (event) => {
+        inp.setAttribute("aria-invalid", !inp.validity.valid)
+      })
+
+
+      if (val.type == "str" && val.min > 0) {
+        inp.required = true
+      }
+
+      if (val.type == "bool") {
+        inp.checked = val.value
+      } else {
+        inp.value = val.value
+      }
+
+      if (val.accuracy_decimals > 0) {
+        inp.step = Math.pow(10.0, -val.accuracy_decimals)
+      }
+
+      const hid = document.createElement("input")
+      hid.id = "_" + inp.id
+      hid.type = "hidden"
+      if (val.accuracy_decimals > 0) {
+        hid.value = val.value.toFixed(val.accuracy_decimals)
+      } else {
+        hid.value = val.value
+      }
+
+      inp.form.appendChild(hid)
+    }
+
+    function applyFormFields(sections) {
+      const form = ed("form_fields")
+      const tpl_section = ed("tpl_section")
+      const tpl_section_empty = ed("tpl_section_empty")
+      for (const [section, vars] of sections) {
+        fields = ""
+        for (const val of vars) {
+          var tpl_input = ed("tpl_input_" + val.type)
+          if (!tpl_input) {
+            tpl_input = ed("tpl_input_str")
+          }
+          node_input = applyNodeSubstitutions(tpl_input.cloneNode(true), val)
+          fields += "<div>" + node_input.innerHTML + "</div>"
+        }
+        const node_section = (section == "" ? tpl_section_empty : tpl_section).cloneNode(true)
+        applyNodeSubstitutions(node_section, { section: section, fields: fields })
+        form.appendChild(document.importNode(node_section.content, true))
+
+        for (const val of vars) {
+          updateInput(val)
+        }
+      }
+    }
+
+    function updateUnchanged(form) {
+      for (inp of document.querySelectorAll("form input:not([type=hidden])")) {
+        hid = ed("_" + inp.id)
+        if (!hid) {
+          continue
+        }
+        hid.name = ""
+        inp_value = inp.value
+        hid_value = hid.value
+        switch (inp.type) {
+          case "checkbox":
+            inp_value = inp.checked.toString()
+            break
+          case "number":
+            if (inp.step < 0) {
+              accuracy_decimals = 0
+              v = inp.step;
+              while (v < 1) {
+                v *= 10
+                accuracy_decimals++
+              }
+              inp_value = parseFloat(inp_value).toFixed(accuracy_decimals)
+            }
+            break
+          default:
+            inp_value = inp_value.trim()
+            break
+        }
+        if (inp_value != hid_value) {
+          hid.value = inp_value
+          hid.name = inp.id.substr(1)
+        }
+      }
+    }
+
+    function initForm(method) {
+      const form = document.getElementsByTagName("form")[0]
+      form.novalidate = true
+      form.method = method
+      form.addEventListener("submit", (event) => {
+        event.preventDefault()
+        if (form.checkValidity()) {
+          updateUnchanged(form)
+          form.submit()
+          return
+        }
+        for (const inp of ed("form_fields").getElementsByTagName("input")) {
+          if (inp.type == "submit" || inp.type == "reset") {
+            continue
+          }
+          if (inp.validity.valid) {
+            inp.removeAttribute("aria-invalid")
+          } else {
+            inp.parentNode.parentNode.setAttribute("open", "")
+            inp.setAttribute("aria-invalid", true)
+          }
+        }
+        form.reportValidity()
+      })
+
+      if (method == "get") {
+        const hid = document.createElement("input");
+        hid.type = "hidden"
+        hid.name = "_"
+        form.appendChild(hid)
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      var xhr = get('settings.json', (r) => {
+        document.title = r.t + " settings"
+        ed("esp_name").innerHTML = document.title
+        applyFormFields(constructSections(r.v))
+        initForm(r.m || "post")
+        document.getElementById("loader").style.display = "none"
+        document.getElementById("content").style.display = "block"
+      });
+    })
+  </script>
+  <style>
+    :where(input[type=checkbox])+small {
+      padding-top: var(--spacing);
+    }
+
+    input:is([type=submit], [type=reset]) {
+      width: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <article aria-busy="true" id="loader">Loading settings. Please wait…</article>
+    <div id="content" style="display: none;">
+      <h1 id="esp_name"></h1>
+      <form action="" novalidate>
+        <div id="form_fields"></div>
+        <input type="submit" />
+      </form>
+    </div>
+    <template id="tpl_section_empty">
+      $fields
+    </template>
+    <template id="tpl_section">
+      <details>
+        <summary>$section</summary>
+        $fields
+      </details>
+    </template>
+    <template id="tpl_input_str">
+      <label for="$key">
+        $name
+        <input type="text" id="$$key" placeholder="$name" minlength="$min" maxlength="$max" />
+        <small>$help</small>
+      </label>
+    </template>
+    <template id="tpl_input_password">
+      <label for="$key">
+        $name
+        <input type="password" id="$$key" placeholder="$name" minlength="$min" maxlength="$max" />
+        <small>$help</small>
+      </label>
+    </template>
+    <template id="tpl_input_mac">
+      <label for="$key">
+        $name
+        <input type="text" id="$$key" placeholder="$name" minlength="17" maxlength="17"
+          pattern="[\da-fA-F]{2}:[\da-fA-F]{2}:[\da-fA-F]{2}:[\da-fA-F]{2}:[\da-fA-F]{2}:[\da-fA-F]{2}" />
+        <small>$help</small>
+      </label>
+    </template>
+    <template id="tpl_input_bool">
+      <label for="$key">
+        <input type="checkbox" id="$$key" placeholder="$name" role="switch" />
+        $name
+        <small>$help</small>
+      </label>
+    </template>
+    <template id="tpl_input_int">
+      <label for="$key">
+        $name
+        <input type="number" id="$$key" placeholder="$name" min="$min" max="$max" step="1" />
+        <small>$help</small>
+      </label>
+    </template>
+    <template id="tpl_input_timeout">
+      <label for="$key">
+        $name
+        <input type="number" id="$$key" placeholder="$name" min="0" max="$max" step="10" />
+        <small>$help
+          Can be disabled by setting this to 0.</small>
+      </label>
+    </template>
+    <template id="tpl_input_float">
+      <label for="$key">
+        $name
+        <input type="number" id="$$key" placeholder="$name" min="$min" max="$max" step="$step" />
+        <small>$help</small>
+      </label>
+    </template>
+  </main>
+</body>
+
+</html>

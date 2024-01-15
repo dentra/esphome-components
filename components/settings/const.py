@@ -1,0 +1,20 @@
+from esphome import const
+
+CONF_VAR_PRESET = const.CONF_PRESET
+CONF_VAR_SECTION = "section"
+CONF_VAR_NAME = const.CONF_NAME
+CONF_VAR_HELP = "help"
+CONF_VAR_TYPE = const.CONF_TYPE
+CONF_VAR_VALUE = const.CONF_VALUE
+CONF_VAR_MIN = "min"
+CONF_VAR_MAX = "max"
+CONF_VAR_ACCURACY_DECIMALS = const.CONF_ACCURACY_DECIMALS
+CONF_VAR_IFDEF = "ifdef"
+CONF_VAR_GETTER = "getter"
+CONF_VAR_SETTER = "setter"
+CONF_VAR_COMP = "component"
+CONF_VAR_COMP_IDX = "component_idx"
+CONF_VAR_COMP_KEY = "component_key"
+
+DEFAULT_STR_SIZE = 31
+MAX_STR_SIZE = 511
