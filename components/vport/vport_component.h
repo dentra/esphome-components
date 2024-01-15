@@ -12,7 +12,7 @@
 #include "vport.h"
 
 #ifndef USE_VPORT_COMMAND_QUEUE_SIZE
-#define USE_VPORT_COMMAND_QUEUE_SIZE 10
+#define USE_VPORT_COMMAND_QUEUE_SIZE 16
 #endif
 
 namespace esphome {

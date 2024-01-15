@@ -1,9 +1,9 @@
 import esphome.codegen as cg
-from esphome.components import ble_client, uart
 import esphome.config_validation as cv
 from esphome import core
-from esphome.cpp_generator import MockObjClass
+from esphome.components import ble_client, uart
 from esphome.const import CONF_ID
+from esphome.cpp_generator import MockObjClass
 
 AUTO_LOAD = ["etl"]
 
@@ -47,7 +47,7 @@ def vport_schema(
             cv.Optional(
                 CONF_COMMAND_INTERVAL, default=default_command_interval
             ): cv.update_interval,
-            cv.Optional(CONF_COMMAND_QUEUE_SIZE, default=10): cv.int_range(2, 100),
+            cv.Optional(CONF_COMMAND_QUEUE_SIZE, default=16): cv.int_range(2, 100),
         }
     )
     # schema = schema.add_extra(_add_command_queue_size)
