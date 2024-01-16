@@ -1,3 +1,7 @@
+# 2024-01-15
+* [+] new component `settings`
+* [+] new component `nvs`
+
 # 2023-11-27
 * [+] new component `partitions`
 * [+] new component `coredump`
