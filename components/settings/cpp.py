@@ -15,8 +15,6 @@ Settings = settings_ns.class_("Settings", cg.Component)
 VariableType = settings_ns.enum("VariableType")
 VarInfo = settings_ns.namespace("VarInfo")
 
-_LOGGER = logging.getLogger(__name__)
-
 _CPP_TYPES = {
     var.VT_INT8: cgp.int8,
     var.VT_UINT8: cg.uint8,
@@ -121,7 +119,7 @@ async def _getter(v: var.Var) -> cpp.LambdaExpression:
     if callable(getter):
         c = _component(v)
         if c is None:
-            _LOGGER.warning("_getter component not found: %s", v.id)
+            logging.warning("_getter component not found: %s", v.id)
             return None
         getter = getter(c, _component_obj(v))
 
@@ -131,7 +129,7 @@ async def _getter(v: var.Var) -> cpp.LambdaExpression:
         getter = getter.as_hex
 
     if getter is None:
-        _LOGGER.warning("_getter is absent: %s", v.id)
+        logging.warning("_getter is absent: %s", v.id)
         return None
 
     return cpp.LambdaExpression(
@@ -228,7 +226,7 @@ async def _setter(v: var.Var, nvs: cg.MockObj):
 
     c = _component(v)
     if c is None:
-        _LOGGER.warning("_setter component not found: %s", v.id)
+        logging.warning("_setter component not found: %s", v.id)
         return None
 
     setter = setter(c, _component_obj(v))

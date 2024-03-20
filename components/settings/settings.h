@@ -75,7 +75,7 @@ class Settings : public AsyncWebHandler, public Component {
   bool canHandle(AsyncWebServerRequest *request) override;
   void handleRequest(AsyncWebServerRequest *request) override;
 
-  void register_variable(VarInfo &&info) { this->items_.push_back(info); }
+  void register_variable(VarInfo &&info) { this->items_.push_back(std::move(info)); }
 
   void load(void (*on_load)(const nvs_flash::NvsFlash &nvs));
 
