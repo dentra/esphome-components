@@ -119,9 +119,9 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
 
   bool q_make_connection_() {
     if (!this->io_->is_connected()) {
-      if (!this->io_->is_connecting()) {
-        this->io_->connect();
-      }
+      // if (!this->io_->is_connecting()) {
+      this->io_->connect();
+      // }
       return false;
     }
     if (!this->is_persistent_connection()) {

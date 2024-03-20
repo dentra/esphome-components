@@ -139,12 +139,12 @@ bool VPortBLENode::write_ble_data(const uint8_t *data, uint16_t size) const {
 }
 
 void VPortBLENode::connect() {
-  ESP_LOGD(TAG, "Enabling connection");
+  // ESP_LOGD(TAG, "Enabling connection");
   this->parent()->set_enabled(true);
 }
 
 void VPortBLENode::disconnect() {
-  ESP_LOGD(TAG, "Disabling connection");
+  // ESP_LOGD(TAG, "Disabling connection");
   this->parent()->set_enabled(false);
 }
 
