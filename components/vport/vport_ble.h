@@ -72,7 +72,9 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
   using super_t = VPortIO<io_t, frame_spec_t>;
 
   static constexpr const char *SCHEDULER_NAME = "vport_ble_queue";
+  static constexpr const char *CONNECT_NAME = "vport_ble_connect";
   static constexpr uint32_t SCHEDULER_TIMEOUT = 3000;
+  static constexpr uint32_t CONNECT_TIMEOUT = 300;
 
  public:
   VPortBLEComponentImpl(io_t *io) : super_t(io) {
@@ -119,9 +121,9 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
 
   bool q_make_connection_() {
     if (!this->io_->is_connected()) {
-      // if (!this->io_->is_connecting()) {
-      this->io_->connect();
-      // }
+      if (this->io_->is_connecting()) {
+        this->connect_();
+      }
       return false;
     }
     if (!this->is_persistent_connection()) {
@@ -129,6 +131,18 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
       this->cancel_timeout(SCHEDULER_NAME);
     }
     return true;
+  }
+
+  void connect_() {
+    this->io_->connect();
+    // Sometimes no ESP_GATTC_WRITE_DESCR_EVT received, so try to reconnect.
+    this->set_timeout(CONNECT_NAME, CONNECT_TIMEOUT, [this]() {
+      if (!this->io->is_connected()) {
+        ESP_LOGW(TAG, "Connection was not espablished. Reconnecting...");
+        this->io->disconnet();
+        // connection will be estabilished on next event loop.
+      }
+    });
   }
 };
 

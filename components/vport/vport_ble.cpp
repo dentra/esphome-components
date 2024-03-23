@@ -18,7 +18,7 @@ void VPortBLENode::dump_settings(const char *tag) const {
 
 void VPortBLENode::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if,
                                        esp_ble_gattc_cb_param_t *param) {
-  auto ble_client = this->parent_;
+  auto *ble_client = this->parent_;
 
   if (event == ESP_GATTC_NOTIFY_EVT) {
     ESP_LOGV(TAG, "[%s] Got notify for handle %04u: %s", ble_client->address_str().c_str(), param->notify.handle,
@@ -41,6 +41,7 @@ void VPortBLENode::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
     auto tx = ble_client->get_characteristic(this->ble_service_, this->ble_char_tx_);
     if (tx == nullptr) {
       ESP_LOGE(TAG, "[%s] Can't discover TX characteristics", ble_client->address_str().c_str());
+      this->disconnect();
       return;
     }
     this->char_tx_ = tx->handle;
@@ -48,6 +49,7 @@ void VPortBLENode::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
     auto rx = ble_client->get_characteristic(this->ble_service_, this->ble_char_rx_);
     if (rx == nullptr) {
       ESP_LOGE(TAG, "[%s] Can't discover RX characteristics", ble_client->address_str().c_str());
+      this->disconnect();
       return;
     }
     this->char_rx_ = rx->handle;
@@ -73,9 +75,9 @@ void VPortBLENode::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
     // let the device to do pair
     if (this->ble_sec_act_ != 0) {
       auto err = esp_ble_set_encryption(param->connect.remote_bda, this->ble_sec_act_);
-      ESP_LOGV(TAG, "[%s] Bonding complete: %s", ble_client->address_str().c_str(), YESNO(err == ESP_OK));
+      ESP_LOGV(TAG, "[%s] Pair complete: %s", ble_client->address_str().c_str(), YESNO(err == ESP_OK));
     } else {
-      ESP_LOGV(TAG, "[%s] Bonding skipped", ble_client->address_str().c_str());
+      ESP_LOGV(TAG, "[%s] Pair skipped", ble_client->address_str().c_str());
     }
     if (this->disable_scan_) {
       esp32_ble_tracker::global_esp32_ble_tracker->stop_scan();
@@ -126,7 +128,7 @@ bool VPortBLENode::write_ble_data(const uint8_t *data, uint16_t size) const {
     return false;
   }
 
-  auto ble_client = this->parent_;
+  auto *ble_client = this->parent_;
   ESP_LOGV(TAG, "[%s] Writing data to 0x%x: %s", ble_client->address_str().c_str(), this->char_tx_,
            format_hex_pretty(data, size).c_str());
 #ifdef ESPHOME_LOG_HAS_VERBOSE
@@ -146,6 +148,7 @@ void VPortBLENode::connect() {
 void VPortBLENode::disconnect() {
   // ESP_LOGD(TAG, "Disabling connection");
   this->parent()->set_enabled(false);
+  this->parent()->release_services();
 }
 
 }  // namespace vport
