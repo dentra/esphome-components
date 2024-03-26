@@ -1,4 +1,5 @@
 #pragma once
+#include "esphome/core/defines.h"
 #ifdef USE_VPORT_UART
 
 #include "esphome/core/component.h"
@@ -49,4 +50,4 @@ using VPortUARTComponent = VPortQComponent<VPortUARTComponentImpl<io_t, frame_sp
 
 }  // namespace vport
 }  // namespace esphome
-#endif
+#endif  // USE_VPORT_UART

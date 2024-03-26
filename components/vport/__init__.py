@@ -15,6 +15,7 @@ CONF_PERSISTENT_CONNECTION = "persistent_connection"
 CONF_DISABLE_SCAN = "disable_scan"
 CONF_COMMAND_INTERVAL = "command_interval"
 CONF_COMMAND_QUEUE_SIZE = "command_queue_size"
+CONF_CONNECTION_TIMEOUT = "connection_timeout"
 
 vport_ns = cg.esphome_ns.namespace("vport")
 VPort = vport_ns.class_("VPort")
@@ -48,6 +49,7 @@ def vport_schema(
                 CONF_COMMAND_INTERVAL, default=default_command_interval
             ): cv.update_interval,
             cv.Optional(CONF_COMMAND_QUEUE_SIZE, default=16): cv.int_range(2, 100),
+            cv.Optional(CONF_CONNECTION_TIMEOUT): cv.positive_time_period_milliseconds,
         }
     )
     # schema = schema.add_extra(_add_command_queue_size)
@@ -105,38 +107,50 @@ async def vport_get_var(config):
     return await cg.get_variable(config[CONF_VPORT_ID])
 
 
-async def setup_vport_ble(config):
-    vio = cg.new_Pvariable(config[CONF_VPORT_IO_ID])
-    await ble_client.register_ble_node(vio, config)
-
+async def _setup_vport_core(config, vio):
     var = cg.new_Pvariable(config[CONF_ID], vio)
     await cg.register_component(var, config)
-
-    cg.add(var.set_persistent_connection(config[CONF_PERSISTENT_CONNECTION]))
 
     cg.add(var.set_command_interval(config[CONF_COMMAND_INTERVAL]))
     # FIXME queue size configured for all components, but not concrete
     cg.add_define("USE_VPORT_COMMAND_QUEUE_SIZE", config[CONF_COMMAND_QUEUE_SIZE])
 
+    return var
+
+
+async def setup_vport_ble(config):
+    vio = cg.new_Pvariable(config[CONF_VPORT_IO_ID])
+    await ble_client.register_ble_node(vio, config)
+
+    var = await _setup_vport_core(config, vio)
+
+    if value := config.get(CONF_PERSISTENT_CONNECTION, False):
+        cg.add(var.set_persistent_connection(value))
+
     # FIXME reimplement and add again
     # cg.add(var.set_disable_scan(config[CONF_DISABLE_SCAN]))
+
+    if value := config.get(CONF_CONNECTION_TIMEOUT, 0):
+        cg.add(var.set_connection_timeout(value))
+
+    cg.add_define("USE_VPORT_BLE")
+
     return var
 
 
 async def setup_vport_uart(config):
     urt = await cg.get_variable(config[uart.CONF_UART_ID])
     vio = cg.new_Pvariable(config[CONF_VPORT_IO_ID], urt)
-    var = cg.new_Pvariable(config[CONF_ID], vio)
-    await cg.register_component(var, config)
 
-    cg.add(var.set_command_interval(config[CONF_COMMAND_INTERVAL]))
-    # FIXME queue size configured for all components, but not concrete
-    cg.add_define("USE_VPORT_COMMAND_QUEUE_SIZE", config[CONF_COMMAND_QUEUE_SIZE])
+    var = await _setup_vport_core(config, vio)
+
+    cg.add_define("USE_VPORT_UART")
 
     return var
 
 
 async def to_code(config):
+    # FIXME remove due to add_define in setup
     if "uart" in core.CORE.config:
         cg.add_build_flag("-DUSE_VPORT_UART")
     if "ble_client" in core.CORE.config:

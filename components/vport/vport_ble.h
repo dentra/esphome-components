@@ -1,4 +1,5 @@
 #pragma once
+#include "esphome/core/defines.h"
 #ifdef USE_VPORT_BLE
 
 #include <type_traits>
@@ -14,7 +15,8 @@ namespace vport {
 #define VPORT_BLE_LOG(port_name) \
   VPORT_LOG(port_name); \
   this->io_->dump_settings(TAG); \
-  ESP_LOGCONFIG(TAG, "  Persistent connection: %s", ONOFF(this->persistent_connection_));
+  ESP_LOGCONFIG(TAG, "  Persistent connection: %s", ONOFF(this->persistent_connection_)); \
+  ESP_LOGCONFIG(TAG, "  Connection Timeout: %.1f s", this->connection_timeout_ * 0.001f);
 
 class VPortBLENode : public ble_client::BLEClientNode {
  public:
@@ -39,8 +41,13 @@ class VPortBLENode : public ble_client::BLEClientNode {
 
   virtual bool ble_reg_for_notify() const { return true; }
 
-  bool is_connected() const { return this->node_state == esp32_ble_tracker::ClientState::ESTABLISHED; }
-  bool is_connecting() const { return !this->is_connected() && this->parent_->enabled; }
+  bool is_connected() const {
+    return this->parent_->enabled && this->node_state == esp32_ble_tracker::ClientState::ESTABLISHED;
+  }
+  bool is_connecting() const {
+    return this->parent_->enabled && this->node_state == esp32_ble_tracker::ClientState::CONNECTING;
+  }
+
   void connect();
   void disconnect();
 
@@ -71,10 +78,10 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
 
   using super_t = VPortIO<io_t, frame_spec_t>;
 
-  static constexpr const char *SCHEDULER_NAME = "vport_ble_queue";
-  static constexpr const char *CONNECT_NAME = "vport_ble_connect";
-  static constexpr uint32_t SCHEDULER_TIMEOUT = 3000;
-  static constexpr uint32_t CONNECT_TIMEOUT = 1000;
+  static constexpr const char *SCHEDULER_TIMEOUT_NAME = "vport_ble_queue";
+  static constexpr const char *CONNECTION_TIMEOUT_NAME = "vport_ble_connect";
+  static constexpr uint32_t SCHEDULER_TIMEOUT = 2000;
+  static constexpr uint32_t CONNECTION_TIMEOUT = 2000;
 
  public:
   VPortBLEComponentImpl(io_t *io) : super_t(io) {
@@ -85,6 +92,7 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
 
   void set_persistent_connection(bool persistent_connection) { this->persistent_connection_ = persistent_connection; }
   bool is_persistent_connection() const { return this->persistent_connection_; }
+  void set_connection_timeout(uint32_t connection_timeout) { this->connection_timeout_ = connection_timeout; }
 
   using io_type = io_t;
   using frame_spec_type = frame_spec_t;
@@ -92,8 +100,10 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
  protected:
   bool persistent_connection_{};
   bool disconnect_scheduled_{};
+  uint32_t connection_timeout_{2000};
 
   void on_ready_() {
+    this->cancel_timeout(CONNECTION_TIMEOUT_NAME);
     this->fire_ready();
     this->q_free_connection_();
   }
@@ -112,7 +122,7 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
     }
     if (!this->disconnect_scheduled_) {
       this->disconnect_scheduled_ = true;
-      this->set_timeout(SCHEDULER_NAME, SCHEDULER_TIMEOUT, [this]() {
+      this->set_timeout(SCHEDULER_TIMEOUT_NAME, SCHEDULER_TIMEOUT, [this]() {
         this->io_->disconnect();
         this->disconnect_scheduled_ = false;
       });
@@ -122,27 +132,24 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
   bool q_make_connection_() {
     if (!this->io_->is_connected()) {
       if (!this->io_->is_connecting()) {
-        this->connect_();
+        this->io_->connect();
+        // Poor connection sometimes leads to some ESP_GATTC events are not received,
+        // so we will drop this connection and reconnect.
+        this->set_timeout(CONNECTION_TIMEOUT_NAME, this->connection_timeout_, [this]() {
+          if (this->io_->is_connecting()) {
+            ESP_LOGW("vport_ble", "Connection was not established for %u ms", CONNECTION_TIMEOUT);
+            this->io_->disconnect();
+            // connection will be estabilished on next event loop.
+          }
+        });
       }
       return false;
     }
     if (!this->is_persistent_connection()) {
       this->disconnect_scheduled_ = false;
-      this->cancel_timeout(SCHEDULER_NAME);
+      this->cancel_timeout(SCHEDULER_TIMEOUT_NAME);
     }
     return true;
-  }
-
-  void connect_() {
-    this->io_->connect();
-    // Sometimes no ESP_GATTC_WRITE_DESCR_EVT received, so try to reconnect.
-    this->set_timeout(CONNECT_NAME, CONNECT_TIMEOUT, [this]() {
-      if (this->io_->is_connecting()) {
-        ESP_LOGW("vport_ble", "Connection was not established. Reconnecting...");
-        this->io_->disconnect();
-        // connection will be estabilished on next event loop.
-      }
-    });
   }
 };
 
@@ -151,4 +158,4 @@ using VPortBLEComponent = VPortQComponent<VPortBLEComponentImpl<io_t, frame_spec
 
 }  // namespace vport
 }  // namespace esphome
-#endif
+#endif // USE_VPORT_BLE

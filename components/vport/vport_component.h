@@ -2,9 +2,9 @@
 
 #include <cinttypes>
 
+#include "esphome/core/defines.h"
 #include "esphome/core/component.h"
 #include "esphome/core/helpers.h"
-#include "esphome/core/defines.h"
 #include "esphome/core/log.h"
 
 #include "etl/circular_buffer.h"
@@ -30,7 +30,7 @@ template<class impl_t> class VPortQComponent : public impl_t {
   using io_t = typename impl_t::io_type;
   using frame_spec_t = typename impl_t::frame_spec_type;
 
-  static constexpr const char *COMMAND_NAME = "command";
+  static constexpr const char *COMMAND_INTERVAL_NAME = "command";
 
  public:
   VPortQComponent(io_t *io) : impl_t(io) {}
@@ -45,7 +45,7 @@ template<class impl_t> class VPortQComponent : public impl_t {
   void call_setup() override {
     impl_t::call_setup();
     if (this->command_interval_ > 0) {
-      this->set_interval(COMMAND_NAME, this->command_interval_, [this]() { this->q_process_(); });
+      this->set_interval(COMMAND_INTERVAL_NAME, this->command_interval_, [this]() { this->q_process_(); });
     }
   }
 
@@ -70,7 +70,7 @@ template<class impl_t> class VPortQComponent : public impl_t {
       return;
     }
 
-    ESP_LOGV("vport_queue", "Processing: %zu of %zu", this->awaited_.size(), this->awaited_.max_size());
+    ESP_LOGV("vport_queue", "Processing: %zu of max %zu", this->awaited_.size(), this->awaited_.max_size());
 
     const auto &el = this->awaited_.front();
     const auto *frame = reinterpret_cast<const frame_spec_t *>(el.data());

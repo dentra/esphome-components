@@ -1,3 +1,4 @@
+#include "esphome/core/defines.h"
 #ifdef USE_VPORT_BLE
 #include "esphome/core/log.h"
 #include "esphome/core/application.h"
@@ -24,7 +25,16 @@ void VPortBLENode::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
     ESP_LOGV(TAG, "[%s] Got notify for handle %04u: %s", ble_client->address_str().c_str(), param->notify.handle,
              format_hex_pretty(param->notify.value, param->notify.value_len).c_str());
     if (param->notify.handle == this->char_rx_) {
+#ifdef USE_VPORT_BLE_RUN_LATER
+      auto *data = new uint8_t[param->notify.value_len];
+      std::memcpy(data, param->notify.value, param->notify.value_len);
+      this->parent_->run_later([this, data, size = param->notify.value_len]() -> void {
+        this->on_ble_data(data, size);
+        delete[] data;
+      });
+#else
       this->on_ble_data(param->notify.value, param->notify.value_len);
+#endif
     }
     return;
   }
@@ -32,6 +42,7 @@ void VPortBLENode::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
   if (event == ESP_GATTC_WRITE_DESCR_EVT) {
     ESP_LOGV(TAG, "[%s] Complete write_char_descr to 0x%x, status=0x%02x", ble_client->address_str().c_str(),
              param->write.handle, param->write.status);
+    ESP_LOGI(TAG, "Connection established");
     this->node_state = esp32_ble_tracker::ClientState::ESTABLISHED;
     this->on_ble_ready();
     return;
@@ -64,6 +75,7 @@ void VPortBLENode::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
       ESP_LOGV(TAG, "[%s] Register for notify 0x%x complete: %s", ble_client->address_str().c_str(), this->char_rx_,
                YESNO(err == ESP_OK));
     } else {
+      ESP_LOGI(TAG, "Connection established");
       this->node_state = esp32_ble_tracker::ClientState::ESTABLISHED;
       this->on_ble_ready();
     }
@@ -75,9 +87,9 @@ void VPortBLENode::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
     // let the device to do pair
     if (this->ble_sec_act_ != 0) {
       auto err = esp_ble_set_encryption(param->connect.remote_bda, this->ble_sec_act_);
-      ESP_LOGV(TAG, "[%s] Pair complete: %s", ble_client->address_str().c_str(), YESNO(err == ESP_OK));
+      ESP_LOGV(TAG, "[%s] Bonding complete: %s", ble_client->address_str().c_str(), YESNO(err == ESP_OK));
     } else {
-      ESP_LOGV(TAG, "[%s] Pair skipped", ble_client->address_str().c_str());
+      ESP_LOGV(TAG, "[%s] Bonding skipped", ble_client->address_str().c_str());
     }
     if (this->disable_scan_) {
       esp32_ble_tracker::global_esp32_ble_tracker->stop_scan();
@@ -91,12 +103,13 @@ void VPortBLENode::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
     if (this->disable_scan_) {
       esp32_ble_tracker::global_esp32_ble_tracker->start_scan();
     }
+    return;
   }
 
 #ifdef ESPHOME_LOG_HAS_VERBOSE
   if (event == ESP_GATTC_OPEN_EVT) {
     if (param->open.status == ESP_GATT_OK) {
-      ESP_LOGI(TAG, "Connected successfully");
+      ESP_LOGV(TAG, "Connected successfully");
     } else {
       ESP_LOGW(TAG, "Connection fails. Status: %d", param->open.status);
     }
@@ -141,16 +154,33 @@ bool VPortBLENode::write_ble_data(const uint8_t *data, uint16_t size) const {
 }
 
 void VPortBLENode::connect() {
-  // ESP_LOGD(TAG, "Enabling connection");
+  if (this->node_state == esp32_ble_tracker::ClientState::CONNECTING) {
+    return;
+  }
+
+  if (this->node_state == esp32_ble_tracker::ClientState::ESTABLISHED) {
+    return;
+  }
+
+  this->node_state = esp32_ble_tracker::ClientState::CONNECTING;
   this->parent()->set_enabled(true);
 }
 
 void VPortBLENode::disconnect() {
-  // ESP_LOGD(TAG, "Disabling connection");
+  if (this->node_state == esp32_ble_tracker::ClientState::DISCONNECTING) {
+    return;
+  }
+
+  if (this->node_state == esp32_ble_tracker::ClientState::IDLE) {
+    return;
+  }
+
+  this->node_state = esp32_ble_tracker::ClientState::DISCONNECTING;
   this->parent()->set_enabled(false);
+  // additionally clear memory if connection was dropped
   this->parent()->release_services();
 }
 
 }  // namespace vport
 }  // namespace esphome
-#endif
+#endif // USE_VPORT_BLE
