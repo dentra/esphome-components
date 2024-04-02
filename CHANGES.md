@@ -1,3 +1,7 @@
+# 2024-04-02
+* [+] new component `qingping`
+* [+] new component `codegen`
+
 # 2024-01-15
 * [+] new component `settings`
 * [+] new component `nvs`

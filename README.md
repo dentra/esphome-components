@@ -25,6 +25,10 @@
 [paypal-me-shield]: https://img.shields.io/static/v1?label=+&message=PayPal.Me&logo=paypal
 [paypal-me]: https://paypal.me/dentra0
 
+[PayPal]: https://paypal.me/dentra0
+[Card2Card]: https://www.tinkoff.ru/cf/3dZPaLYDBAI
+[Boosty]: https://boosty.to/dentra
+
 
 A collection of my ESPHome components.
 
@@ -101,7 +105,9 @@ Control partitions table from your yaml-configuration.
 ## [Coredump](components/coredump/)
 Configure storage and downloading ESP-IDF core dump.
 
+## [Qingping](components/coredump/)
+Supports all BLE Qingping devices.
 
-### Your thanks
+## Your thanks
 If this project was useful to you, you can buy me a Cup of coffee via
-[Card2Card](https://www.tinkoff.ru/cf/3dZPaLYDBAI) or [PayPal](https://paypal.me/dentra0) :)
+[PayPal], [Card2Card], [Boosty] subscripion or or just star the project :)

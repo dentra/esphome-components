@@ -4,6 +4,8 @@
 
 > You colud automaticaly get bindkey from Xiaomi Cloud by configuring `xiaomi_account` property in [MIOT](../miot/) platform.
 
+> You could also configure this device via [Qingping](../qingping/) platform.
+
 Sample configuration:
 ```yaml
 external_components:
