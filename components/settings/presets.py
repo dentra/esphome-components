@@ -6,7 +6,7 @@ from esphome.components import api, esp32, mqtt, uart, wifi
 from esphome.const import CONF_ESPHOME, CONF_ID, CONF_MQTT, CONF_NAME, CONF_WIFI
 from esphome.core import CORE
 
-from . import codegen_plus as cgp
+from ..codegen.cpp import cgp
 from . import const, cpp, var
 
 PRESET_API = "api"

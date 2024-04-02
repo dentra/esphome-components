@@ -1,3 +1,5 @@
+from typing import Union
+
 import esphome.codegen as cg
 import esphome.cpp_generator as cpp
 
@@ -6,7 +8,7 @@ char = cg.global_ns.namespace("char")
 std_strncpy = cg.std_ns.class_("strncpy")
 to_string = cg.esphome_ns.class_("to_string")
 esp_logd = cg.esphome_ns.class_("ESP_LOGD")
-esp_logv = cg.esphome_ns.class_("ESP_LOGD")  # TODO replace with ESP_LOGV
+esp_logv = cg.esphome_ns.class_("ESP_LOGV")
 esp_truefalse = cg.esphome_ns.class_("TRUEFALSE")
 gpio_num_t = cg.global_ns.enum("gpio_num_t")
 
@@ -137,7 +139,7 @@ class ElseStatement(cg.Statement):
 
 
 class ReturnExpression(cg.Expression):
-    __slots__ = "expression"
+    __slots__ = ("expression",)
 
     def __init__(self, expression):
         self.expression = expression
@@ -176,7 +178,7 @@ class StructStatement(cg.Statement):
 
     def __init__(
         self,
-        name: [str, cg.MockObjClass],
+        name: Union[str, cg.MockObjClass],
         statements: list,
         use_ns: bool = True,
         packed: bool = False,

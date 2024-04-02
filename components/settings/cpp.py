@@ -6,8 +6,8 @@ import esphome.cpp_generator as cpp
 from esphome import core
 from esphome.const import CONF_ESPHOME, CONF_ID
 
+from ..codegen import cpp as cgp
 from ..nvs import NVSFlashConstRef
-from . import codegen_plus as cgp
 from . import var
 
 settings_ns = cg.esphome_ns.namespace("settings")
