@@ -105,7 +105,7 @@ Control partitions table from your yaml-configuration.
 ## [Coredump](components/coredump/)
 Configure storage and downloading ESP-IDF core dump.
 
-## [Qingping](components/coredump/)
+## [Qingping](components/qingping/)
 Supports all BLE Qingping devices.
 
 ## Your thanks
