@@ -23,7 +23,12 @@ from esphome.core import MACAddress
 from .. import codegen  # pylint: disable=relative-beyond-top-level
 
 CODEOWNERS = ["@dentra"]
-AUTO_LOAD = ["esp32_ble_tracker", "codegen"]
+AUTO_LOAD = [
+    "esp32_ble_tracker",
+    "codegen",
+    "sensor",  # required by explorer
+    "binary_sensor",  # required by explorer
+]
 
 qingping_ns = cg.esphome_ns.namespace("qingping")
 qingping_pc_ns = qingping_ns.namespace("property_controller")
@@ -42,7 +47,6 @@ CONF_DOOR = "door"
 CONF_DOOR_LEFT_OPEN = "door_left_open"
 CONF_PM10 = "pm10"
 CONF_PM25 = "pm25"
-
 
 string_or_none = cv.Any(cv.none, cv.string)
 
@@ -178,6 +182,9 @@ async def to_code(config):
     macs = [conf[CONF_MAC_ADDRESS] for conf in config if CONF_MAC_ADDRESS in conf]
     for conf in config:
         await _setup_hub(conf, macs)
+
+    cg.add_build_flag("-std=gnu++17")
+    cg.add_platformio_option("build_unflags", ["-std=gnu++11"])
 
 
 def new_pc(pc_cfg: dict[str, str | dict[str, Any]]):

@@ -55,6 +55,10 @@ binary_sensor:
 > [!NOTE]
 > If you do not receiving Qingping BLE advertisements on WiFi device you may need to connect it to the cloud.
 
+> [!IMPORTANT]
+> To compile properly this component requires C++17 with GNU extensions and up.
+> It automatically changes environment to `gnu++17` to support it.
+
 ## Configuring Qingping Hub.
 
 The Qingping platform is using [esp32_ble_tracker] so you able to configure it first.
