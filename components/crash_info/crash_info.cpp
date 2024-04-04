@@ -68,7 +68,7 @@ void CrashInfo::dump_config() {
 
 #ifdef USE_TIME
   ESP_LOGI(TAG, "  Exception cause code: %d, time: %s", ci.exccause,
-           time::ESPTime::from_epoch_local(ci.time).strftime("%F %T").c_str());
+           ESPTime::from_epoch_local(ci.time).strftime("%F %T").c_str());
 #else
   ESP_LOGI(TAG, "  Exception cause code: %d", ci.exccause);
 #endif
