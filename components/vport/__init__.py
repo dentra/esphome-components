@@ -149,9 +149,9 @@ async def setup_vport_uart(config):
     return var
 
 
-async def to_code(config):
-    # FIXME remove due to add_define in setup
-    if "uart" in core.CORE.config:
-        cg.add_build_flag("-DUSE_VPORT_UART")
-    if "ble_client" in core.CORE.config:
-        cg.add_build_flag("-DUSE_VPORT_BLE")
+# async def to_code(config):
+#     # FIXME remove due to add_define in setup
+#     if "uart" in core.CORE.config:
+#         cg.add_build_flag("-DUSE_VPORT_UART")
+#     if "ble_client" in core.CORE.config:
+#         cg.add_build_flag("-DUSE_VPORT_BLE")

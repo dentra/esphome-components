@@ -108,9 +108,7 @@ void VPortBLENode::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
 
 #ifdef ESPHOME_LOG_HAS_VERBOSE
   if (event == ESP_GATTC_OPEN_EVT) {
-    if (param->open.status == ESP_GATT_OK) {
-      ESP_LOGV(TAG, "Connected successfully");
-    } else {
+    if (param->open.status != ESP_GATT_OK) {
       ESP_LOGW(TAG, "Connection fails. Status: %d", param->open.status);
     }
     return;
@@ -167,20 +165,15 @@ void VPortBLENode::connect() {
 }
 
 void VPortBLENode::disconnect() {
-  if (this->node_state == esp32_ble_tracker::ClientState::DISCONNECTING) {
-    return;
-  }
-
   if (this->node_state == esp32_ble_tracker::ClientState::IDLE) {
     return;
   }
-
-  this->node_state = esp32_ble_tracker::ClientState::DISCONNECTING;
   this->parent()->set_enabled(false);
   // additionally clear memory if connection was dropped
   this->parent()->release_services();
+  this->node_state = esp32_ble_tracker::ClientState::IDLE;
 }
 
 }  // namespace vport
 }  // namespace esphome
-#endif // USE_VPORT_BLE
+#endif  // USE_VPORT_BLE
