@@ -6,7 +6,7 @@ import esphome.cpp_generator as cpp
 from esphome import core
 from esphome.const import CONF_ESPHOME, CONF_ID
 
-from ..codegen import cpp as cgp
+from .. import cgp
 from ..nvs import NVSFlashConstRef
 from . import var
 

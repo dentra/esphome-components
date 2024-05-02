@@ -1,6 +1,6 @@
 from typing import Any
 
-from . import codegen_plus as cgp
+from .. import cgp
 from . import const, cpp_utils
 
 # variable types

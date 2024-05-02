@@ -20,12 +20,12 @@ from esphome.const import (
 )
 from esphome.core import MACAddress
 
-from .. import codegen  # pylint: disable=relative-beyond-top-level
+from .. import cgp  # pylint: disable=relative-beyond-top-level
 
 CODEOWNERS = ["@dentra"]
 AUTO_LOAD = [
     "esp32_ble_tracker",
-    "codegen",
+    "cgp",
     "sensor",  # required by explorer
     "binary_sensor",  # required by explorer
 ]
@@ -119,7 +119,7 @@ CONFIG_SCHEMA = cv.All(
                 cv.Optional(CONF_USE_BEACON_MAC): cv.boolean,
                 cv.Optional(CONF_VERBOSE): cv.boolean,
                 cv.Optional(CONF_EXPLORER): EXPLORER_SCHEMA,
-                cv.Optional(CONF_ON_STATE): codegen.automation_schema(
+                cv.Optional(CONF_ON_STATE): cgp.automation_schema(
                     QingpingStateTrigger
                 ),
             }
@@ -162,19 +162,19 @@ async def _setup_hub(config: dict, macs: list[MACAddress]):
     await cg.register_component(var, config)
     await esp32_ble_tracker.register_ble_device(var, config)
 
-    codegen.setup_value(config, CONF_VERBOSE, var.set_verbose)
+    cgp.setup_value(config, CONF_VERBOSE, var.set_verbose)
 
     if CONF_MAC_ADDRESS in config:
         cg.add(var.set_address(config[CONF_MAC_ADDRESS].as_hex))
     elif macs:
         cg.add(var.set_mac_exclude([mac.as_hex for mac in macs]))
 
-    codegen.setup_value(config, CONF_USE_BEACON_MAC, var.set_use_beacon_mac, False)
+    cgp.setup_value(config, CONF_USE_BEACON_MAC, var.set_use_beacon_mac, False)
 
     if CONF_EXPLORER in config:
         await _setup_explorer(config[CONF_EXPLORER], var)
 
-    await codegen.setup_automation(config, CONF_ON_STATE, var, (QPDataPointRef, "x"))
+    await cgp.setup_automation(config, CONF_ON_STATE, var, (QPDataPointRef, "x"))
 
 
 async def to_code(config):
@@ -188,7 +188,7 @@ async def to_code(config):
 
 
 def new_pc(pc_cfg: dict[str, str | dict[str, Any]]):
-    return codegen.PC(Qingping, CONF_QINGPING_ID, pc_cfg)
+    return cgp.PC(Qingping, CONF_QINGPING_ID, pc_cfg)
 
 
 def qp_final_validate_config(config):
