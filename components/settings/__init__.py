@@ -207,3 +207,6 @@ async def to_code(config):
     path = f"{os.path.dirname(__file__)}/settings.html"
     with open(file=path, encoding="utf-8") as html_file:
         web_server.add_resource_as_progmem("SETTINGS_HTML", html_file.read())
+
+    if 'web_server' not in core.CORE.config:
+        cg.add(settings.set_base_url("/"))
