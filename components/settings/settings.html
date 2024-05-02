@@ -181,10 +181,9 @@
       }
     }
 
-    function initForm(method) {
+    function initForm() {
       const form = document.getElementsByTagName("form")[0]
       form.novalidate = true
-      form.method = method
       form.addEventListener("submit", (event) => {
         event.preventDefault()
         if (form.checkValidity()) {
@@ -205,13 +204,25 @@
         }
         form.reportValidity()
       })
+    }
 
-      if (method == "get") {
-        const hid = document.createElement("input");
-        hid.type = "hidden"
-        hid.name = "_"
-        form.appendChild(hid)
-      }
+    function initFactoryReset() {
+      ed("factory_reset_action").addEventListener("click", (event) => {
+        ed("rfc_dialog").open = true
+        ed("rfc_submit").disabled = true
+        ed("rfc_confirm").checked = ""
+      })
+      ed("rfc_cancel").addEventListener("click", (event) => {
+        ed("rfc_dialog").open = false
+      })
+      ed("rfc_submit").addEventListener("click", (event) => {
+        const form = document.getElementsByTagName("form")[0]
+        form.action = "reset"
+        form.submit()
+      })
+      ed("rfc_confirm").addEventListener("click", (event) => {
+        ed("rfc_submit").disabled = !event.target.checked
+      })
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -219,7 +230,8 @@
         document.title = r.t + " settings"
         ed("esp_name").innerHTML = document.title
         applyFormFields(constructSections(r.v))
-        initForm(r.m || "post")
+        initForm()
+        initFactoryReset()
         document.getElementById("loader").style.display = "none"
         document.getElementById("content").style.display = "block"
       });
@@ -230,8 +242,18 @@
       padding-top: var(--spacing);
     }
 
-    input:is([type=submit], [type=reset]) {
+    input:is([type=submit], [type=reset], [type=button]) {
       width: auto;
+    }
+
+    #rfc_submit {
+      background-color: var(--form-element-invalid-border-color);
+      border-color: var(--form-element-invalid-border-color);
+    }
+
+    #rfc_submit:hover {
+      background-color: var(--form-element-invalid-active-border-color);
+      border-color: var(--form-element-invalid-active-border-color);
     }
   </style>
 </head>
@@ -239,11 +261,13 @@
 <body>
   <main>
     <article aria-busy="true" id="loader">Loading settings. Please wait…</article>
+
     <div id="content" style="display: none;">
       <h1 id="esp_name"></h1>
-      <form action="" novalidate>
+      <form action="" method="post" novalidate>
         <div id="form_fields"></div>
         <input type="submit" />
+        <input type="button" value="Factory Reset" id="factory_reset_action" />
       </form>
     </div>
     <template id="tpl_section_empty">
@@ -307,6 +331,29 @@
       </label>
     </template>
   </main>
+  <dialog id="rfc_dialog">
+    <article>
+      <header>Factory Reset confirmation</header>
+      <p>
+        CAUTION: All credentials, global variables, counters and saved states stored in
+        non-volatile memory will be lost with no chance of recovering them.
+      </p>
+      <p>
+        This will also reset the Wi-Fi settings, which will make the device offline.
+        You'll need to be in close proximity to your device to configure it again using a
+        built-in WiFi access point and captive portal.
+      </p>
+      <p>Do you still really want to proceed?</p>
+      <p>
+        <input type="checkbox" name="confirm" id="rfc_confirm">
+        Yes, I confirm that I am aware of the effect.
+      </p>
+      <footer>
+        <input id="rfc_cancel" type="button" value="Cancel">
+        <input id="rfc_submit" type="button" value="Confirm" disabled>
+      </footer>
+    </article>
+  </dialog>
 </body>
 
 </html>

@@ -79,15 +79,22 @@ class Settings : public AsyncWebHandler, public Component {
 
   void load(void (*on_load)(const nvs_flash::NvsFlash &nvs));
 
+  void set_base_url(const char *value) { this->base_url_ = value; }
+
  protected:
   nvs_flash::NvsFlash nvs_;
-  const char *base_url_{"/settings/"};
-  const char *json_url_{"/settings/settings.json"};
+  std::string base_url_{"/settings"};
   web_server_base::WebServerBase *base_{};
   std::vector<VarInfo> items_;
   void handle_base_(AsyncWebServerRequest *request);
-  void handle_json_(AsyncWebServerRequest *request);
+  void handle_load_(AsyncWebServerRequest *request);
   void handle_save_(AsyncWebServerRequest *request);
+  void handle_reset_(AsyncWebServerRequest *request);
+  void redirect_home_(AsyncWebServerRequest *request);
+
+  std::string url_(const char *path);
+
+  void reboot_();
 
   std::string get_json_value_(const VarInfo &v) const;
   bool save_pv_(const VarInfo &x, const char *param) const;

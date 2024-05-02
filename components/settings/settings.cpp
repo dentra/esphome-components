@@ -1,6 +1,7 @@
 #include "esphome/core/log.h"
 #include "esphome/core/defines.h"
 #include "esphome/core/helpers.h"
+// #include "esphome/"
 
 #include "json_writer.h"
 #include "settings.h"
@@ -13,7 +14,7 @@ static const char *const NVS_NS = TAG;
 
 void Settings::dump_config() {
   ESP_LOGCONFIG(TAG, "Settings:");
-  ESP_LOGCONFIG(TAG, "  Base URL: %s", this->base_url_);
+  ESP_LOGCONFIG(TAG, "  Base URL: %s", this->base_url_.c_str());
 }
 
 void Settings::setup() {
@@ -22,8 +23,26 @@ void Settings::setup() {
   this->base_->add_handler(this);
 }
 
+std::string Settings::url_(const char *path) {
+  std::string res = this->base_url_;
+  if (*res.rbegin() != '/') {
+    res += '/';
+  }
+  res += path;
+  return res;
+}
+
+void Settings::redirect_home_(AsyncWebServerRequest *request) {
+  if (*this->base_url_.rbegin() != '/') {
+    request->redirect(this->base_url_ + '/');
+  } else {
+    request->redirect(this->base_url_);
+  }
+}
+
 bool Settings::canHandle(AsyncWebServerRequest *request) {
 #ifdef USE_ARDUINO
+  // arduino returns String but not std::string
   return str_startswith(request->url().c_str(), this->base_url_);
 #else
   return str_startswith(request->url(), this->base_url_);
@@ -34,7 +53,11 @@ void Settings::handleRequest(AsyncWebServerRequest *request) {  // NOLINT(readab
   SETTINGS_TRACE(TAG, "Handle request method %u, url: %s", request->method(), request->url().c_str());
 
   if (request->method() == HTTP_POST) {
-    this->handle_save_(request);
+    if (request->url() == this->url_("reset")) {
+      this->handle_reset_(request);
+    } else {
+      this->handle_save_(request);
+    }
     return;
   }
 
@@ -42,22 +65,16 @@ void Settings::handleRequest(AsyncWebServerRequest *request) {  // NOLINT(readab
     return;
   }
 
-  if (request->url() == this->json_url_) {
-    this->handle_json_(request);
+  if (request->url() == this->url_("settings.json")) {
+    this->handle_load_(request);
     return;
   }
 
-  if (request->url() != this->base_url_) {
-    ESP_LOGW(TAG, "Unknown request url: %s", request->url().c_str());
+  if (*this->base_url_.rbegin() != '/') {
+    this->redirect_home_(request);
     return;
   }
 
-#ifdef USE_ESP_IDF
-  if (request->hasArg("_")) {
-    this->handle_save_(request);
-    return;
-  }
-#endif
   this->handle_base_(request);
 }
 
@@ -122,15 +139,15 @@ std::string Settings::get_json_value_(const VarInfo &v) const {
   }
 }
 
-void Settings::handle_json_(AsyncWebServerRequest *request) {  // NOLINT(readability-non-const-parameter)
+void Settings::handle_load_(AsyncWebServerRequest *request) {  // NOLINT(readability-non-const-parameter)
   SETTINGS_TRACE(TAG, "Handle json...");
-  this->nvs_.open(NVS_NS, true);
+  this->nvs_.open(NVS_NS);
   auto s = JsonWriter(request->beginResponseStream("application/json"));
   s.start_object();
   s.add_kv("t", App.get_name());
-#ifdef USE_ESP_IDF
-  s.add_kv("m", "get");
-#endif
+  // #ifdef USE_ESP_IDF
+  //   s.add_kv("m", "get");
+  // #endif
   s.start_array("v");
   bool is_first = true;  // NOLINT(misc-const-correctness)
   for (auto const &x : this->items_) {
@@ -244,7 +261,7 @@ bool Settings::save_pv_(const VarInfo &x, const char *param) const {
 
 void Settings::handle_save_(AsyncWebServerRequest *request) {  // NOLINT(readability-non-const-parameter)
   SETTINGS_TRACE(TAG, "Saving changes...");
-  this->nvs_.open(NVS_NS, false);
+  this->nvs_.open(NVS_NS, true);
 
   size_t changes = 0;
   for (auto const &x : this->items_) {
@@ -262,16 +279,26 @@ void Settings::handle_save_(AsyncWebServerRequest *request) {  // NOLINT(readabi
   if (changes > 0) {
     ESP_LOGD(TAG, "%zu change(s) was made", changes);
     this->nvs_.commit();
-    this->set_timeout(1000, []() { App.reboot(); });
+    this->reboot_();
   }
 
   this->nvs_.close();
 
-  request->redirect(this->base_url_);
+  this->redirect_home_(request);
+}
+
+void Settings::handle_reset_(AsyncWebServerRequest *request) {  // NOLINT(readability-non-const-parameter)
+  global_preferences->reset();
+  this->reboot_();
+  this->redirect_home_(request);
+}
+
+void Settings::reboot_() {
+  this->set_timeout(1000, []() { App.safe_reboot(); });
 }
 
 void Settings::load(void (*on_load)(const nvs_flash::NvsFlash &nvs)) {
-  this->nvs_.open(NVS_NS, true);
+  this->nvs_.open(NVS_NS);
   on_load(this->nvs_);
   this->nvs_.close();
 }
