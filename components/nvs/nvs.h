@@ -27,8 +27,8 @@ struct is_nvs_type : std::integral_constant<bool, std::is_integral<T>::value && 
 class NvsFlash {
  public:
   NvsFlash() {}
-  NvsFlash(const char *namespace_name, bool read_only = false) { this->open(namespace_name, read_only); }
-  NvsFlash(const std::string &namespace_name, bool read_only = false) { this->open(namespace_name, read_only); }
+  NvsFlash(const char *namespace_name, bool read_write = false) { this->open(namespace_name, read_write); }
+  NvsFlash(const std::string &namespace_name, bool read_write = false) { this->open(namespace_name, read_write); }
   ~NvsFlash() { this->close(); }
 
   bool init() { return nvs_flash_init() == ESP_OK; }
@@ -37,11 +37,11 @@ class NvsFlash {
   bool open(const std::string &namespace_name, nvs_open_mode_t open_mode) {
     return this->open(namespace_name.c_str(), open_mode);
   }
-  bool open(const char *namespace_name, bool read_only = false) {
-    return this->open(namespace_name, read_only ? NVS_READONLY : NVS_READWRITE);
+  bool open(const char *namespace_name, bool read_write = false) {
+    return this->open(namespace_name, read_write ? NVS_READWRITE : NVS_READONLY);
   }
-  bool open(const std::string &namespace_name, bool read_only = false) {
-    return this->open(namespace_name.c_str(), read_only);
+  bool open(const std::string &namespace_name, bool read_write = false) {
+    return this->open(namespace_name.c_str(), read_write);
   }
 
   void close() {
@@ -240,6 +240,8 @@ class NvsFlash {
     return this->set(key, value.data(), value.size_bytes());
   }
 #endif
+
+  bool reset() const { return this->handle_->erase_all() == ESP_OK; }
 
  protected:
   std::unique_ptr<nvs::NVSHandle> handle_;
