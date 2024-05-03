@@ -4,8 +4,10 @@ from typing import Any
 import esphome.codegen as cg
 from esphome.components import api, esp32, mqtt, uart, wifi
 from esphome.const import (
+    CONF_AREA,
     CONF_COMMENT,
     CONF_ESPHOME,
+    CONF_FRIENDLY_NAME,
     CONF_ID,
     CONF_MQTT,
     CONF_NAME,
@@ -272,8 +274,8 @@ def _node_setter(config, App: cg.MockObj):
                         node_name.value(),
                         config[CONF_NAME],
                     ),
-                    App.get_friendly_name(),
-                    App.get_area(),
+                    config[CONF_FRIENDLY_NAME],
+                    config[CONF_AREA],
                     config.get(CONF_COMMENT, ""),
                     cg.RawExpression('__DATE__ ", " __TIME__'),
                     cgp.ConditionalExperession(
