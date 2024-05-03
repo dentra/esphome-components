@@ -43,7 +43,7 @@ void Settings::redirect_home_(AsyncWebServerRequest *request) {
 bool Settings::canHandle(AsyncWebServerRequest *request) {
 #ifdef USE_ARDUINO
   // arduino returns String but not std::string
-  return str_startswith(request->url().c_str(), this->base_url_);
+  return request->url().startsWith(this->base_url_.c_str());
 #else
   return str_startswith(request->url(), this->base_url_);
 #endif
@@ -69,8 +69,13 @@ void Settings::handleRequest(AsyncWebServerRequest *request) {  // NOLINT(readab
     this->handle_load_(request);
     return;
   }
-
-  if (*this->base_url_.rbegin() != '/') {
+#ifdef USE_ARDUINO
+  // arduino returns String but not std::string
+  if (!request->url().endsWith("/"))
+#else
+  if (*request->url().rbegin() != '/')
+#endif
+  {
     this->redirect_home_(request);
     return;
   }
@@ -144,10 +149,7 @@ void Settings::handle_load_(AsyncWebServerRequest *request) {  // NOLINT(readabi
   this->nvs_.open(NVS_NS);
   auto s = JsonWriter(request->beginResponseStream("application/json"));
   s.start_object();
-  s.add_kv("t", App.get_name());
-  // #ifdef USE_ESP_IDF
-  //   s.add_kv("m", "get");
-  // #endif
+  s.add_kv("t", App.get_friendly_name().empty() ? App.get_name() : App.get_friendly_name());
   s.start_array("v");
   bool is_first = true;  // NOLINT(misc-const-correctness)
   for (auto const &x : this->items_) {
