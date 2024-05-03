@@ -4,7 +4,8 @@
 <head>
   <meta charset="utf-8">
   <meta name=viewport content="width=device-width,initial-scale=1,user-scalable=no">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.classless.min.css">
+  <meta name="color-scheme" content="light dark" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css">
   <script>
     function ee(e, id) {
       return e.getElementById(id)
@@ -239,7 +240,7 @@
   </script>
   <style>
     :where(input[type=checkbox])+small {
-      padding-top: var(--spacing);
+      padding-top: var(--pico-spacing);
     }
 
     input:is([type=submit], [type=reset], [type=button]) {
@@ -247,13 +248,13 @@
     }
 
     #rfc_submit {
-      background-color: var(--form-element-invalid-border-color);
-      border-color: var(--form-element-invalid-border-color);
+      background-color: var(--pico-form-element-invalid-border-color);
+      border-color: var(--pico-form-element-invalid-border-color);
     }
 
     #rfc_submit:hover {
-      background-color: var(--form-element-invalid-active-border-color);
-      border-color: var(--form-element-invalid-active-border-color);
+      background-color: var(--pico-form-element-invalid-active-border-color);
+      border-color: var(--pico-form-element-invalid-active-border-color);
     }
   </style>
 </head>
