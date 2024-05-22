@@ -1,13 +1,24 @@
 #pragma once
 
 #include "esphome/core/defines.h"
-#include "esphome/components/ota/ota_component.h"
+#include "esphome/core/version.h"
+
 #include "esphome/components/switch/switch.h"
+
+#if (ESPHOME_VERSION_CODE < VERSION_CODE(2024, 6, 0))
+#include "esphome/components/ota/ota_component.h"
+#else
+#include "esphome/components/esphome/ota/ota_esphome.h"
+#endif
 
 namespace esphome {
 namespace otax {
 
-class Otax : public ota::OTAComponent {
+#if (ESPHOME_VERSION_CODE < VERSION_CODE(2024, 6, 0))
+using ESPHomeOTAComponent = ota::OTAComponent;
+#endif
+
+class Otax : public ESPHomeOTAComponent {
  public:
   void dump_config() override;
   void loop() override;

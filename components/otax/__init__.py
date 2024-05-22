@@ -2,17 +2,23 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 import esphome.final_validate as fv
 from esphome.core import CORE, ID
-from esphome.components import ota, switch
+from esphome.components import switch
 from esphome.const import (
     CONF_OTA,
     CONF_ID,
     ENTITY_CATEGORY_DIAGNOSTIC,
-    DEVICE_CLASS_AQI,
+    CONF_PLATFORM,
+    CONF_ESPHOME,
+    __version__ as ESPHOME_VERSION,
 )
 
 CODEOWNERS = ["@dentra"]
 AUTO_LOAD = ["switch"]
-DEPENDENCIES = ["ota"]
+DEPENDENCIES = [
+    "ota"
+    if cv.Version.parse(ESPHOME_VERSION) < cv.Version.parse("2024.6.0")
+    else "ota.esphome"
+]
 
 otax_ns = cg.esphome_ns.namespace("otax")
 Otax = otax_ns.class_("Otax", cg.Component)
@@ -32,16 +38,31 @@ CONFIG_SCHEMA = cv.Schema(
 )
 
 
+def _get_ota_component(full_config) -> ID:
+    ota_conf = full_config[CONF_OTA]
+
+    if cv.Version.parse(ESPHOME_VERSION) < cv.Version.parse("2024.6.0"):
+        return ota_conf[CONF_ID]
+
+    for conf in ota_conf:
+        if conf[CONF_PLATFORM] == CONF_ESPHOME:
+            return conf[CONF_ID]
+
+    return None
+
+
 def _final_validate(config):
-    ota_conf = fv.full_config.get()[CONF_OTA]
-    ota_conf[CONF_ID].type = Otax
+    ota_comp = _get_ota_component(fv.full_config.get())
+    if not ota_comp:
+        raise cv.Invalid(f"No {CONF_ESPHOME} ota platform found")
+    ota_comp.type = Otax
 
 
 FINAL_VALIDATE_SCHEMA = _final_validate
 
 
 async def to_code(config):
-    var = await cg.get_variable(CORE.config[CONF_OTA][CONF_ID])
+    var = await cg.get_variable(_get_ota_component(CORE.config))
 
     enabled = await switch.new_switch(config[CONF_ENABLED])
 
