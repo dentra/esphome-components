@@ -8,13 +8,13 @@ namespace otax {
 static const char *const TAG = "otax";
 
 void Otax::dump_config() {
-  ota::OTAComponent::dump_config();
+  ESPHomeOTAComponent::dump_config();
   LOG_SWITCH(" ", "Enabled", this->enabled_);
 }
 
 void Otax::loop() {
   if (this->enabled_ == nullptr || this->enabled_->state) {
-    ota::OTAComponent::loop();
+    ESPHomeOTAComponent::loop();
   }
 }
 

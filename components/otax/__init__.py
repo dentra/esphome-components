@@ -1,16 +1,16 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 import esphome.final_validate as fv
-from esphome.core import CORE, ID
 from esphome.components import switch
 from esphome.const import (
-    CONF_OTA,
-    CONF_ID,
-    ENTITY_CATEGORY_DIAGNOSTIC,
-    CONF_PLATFORM,
     CONF_ESPHOME,
-    __version__ as ESPHOME_VERSION,
+    CONF_ID,
+    CONF_OTA,
+    CONF_PLATFORM,
+    ENTITY_CATEGORY_DIAGNOSTIC,
 )
+from esphome.const import __version__ as ESPHOME_VERSION
+from esphome.core import CORE, ID
 
 CODEOWNERS = ["@dentra"]
 AUTO_LOAD = ["switch"]
