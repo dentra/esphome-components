@@ -137,7 +137,7 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
         // so we will drop this connection and reconnect.
         this->set_timeout(CONNECTION_TIMEOUT_NAME, this->connection_timeout_, [this]() {
           if (this->io_->is_connecting()) {
-            ESP_LOGW("vport_ble", "Connection was not established for %u ms", CONNECTION_TIMEOUT);
+            ESP_LOGW("vport_ble", "Connection was not established for %" PRIu32 " ms", CONNECTION_TIMEOUT);
             this->io_->disconnect();
             // connection will be estabilished on next event loop.
           }
@@ -158,4 +158,4 @@ using VPortBLEComponent = VPortQComponent<VPortBLEComponentImpl<io_t, frame_spec
 
 }  // namespace vport
 }  // namespace esphome
-#endif // USE_VPORT_BLE
+#endif  // USE_VPORT_BLE
