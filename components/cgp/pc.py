@@ -137,9 +137,9 @@ class PC:
     def _get_component_source(self, config: dict):
         prefix = self.parent_id.replace("_id", "")
         if self.component_type:
-            prefix = f"{prefix}_{self.component_type}"
+            prefix = f"{prefix}.{self.component_type}"
         if pc_typ := self.get_type(config):
-            return f"{prefix}_{pc_typ}"
+            return f"{prefix}[type={pc_typ}]"
         return prefix
 
     def button_schema(
