@@ -1,3 +1,6 @@
+# 2024-06-24
+* [+] new component `setup`
+
 # 2024-04-02
 * [+] new component `qingping`
 * [+] new component `codegen`
