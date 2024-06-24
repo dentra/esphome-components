@@ -72,7 +72,6 @@ class VPortBLENode : public ble_client::BLEClientNode {
 ///   void write(const uint8_t *data, size_t size);
 /// };
 template<class io_t, class frame_spec_t, class component_t>
-
 class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public component_t {
   static_assert(std::is_base_of<Component, component_t>::value, "component_t must derived from Component class");
 
@@ -100,7 +99,7 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
  protected:
   bool persistent_connection_{};
   bool disconnect_scheduled_{};
-  uint32_t connection_timeout_{2000};
+  uint32_t connection_timeout_{3000};
 
   void on_ready_() {
     this->cancel_timeout(CONNECTION_TIMEOUT_NAME);
@@ -133,15 +132,17 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
     if (!this->io_->is_connected()) {
       if (!this->io_->is_connecting()) {
         this->io_->connect();
-        // Poor connection sometimes leads to some ESP_GATTC events are not received,
-        // so we will drop this connection and reconnect.
-        this->set_timeout(CONNECTION_TIMEOUT_NAME, this->connection_timeout_, [this]() {
-          if (this->io_->is_connecting()) {
-            ESP_LOGW("vport_ble", "Connection was not established for %" PRIu32 " ms", CONNECTION_TIMEOUT);
-            this->io_->disconnect();
-            // connection will be estabilished on next event loop.
-          }
-        });
+        if (this->connection_timeout_ > 0) {
+          // Poor connection sometimes leads to some ESP_GATTC events are not received,
+          // so we will drop this connection and reconnect.
+          this->set_timeout(CONNECTION_TIMEOUT_NAME, this->connection_timeout_, [this]() {
+            if (this->io_->is_connecting()) {
+              ESP_LOGW("vport_ble", "Connection was not established for %" PRIu32 " ms", CONNECTION_TIMEOUT);
+              this->io_->disconnect();
+              // connection will be estabilished on next event loop.
+            }
+          });
+        }
       }
       return false;
     }
