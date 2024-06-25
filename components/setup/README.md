@@ -2,30 +2,55 @@
 
 Allow execute your code at end of setup process.
 
+Parameters:
+
+- depends: Optional string or list of strings. Component names required in config to generate lambda.
+  You could also set alias for component to use in your code.
+- lambda: c++ code to execute
+
+## Examples
+
 ```yaml
 setup: |-
-  #ifdef USE_MQTT
-    if (App.is_name_add_mac_suffix_enabled()) {
-      auto topic_prefix = str_sanitize(App.get_name());
-      if (id(g_mqtt).get_topic_prefix() != topic_prefix) {
-        id(g_mqtt).set_topic_prefix(topic_prefix);
-      }
-      if (id(g_mqtt).is_log_message_enabled()) {
-        auto log_topic = topic_prefix + "/debug";
-        id(g_mqtt).set_log_message_template(mqtt::MQTTMessage{
-          .topic = log_topic, .payload = "", .qos = 0, .retain = true
-        });
-      }
-      auto status_topic = topic_prefix + "/status";
-      id(g_mqtt).set_birth_message(mqtt::MQTTMessage{
-        .topic = status_topic, .payload = "online", .qos = 0, .retain = true
-      });
-      id(g_mqtt).set_last_will(mqtt::MQTTMessage{
-        .topic = status_topic, .payload = "offline", .qos = 0, .retain = true
-      });
-      id(g_mqtt).set_shutdown_message(mqtt::MQTTMessage{
-        .topic = status_topic, .payload = "offline", .qos = 0, .retain = true
-      });
-    }
-  #endif
+  // put your c++ code here
+```
+
+```yaml
+setup:
+  lambda: |-
+    // put your c++ code here
+```
+
+Example using depends:
+
+```yaml
+setup:
+  depends: mqtt
+  lambda: |-
+    // g_mqtt is defind with id in config
+    ESP_LOGI("setup", "MQTT prefix is %s", id(g_mqtt).get_topic_prefix());
+```
+
+Example using depends with alias:
+
+```yaml
+setup:
+  depends: mqtt as my_mqtt
+  lambda: |-
+    // my_mqtt may not be defind with id in config
+    ESP_LOGI("setup", "MQTT prefix is %s", my_mqtt->get_topic_prefix());
+```
+
+Complex example:
+
+```yaml
+setup:
+  - depends:
+      - mqtt as my_mqtt
+      - ota
+    lambda: |-
+      // do something when only mqtt and ota exists in config
+  - depends: [api, ota]
+    lambda: |-
+      // do something when only api and ota exists in config
 ```
