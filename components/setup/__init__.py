@@ -47,7 +47,7 @@ async def to_code(config):
             content = f"{lambda_.source.as_line_directive}\n{content}"
         vars = "\n".join(
             [
-                f"const auto *{dep['var']} = {core.CORE.config[dep['key']][CONF_ID]};"
+                f"auto *{dep['var']} = {core.CORE.config[dep['key']][CONF_ID]};"
                 for dep in deps
                 if dep["var"]
             ]
