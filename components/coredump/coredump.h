@@ -25,7 +25,7 @@ class Coredump : public Component, public AsyncWebHandler {
   const char *erase_url_{"/coredump/erase"};
   const char *download_url_{"/coredump/coredump.elf"};
   const char *crash_url_{"/coredump/crash"};
-  const char *css_url_{"https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css"};
+  const char *css_url_{"https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css"};
 
   void css_(AsyncWebServerRequest *request);
   void index_(AsyncWebServerRequest *request);
