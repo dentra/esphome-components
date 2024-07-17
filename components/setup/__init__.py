@@ -32,7 +32,7 @@ def _get_deps(config):
     return deps
 
 
-@core.coroutine_with_priority(-300.0)
+@core.coroutine_with_priority(-999.0)
 async def to_code(config):
     for conf in config:
         if isinstance(conf, cv.Lambda):
