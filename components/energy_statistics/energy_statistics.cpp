@@ -22,6 +22,9 @@ void EnergyStatistics::dump_config() {
   if (this->energy_month_) {
     LOG_SENSOR(GAP, "Energy Month", this->energy_month_);
   }
+  if (this->energy_year_) {
+    LOG_SENSOR(GAP, "Energy Year", this->energy_year_);
+  }
 }
 
 void EnergyStatistics::setup() {
@@ -70,6 +73,10 @@ void EnergyStatistics::loop() {
     if (t.day_of_month == 1) {
       this->energy_.start_month = total;
     }
+    // at first day of year we start a new year calculation
+    if (t.day_of_year == 1) {
+      this->energy_.start_year = total;
+    }
   }
 
   this->energy_.current_day_of_year = t.day_of_year;
@@ -94,6 +101,10 @@ void EnergyStatistics::process_(float total) {
     this->energy_month_->publish_state(total - this->energy_.start_month);
   }
 
+  if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
+    this->energy_year_->publish_state(total - this->energy_.start_year);
+  }
+  
   this->save_();
 }
 
