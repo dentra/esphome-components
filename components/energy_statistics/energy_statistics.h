@@ -54,6 +54,7 @@ class EnergyStatistics : public Component {
     float start_yesterday{NAN};
     float start_week{NAN};
     float start_month{NAN};
+    float start_year{NAN};
   } energy_;
 
   void process_(float total);
