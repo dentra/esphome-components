@@ -19,6 +19,7 @@ CONF_ENERGY_TODAY = "energy_today"
 CONF_ENERGY_YESTERDAY = "energy_yesterday"
 CONF_ENERGY_WEEK = "energy_week"
 CONF_ENERGY_MONTH = "energy_month"
+CONF_ENERGY_YEAR = "energy_year"
 
 energy_statistics_ns = cg.esphome_ns.namespace("energy_statistics")
 
@@ -48,6 +49,12 @@ CONFIG_SCHEMA = cv.Schema(
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_ENERGY_MONTH): sensor.sensor_schema(
+            unit_of_measurement=UNIT_KILOWATT_HOURS,
+            accuracy_decimals=2,
+            device_class=DEVICE_CLASS_ENERGY,
+            state_class=STATE_CLASS_TOTAL_INCREASING,
+        ),
+        cv.Optional(CONF_ENERGY_YEAR): sensor.sensor_schema(
             unit_of_measurement=UNIT_KILOWATT_HOURS,
             accuracy_decimals=2,
             device_class=DEVICE_CLASS_ENERGY,
@@ -92,3 +99,4 @@ async def to_code(config):
     await setup_sensor(config, CONF_ENERGY_YESTERDAY, var.set_energy_yesterday)
     await setup_sensor(config, CONF_ENERGY_WEEK, var.set_energy_week)
     await setup_sensor(config, CONF_ENERGY_MONTH, var.set_energy_month)
+    await setup_sensor(config, CONF_ENERGY_YEAR, var.set_energy_year)
