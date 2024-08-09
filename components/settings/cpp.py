@@ -217,7 +217,9 @@ async def _setter(v: var.Var, nvs: cg.MockObj):
     sav = cg.MockObj("sav")
 
     if not callable(setter):
-        lam: core.Lambda = await cg.process_lambda(setter, [])
+        lam: cpp.LambdaExpression = await cg.process_lambda(
+            setter, parameters=[], capture=""
+        )
         if len(lam.content.strip()) == 0:
             return None
         setter = cg.RawStatement(lam.content)

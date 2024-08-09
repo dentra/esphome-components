@@ -4,14 +4,21 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import core
 from esphome.components import web_server, web_server_base
-from esphome.const import CONF_ID, CONF_LAMBDA
+from esphome.const import (
+    CONF_AUTH,
+    CONF_ID,
+    CONF_LAMBDA,
+    CONF_PASSWORD,
+    CONF_USERNAME,
+)
 
 from . import const, cpp, presets, var
 
 CODEOWNERS = ["@dentra"]
-AUTO_LOAD = ["web_server_base", "json", "nvs"]
+AUTO_LOAD = ["web_server_base", "json", "nvs", "dtu"]
 DEPENDENCIES = ["wifi"]
 
+CONF_BASE_URL = "base_url"
 
 CONF_SETTINGS_VARIABLES = "settings_variables"
 CONF_VARIABLES = "variables"
@@ -162,13 +169,46 @@ VARIABLE_SCHEMA = cv.Any(
     cv.All(VARIABLE_DATA, variable_shorthand),
 )
 
-CONFIG_SCHEMA = cv.Schema(
+
+def _web_menu_schema(config):
+    schema = cv.Schema(config)
+    try:
+        from esphome.components import web_menu
+
+        schema = schema.extend(
+            {cv.GenerateID(web_menu.CONF_WEB_MENU_ID): cv.use_id(web_menu.WebMenu)}
+        )
+    except ImportError:
+        pass
+
+    return schema
+
+
+async def _web_menu_add_item(config, var, name):
+    try:
+        from esphome.components import web_menu
+
+        if menu := await web_menu.get_web_menu_variable(config):
+            cg.add(menu.add_item(var.get_base_url(), name))
+            cg.add(var.set_menu_url(menu.get_base_url()))
+    except ImportError:
+        pass
+
+
+CONFIG_SCHEMA = _web_menu_schema(
     {
         cv.GenerateID(): cv.declare_id(cpp.Settings),
         cv.GenerateID(web_server_base.CONF_WEB_SERVER_BASE_ID): cv.use_id(
             web_server_base.WebServerBase,
         ),
-        cv.Required(CONF_VARIABLES): cv.Schema(
+        cv.Optional(CONF_BASE_URL): cv.string_strict,
+        cv.Optional(CONF_AUTH): cv.Schema(
+            {
+                cv.Required(CONF_USERNAME): cv.All(cv.string_strict, cv.Length(min=1)),
+                cv.Required(CONF_PASSWORD): cv.All(cv.string_strict, cv.Length(min=1)),
+            }
+        ),
+        cv.Optional(CONF_VARIABLES, default={}): cv.Schema(
             {
                 cv.valid_name: cv.All(
                     VARIABLE_SCHEMA,
@@ -184,14 +224,17 @@ CONFIG_SCHEMA = cv.Schema(
 )
 
 
-# Run with low priority so that all initilization be doing first
-@core.coroutine_with_priority(-200.0)
-async def to_code(config):
-    # for key, val in CORE.config["mqtt"].items():
-    #     print("to_code", key, val)
-    #     # for k, v in val.items():
-    #     #     print("  ", k, v)
+def _add_resource(filename: str, resurce_name: str = ""):
+    if not resurce_name:
+        resurce_name = filename.replace(".", "_").upper()
+    path = f"{os.path.dirname(__file__)}/{filename}"
+    with open(file=path, encoding="utf-8") as file:
+        web_server.add_resource_as_progmem(resurce_name, file.read())
 
+
+# Run with low priority so that all initilization be doing first
+@core.coroutine_with_priority(-1000.0)
+async def to_code(config):
     presets.presets_init(config.get(CONF_PRESETS), config[CONF_VARIABLES])
 
     web = await cg.get_variable(config[web_server_base.CONF_WEB_SERVER_BASE_ID])
@@ -204,9 +247,14 @@ async def to_code(config):
     # last step, loading settings
     await cpp.add_on_load(settings, vars, config.get(CONF_LAMBDA, None))
 
-    path = f"{os.path.dirname(__file__)}/settings.html"
-    with open(file=path, encoding="utf-8") as html_file:
-        web_server.add_resource_as_progmem("SETTINGS_HTML", html_file.read())
+    _add_resource("settings.html")
+    _add_resource("settings.js")
 
-    if 'web_server' not in core.CORE.config:
-        cg.add(settings.set_base_url("/"))
+    if CONF_BASE_URL in config:
+        cg.add(settings.set_base_url(config[CONF_BASE_URL]))
+
+    await _web_menu_add_item(config, settings, "Settings")
+
+    if CONF_AUTH in config:
+        cg.add(settings.set_username(config[CONF_AUTH][CONF_USERNAME]))
+        cg.add(settings.set_password(config[CONF_AUTH][CONF_PASSWORD]))
