@@ -1,7 +1,6 @@
 #include "esphome/core/log.h"
 #include "esphome/core/defines.h"
 #include "esphome/core/helpers.h"
-// #include "esphome/"
 
 #include "json_writer.h"
 #include "settings.h"
@@ -34,9 +33,18 @@ std::string Settings::url_(const char *path) {
 
 void Settings::redirect_home_(AsyncWebServerRequest *request) {
   if (*this->base_url_.rbegin() != '/') {
-    request->redirect(this->base_url_ + '/');
+    const auto url = this->base_url_ + '/';
+#ifdef USE_ARDUINO
+    request->redirect(url.c_str());
+#else
+    request->redirect(url);
+#endif
   } else {
+#ifdef USE_ARDUINO
+    request->redirect(this->base_url_.c_str());
+#else
     request->redirect(this->base_url_);
+#endif
   }
 }
 
@@ -56,8 +64,15 @@ void Settings::handleRequest(AsyncWebServerRequest *request) {  // NOLINT(readab
     return request->requestAuthentication();
   }
 
+#ifdef USE_ARDUINO
+  // arduino returns String but not std::string
+  const std::string url = request->url().c_str();
+#else
+  const std::string url = request->url();
+#endif
+
   if (request->method() == HTTP_POST) {
-    if (request->url() == this->url_("reset")) {
+    if (url == this->url_("reset")) {
       this->handle_reset_(request);
     } else {
       this->handle_save_(request);
@@ -69,23 +84,17 @@ void Settings::handleRequest(AsyncWebServerRequest *request) {  // NOLINT(readab
     return;
   }
 
-  if (request->url() == this->url_("settings.json")) {
+  if (url == this->url_("settings.json")) {
     this->handle_json_(request);
     return;
   }
 
-  if (request->url() == this->url_("settings.js")) {
+  if (url == this->url_("settings.js")) {
     this->handle_js_(request);
     return;
   }
 
-#ifdef USE_ARDUINO
-  // arduino returns String but not std::string
-  if (!request->url().endsWith("/"))
-#else
-  if (*request->url().rbegin() != '/')
-#endif
-  {
+  if (*url.rbegin() != '/') {
     this->redirect_home_(request);
     return;
   }
