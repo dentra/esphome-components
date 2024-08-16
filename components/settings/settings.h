@@ -10,6 +10,9 @@
 extern const uint8_t ESPHOME_WEBSERVER_SETTINGS_HTML[] PROGMEM;
 extern const size_t ESPHOME_WEBSERVER_SETTINGS_HTML_SIZE;
 
+extern const uint8_t ESPHOME_WEBSERVER_SETTINGS_JS[] PROGMEM;
+extern const size_t ESPHOME_WEBSERVER_SETTINGS_JS_SIZE;
+
 namespace esphome {
 
 namespace settings {
@@ -67,10 +70,7 @@ class Settings : public AsyncWebHandler, public Component {
 
   void dump_config() override;
   void setup() override;
-  float get_setup_priority() const override {
-    // After WiFi
-    return setup_priority::WIFI - 1.0f;
-  }
+  float get_setup_priority() const override { return setup_priority::AFTER_WIFI; }
 
   bool canHandle(AsyncWebServerRequest *request) override;
   void handleRequest(AsyncWebServerRequest *request) override;
@@ -80,14 +80,22 @@ class Settings : public AsyncWebHandler, public Component {
   void load(void (*on_load)(const nvs_flash::NvsFlash &nvs));
 
   void set_base_url(const char *value) { this->base_url_ = value; }
+  const char *get_base_url() const { return this->base_url_.c_str(); }
+  void set_username(const char *username) { this->username_ = username; }
+  void set_password(const char *password) { this->password_ = password; }
+  void set_menu_url(const char *value) { this->menu_url_ = value; }
 
  protected:
   nvs_flash::NvsFlash nvs_;
+  const char *menu_url_{};
+  const char *username_{};
+  const char *password_{};
   std::string base_url_{"/settings"};
   web_server_base::WebServerBase *base_{};
   std::vector<VarInfo> items_;
-  void handle_base_(AsyncWebServerRequest *request);
-  void handle_load_(AsyncWebServerRequest *request);
+  void handle_html_(AsyncWebServerRequest *request);
+  void handle_js_(AsyncWebServerRequest *request);
+  void handle_json_(AsyncWebServerRequest *request);
   void handle_save_(AsyncWebServerRequest *request);
   void handle_reset_(AsyncWebServerRequest *request);
   void redirect_home_(AsyncWebServerRequest *request);

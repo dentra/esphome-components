@@ -1,7 +1,6 @@
 #include "esphome/core/log.h"
 #include "esphome/core/defines.h"
 #include "esphome/core/helpers.h"
-// #include "esphome/"
 
 #include "json_writer.h"
 #include "settings.h"
@@ -34,9 +33,18 @@ std::string Settings::url_(const char *path) {
 
 void Settings::redirect_home_(AsyncWebServerRequest *request) {
   if (*this->base_url_.rbegin() != '/') {
-    request->redirect(this->base_url_ + '/');
+    const auto url = this->base_url_ + '/';
+#ifdef USE_ARDUINO
+    request->redirect(url.c_str());
+#else
+    request->redirect(url);
+#endif
   } else {
+#ifdef USE_ARDUINO
+    request->redirect(this->base_url_.c_str());
+#else
     request->redirect(this->base_url_);
+#endif
   }
 }
 
@@ -52,8 +60,19 @@ bool Settings::canHandle(AsyncWebServerRequest *request) {
 void Settings::handleRequest(AsyncWebServerRequest *request) {  // NOLINT(readability-non-const-parameter)
   SETTINGS_TRACE(TAG, "Handle request method %u, url: %s", request->method(), request->url().c_str());
 
+  if (!request->authenticate(this->username_, this->password_)) {
+    return request->requestAuthentication();
+  }
+
+#ifdef USE_ARDUINO
+  // arduino returns String but not std::string
+  const std::string url = request->url().c_str();
+#else
+  const std::string url = request->url();
+#endif
+
   if (request->method() == HTTP_POST) {
-    if (request->url() == this->url_("reset")) {
+    if (url == this->url_("reset")) {
       this->handle_reset_(request);
     } else {
       this->handle_save_(request);
@@ -65,25 +84,32 @@ void Settings::handleRequest(AsyncWebServerRequest *request) {  // NOLINT(readab
     return;
   }
 
-  if (request->url() == this->url_("settings.json")) {
-    this->handle_load_(request);
+  if (url == this->url_("settings.json")) {
+    this->handle_json_(request);
     return;
   }
-#ifdef USE_ARDUINO
-  // arduino returns String but not std::string
-  if (!request->url().endsWith("/"))
-#else
-  if (*request->url().rbegin() != '/')
-#endif
-  {
+
+  if (url == this->url_("settings.js")) {
+    this->handle_js_(request);
+    return;
+  }
+
+  if (*url.rbegin() != '/') {
     this->redirect_home_(request);
     return;
   }
 
-  this->handle_base_(request);
+  this->handle_html_(request);
 }
 
-void Settings::handle_base_(AsyncWebServerRequest *request) {  // NOLINT(readability-non-const-parameter)
+void Settings::handle_js_(AsyncWebServerRequest *request) {  // NOLINT(readability-non-const-parameter)
+  auto *response = request->beginResponse_P(200, "text/javascript", ESPHOME_WEBSERVER_SETTINGS_JS,
+                                            ESPHOME_WEBSERVER_SETTINGS_JS_SIZE);
+  response->addHeader("Content-Encoding", "gzip");
+  request->send(response);
+}
+
+void Settings::handle_html_(AsyncWebServerRequest *request) {  // NOLINT(readability-non-const-parameter)
   auto *response =
       request->beginResponse_P(200, "text/html", ESPHOME_WEBSERVER_SETTINGS_HTML, ESPHOME_WEBSERVER_SETTINGS_HTML_SIZE);
   response->addHeader("Content-Encoding", "gzip");
@@ -144,12 +170,13 @@ std::string Settings::get_json_value_(const VarInfo &v) const {
   }
 }
 
-void Settings::handle_load_(AsyncWebServerRequest *request) {  // NOLINT(readability-non-const-parameter)
+void Settings::handle_json_(AsyncWebServerRequest *request) {  // NOLINT(readability-non-const-parameter)
   SETTINGS_TRACE(TAG, "Handle json...");
   this->nvs_.open(NVS_NS);
   auto s = JsonWriter(request->beginResponseStream("application/json"));
   s.start_object();
   s.add_kv("t", App.get_friendly_name().empty() ? App.get_name() : App.get_friendly_name());
+  s.add_kv("m", this->menu_url_);
   s.start_array("v");
   bool is_first = true;  // NOLINT(misc-const-correctness)
   for (auto const &x : this->items_) {
@@ -262,7 +289,7 @@ bool Settings::save_pv_(const VarInfo &x, const char *param) const {
 }
 
 void Settings::handle_save_(AsyncWebServerRequest *request) {  // NOLINT(readability-non-const-parameter)
-  SETTINGS_TRACE(TAG, "Saving changes...");
+  ESP_LOGD(TAG, "Saving changes...");
   this->nvs_.open(NVS_NS, true);
 
   size_t changes = 0;
@@ -290,13 +317,18 @@ void Settings::handle_save_(AsyncWebServerRequest *request) {  // NOLINT(readabi
 }
 
 void Settings::handle_reset_(AsyncWebServerRequest *request) {  // NOLINT(readability-non-const-parameter)
-  global_preferences->reset();
-  this->reboot_();
+  ESP_LOGD(TAG, "Resetting device to factory...");
+
   this->redirect_home_(request);
+
+  if (request->arg("confirm") == "on") {
+    global_preferences->reset();
+    this->reboot_();
+  }
 }
 
 void Settings::reboot_() {
-  this->set_timeout(1000, []() { App.safe_reboot(); });
+  this->set_timeout(100, []() { App.safe_reboot(); });
 }
 
 void Settings::load(void (*on_load)(const nvs_flash::NvsFlash &nvs)) {

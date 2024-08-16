@@ -215,8 +215,47 @@ _PRESETS = OrderedDict(
                 },
                 "mqtt_topic_prefix": {
                     const.CONF_VAR_TYPE: var.VT_STR,
-                    const.CONF_VAR_GETTER: lambda _, o: o.get_topic_prefix(),
-                    const.CONF_VAR_SETTER: lambda _, o: o.set_topic_prefix,
+                    const.CONF_VAR_HELP: "The prefix used for all MQTT messages. Set to empty to disable publishing or subscribing of any MQTT topic unless it is explicitly configured",
+                    const.CONF_VAR_GETTER: lambda _, o: _mqtt_access(o).topic_prefix(),
+                    const.CONF_VAR_SETTER: lambda _, o: _mqtt_access(o).topic_prefix,
+                },
+                "mqtt_birth_message": {
+                    const.CONF_VAR_TYPE: var.VT_STR,
+                    const.CONF_VAR_HELP: "The message to send when a connection to the broker is established",
+                    const.CONF_VAR_GETTER: lambda _, o: _mqtt_access(
+                        o
+                    ).birth_message_topic(),
+                    const.CONF_VAR_SETTER: lambda _, o: _mqtt_access(
+                        o
+                    ).birth_message_topic,
+                },
+                "mqtt_will_message": {
+                    const.CONF_VAR_TYPE: var.VT_STR,
+                    const.CONF_VAR_HELP: "The message to send when the MQTT connection is dropped",
+                    const.CONF_VAR_GETTER: lambda _, o: _mqtt_access(
+                        o
+                    ).last_will_topic(),
+                    const.CONF_VAR_SETTER: lambda _, o: _mqtt_access(o).last_will_topic,
+                },
+                "mqtt_shutdown_message": {
+                    const.CONF_VAR_TYPE: var.VT_STR,
+                    const.CONF_VAR_HELP: "The message to send when the node shuts down and the connection is closed cleanly",
+                    const.CONF_VAR_GETTER: lambda _, o: _mqtt_access(
+                        o,
+                    ).shutdown_message_topic(),
+                    const.CONF_VAR_SETTER: lambda _, o: _mqtt_access(
+                        o
+                    ).shutdown_message_topic,
+                },
+                "mqtt_log_topic": {
+                    const.CONF_VAR_TYPE: var.VT_STR,
+                    const.CONF_VAR_HELP: " The topic to send MQTT log messages to. Set to empty for disable logging",
+                    const.CONF_VAR_GETTER: lambda _, o: _mqtt_access(
+                        o
+                    ).log_message_topic(),
+                    const.CONF_VAR_SETTER: lambda _, o: _mqtt_access(
+                        o
+                    ).log_message_topic,
                 },
                 "mqtt_reboot_timeout": {
                     const.CONF_VAR_TYPE: var.VT_TIMEOUT,
@@ -342,6 +381,10 @@ def _wifi_network_setter(index: int, c: dict, wifi_comp: cg.MockObj) -> cg.State
     )
 
     return cgp.CodeBlock(None, None, ss)
+
+
+def _mqtt_access(mqtt_comp: cg.MockObj):
+    return cg.MockObj("settings::mqtt_access", "->")(mqtt_comp)
 
 
 def _get_presets(cpresets: list[str]) -> OrderedDict[str, Any]:

@@ -1,5 +1,6 @@
 #include "esphome/core/log.h"
 #include "esphome/core/helpers.h"
+#include "esphome/core/application.h"
 
 #include "esp_partition.h"
 #include "esp_core_dump.h"
@@ -72,14 +73,16 @@ inline void write_html_begin(AsyncWebServerRequest *request, const char *css_url
   if (redirect_url) {
     tags.append(str_sprintf(R"(<meta http-equiv="refresh" content="3;url=%s">)", redirect_url));
   }
+  const auto title = (App.get_friendly_name().empty() ? App.get_name() : App.get_friendly_name()) + " coredump";
   write_html_chunk(request, str_sprintf(R"(<!DOCTYPE html>
     <html><head>
     <meta charset="utf-8">
     <meta name=viewport content="width=device-width,initial-scale=1,user-scalable=no">
+    <meta name="color-scheme" content="light dark">
     %s
     <title>%s</title>
-    </head><body><main class="container">)",
-                                        tags.c_str(), TAG));
+    </head><body><main><h1>%s</h1>)",
+                                        tags.c_str(), title.c_str(), title.c_str()));
 }
 
 inline void write_html_end(AsyncWebServerRequest *request) { write_html_chunk(request, R"(</main></body></html>)"); }
