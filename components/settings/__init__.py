@@ -241,6 +241,10 @@ async def to_code(config):
     settings = cg.new_Pvariable(config[CONF_ID], web)
     await cg.register_component(settings, config)
 
+    if CONF_AUTH in config:
+        cg.add(settings.set_username(config[CONF_AUTH][CONF_USERNAME]))
+        cg.add(settings.set_password(config[CONF_AUTH][CONF_PASSWORD]))
+
     vars = var.var_list(config[CONF_VARIABLES])
     # registering vars first
     await cpp.register_vars(settings, vars)
@@ -254,7 +258,3 @@ async def to_code(config):
         cg.add(settings.set_base_url(config[CONF_BASE_URL]))
 
     await _web_menu_add_item(config, settings, "Settings")
-
-    if CONF_AUTH in config:
-        cg.add(settings.set_username(config[CONF_AUTH][CONF_USERNAME]))
-        cg.add(settings.set_password(config[CONF_AUTH][CONF_PASSWORD]))
