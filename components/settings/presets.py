@@ -2,7 +2,7 @@ from collections import OrderedDict
 from typing import Any
 
 import esphome.codegen as cg
-from esphome.components import api, esp32, mqtt, uart, wifi
+from esphome.components import api, esp32, mqtt, uart, web_server, wifi
 from esphome.const import (
     CONF_AREA,
     CONF_COMMENT,
@@ -11,6 +11,7 @@ from esphome.const import (
     CONF_ID,
     CONF_MQTT,
     CONF_NAME,
+    CONF_WEB_SERVER,
     CONF_WIFI,
 )
 from esphome.core import CORE
@@ -25,6 +26,7 @@ PRESET_UART = "uart"
 PRESET_NODE = "node"
 PRESET_WIFI = CONF_WIFI
 PRESET_MQTT = CONF_MQTT
+PRESET_WEB_SERVER = CONF_WEB_SERVER
 
 COMP_API = "api"
 COMP_UART = "uart"
@@ -32,11 +34,19 @@ COMP_WIFI = CONF_WIFI
 COMP_MQTT = CONF_MQTT
 COMP_ESPHOME = CONF_ESPHOME
 COMP_BLE_CLIENT = "ble_client"
+COMP_WEB_SERVER = CONF_WEB_SERVER
 
 KEY_NODE_NAME = "node_name"
 KEY_NODE_NAME_ADD_MAC_SUFFIX = "node_name_add_mac_suffix"
 KEY_WIFI_SSID = "wifi_network0_ssid"
 KEY_WIFI_PASSWORD = "wifi_network0_password"
+
+USE_ARDUINO = "USE_ARDUINO"
+USE_API = "USE_API"
+USE_ESP32 = "USE_ESP32"
+USE_MQTT = "USE_MQTT"
+USE_WEB_SERVER = "USE_WEB_SERVER"
+USE_WIFI = "USE_WIFI"
 
 _PRESET_DEFAULTS = {
     PRESET_UART: {
@@ -48,7 +58,7 @@ _PRESET_DEFAULTS = {
         const.CONF_VAR_PRESET: PRESET_BLE,
         const.CONF_VAR_SECTION: "BLE",
         const.CONF_VAR_COMP: COMP_BLE_CLIENT,
-        const.CONF_VAR_IFDEF: "USE_ESP32",
+        const.CONF_VAR_IFDEF: USE_ESP32,
     },
     PRESET_NODE: {
         const.CONF_VAR_PRESET: PRESET_NODE,
@@ -59,19 +69,25 @@ _PRESET_DEFAULTS = {
         const.CONF_VAR_PRESET: PRESET_WIFI,
         const.CONF_VAR_SECTION: "WiFi",
         const.CONF_VAR_COMP: COMP_WIFI,
-        const.CONF_VAR_IFDEF: "USE_WIFI",
+        const.CONF_VAR_IFDEF: USE_WIFI,
     },
     PRESET_API: {
         const.CONF_VAR_PRESET: PRESET_API,
         const.CONF_VAR_SECTION: "API",
         const.CONF_VAR_COMP: COMP_API,
-        const.CONF_VAR_IFDEF: "USE_API",
+        const.CONF_VAR_IFDEF: USE_API,
     },
     PRESET_MQTT: {
         const.CONF_VAR_PRESET: PRESET_MQTT,
         const.CONF_VAR_SECTION: "MQTT",
         const.CONF_VAR_COMP: COMP_MQTT,
-        const.CONF_VAR_IFDEF: "USE_MQTT",
+        const.CONF_VAR_IFDEF: USE_MQTT,
+    },
+    PRESET_WEB_SERVER: {
+        const.CONF_VAR_PRESET: PRESET_WEB_SERVER,
+        const.CONF_VAR_SECTION: "Web Server",
+        const.CONF_VAR_COMP: COMP_WEB_SERVER,
+        const.CONF_VAR_IFDEF: USE_WEB_SERVER,
     },
 }
 
@@ -151,7 +167,7 @@ _PRESETS = OrderedDict(
                     const.CONF_VAR_TYPE: var.VT_BOOL,
                     const.CONF_VAR_NAME: "Enable BTM",
                     const.CONF_VAR_HELP: "Enable 802.11v BSS Transition Management support",
-                    const.CONF_VAR_IFDEF: ["USE_WIFI", "USE_WIFI_11KV_SUPPORT"],
+                    const.CONF_VAR_IFDEF: [USE_WIFI, "USE_WIFI_11KV_SUPPORT"],
                     const.CONF_VAR_GETTER: lambda c, _: c.get(
                         wifi.CONF_ENABLE_BTM, False
                     ),
@@ -161,7 +177,7 @@ _PRESETS = OrderedDict(
                     const.CONF_VAR_TYPE: var.VT_BOOL,
                     const.CONF_VAR_NAME: "Enable RRM",
                     const.CONF_VAR_HELP: "Enable 802.11k Radio Resource Management support",
-                    const.CONF_VAR_IFDEF: ["USE_WIFI", "USE_WIFI_11KV_SUPPORT"],
+                    const.CONF_VAR_IFDEF: [USE_WIFI, "USE_WIFI_11KV_SUPPORT"],
                     const.CONF_VAR_GETTER: lambda c, _: c.get(
                         wifi.CONF_ENABLE_RRM, False
                     ),
@@ -262,6 +278,51 @@ _PRESETS = OrderedDict(
                     const.CONF_VAR_HELP: "The amount of time in seconds to wait before rebooting when no MQTT connection exists",
                     const.CONF_VAR_GETTER: lambda c, _: c[mqtt.CONF_REBOOT_TIMEOUT],
                     const.CONF_VAR_SETTER: lambda _, o: o.set_reboot_timeout,
+                },
+            }
+        ),
+        PRESET_WEB_SERVER: OrderedDict(
+            {
+                "web_server_username": {
+                    const.CONF_VAR_TYPE: var.VT_STR,
+                    const.CONF_VAR_NAME: "Username",
+                    const.CONF_VAR_HELP: "The username to use for authentication. Set to empty for remove authentication",
+                    const.CONF_VAR_GETTER: lambda c, _: c[web_server.CONF_AUTH][
+                        web_server.CONF_USERNAME
+                    ]
+                    if web_server.CONF_AUTH in c
+                    else "",
+                    const.CONF_VAR_SETTER: lambda c, _: cg.MockObj(
+                        c[web_server.CONF_WEB_SERVER_BASE_ID]
+                    ).set_auth_username,
+                },
+                "web_server_password": {
+                    const.CONF_VAR_TYPE: var.VT_PASSWORD,
+                    const.CONF_VAR_NAME: "Password",
+                    const.CONF_VAR_HELP: "The password to check for authentication",
+                    const.CONF_VAR_GETTER: lambda c, _: c[web_server.CONF_AUTH][
+                        web_server.CONF_PASSWORD
+                    ]
+                    if web_server.CONF_AUTH in c
+                    else "",
+                    const.CONF_VAR_SETTER: lambda c, _: cg.MockObj(
+                        c[web_server.CONF_WEB_SERVER_BASE_ID]
+                    ).set_auth_password,
+                },
+                "web_server_log": {
+                    const.CONF_VAR_TYPE: var.VT_BOOL,
+                    const.CONF_VAR_NAME: "Log",
+                    const.CONF_VAR_HELP: "Turn on or off the log feature inside web server",
+                    const.CONF_VAR_GETTER: lambda c, _: c[web_server.CONF_LOG],
+                    const.CONF_VAR_SETTER: lambda _, o: o.set_expose_log,
+                },
+                "web_server_ota": {
+                    const.CONF_VAR_IFDEF: [USE_WEB_SERVER, USE_ARDUINO],
+                    const.CONF_VAR_TYPE: var.VT_BOOL,
+                    const.CONF_VAR_NAME: "OTA",
+                    const.CONF_VAR_HELP: "Turn on or off the OTA feature inside web server. Strongly not suggested without enabled authentication settings",
+                    const.CONF_VAR_GETTER: lambda c, _: c[web_server.CONF_OTA],
+                    const.CONF_VAR_SETTER: lambda _, o: o.set_allow_ota,
                 },
             }
         ),

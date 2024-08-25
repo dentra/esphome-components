@@ -124,8 +124,10 @@ def validate_variable(config):
         elif slen > const.MAX_STR_SIZE:
             raise cv.Invalid(f"Maximum string length is {const.MAX_STR_SIZE}")
 
-    if typ == var.VT_TIMEOUT and not isinstance(
-        config[const.CONF_VAR_VALUE], core.TimePeriod
+    if (
+        const.CONF_VAR_VALUE in config
+        and typ == var.VT_TIMEOUT
+        and not isinstance(config[const.CONF_VAR_VALUE], core.TimePeriod)
     ):
         config[const.CONF_VAR_VALUE] = core.TimePeriod(
             milliseconds=int(config[const.CONF_VAR_VALUE])
