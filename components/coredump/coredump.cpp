@@ -3,6 +3,7 @@
 #include "esphome/core/log.h"
 #include "esphome/core/helpers.h"
 #include "esphome/core/application.h"
+#include "esphome/core/defines.h"
 #include "esphome/core/version.h"
 
 #include "esp_partition.h"
@@ -164,7 +165,9 @@ void Coredump::index_(AsyncWebServerRequest *request) {
     write_html_link(request, "Erase", this->erase_url_);
   } else {
     write_html_message(request, "Great! There is no crash report yet.");
+#ifdef USE_COREDUMP_ENABLE_TEST_CRASH
     write_html_link(request, "Click on this button to cause a crash", this->crash_url_);
+#endif
   }
 
   write_html_end(request);
