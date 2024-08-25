@@ -65,7 +65,7 @@ class Var:
             name = self.id
             section = self.section
             if section:
-                if name.lower().startswith(self.section.lower()):
+                if name.lower().startswith(self.section.replace(" ", "_").lower()):
                     name = name[len(self.section) :]
                 if name.startswith("_"):
                     name = name[1:]
