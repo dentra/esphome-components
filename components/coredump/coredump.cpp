@@ -159,9 +159,7 @@ void Coredump::index_(AsyncWebServerRequest *request) {
     write_html_message(request, "App ELF SHA2", reinterpret_cast<const char *>(summary.app_elf_sha256));
 
     write_html_message(request, "Select action");
-    if (!summary.exc_bt_info.corrupted) {
-      write_html_link(request, "Download", this->download_url_);
-    }
+    write_html_link(request, "Download", this->download_url_);
     write_html_link(request, "Erase", this->erase_url_);
   } else {
     write_html_message(request, "Great! There is no crash report yet.");
@@ -169,6 +167,8 @@ void Coredump::index_(AsyncWebServerRequest *request) {
     write_html_link(request, "Click on this button to cause a crash", this->crash_url_);
 #endif
   }
+
+  write_html_link(request, "Go to Home", "/");
 
   write_html_end(request);
   // request->send(response);
