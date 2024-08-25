@@ -45,7 +45,7 @@ USE_ARDUINO = "USE_ARDUINO"
 USE_API = "USE_API"
 USE_ESP32 = "USE_ESP32"
 USE_MQTT = "USE_MQTT"
-USE_WEB_SERVER = "USE_WEB_SERVER"
+USE_WEB_SERVER = "USE_WEBSERVER"
 USE_WIFI = "USE_WIFI"
 
 _PRESET_DEFAULTS = {
@@ -285,7 +285,6 @@ _PRESETS = OrderedDict(
             {
                 "web_server_username": {
                     const.CONF_VAR_TYPE: var.VT_STR,
-                    const.CONF_VAR_NAME: "Username",
                     const.CONF_VAR_HELP: "The username to use for authentication. Set to empty for remove authentication",
                     const.CONF_VAR_GETTER: lambda c, _: c[web_server.CONF_AUTH][
                         web_server.CONF_USERNAME
@@ -293,12 +292,11 @@ _PRESETS = OrderedDict(
                     if web_server.CONF_AUTH in c
                     else "",
                     const.CONF_VAR_SETTER: lambda c, _: cg.MockObj(
-                        c[web_server.CONF_WEB_SERVER_BASE_ID]
+                        c[web_server.CONF_WEB_SERVER_BASE_ID], "->"
                     ).set_auth_username,
                 },
                 "web_server_password": {
                     const.CONF_VAR_TYPE: var.VT_PASSWORD,
-                    const.CONF_VAR_NAME: "Password",
                     const.CONF_VAR_HELP: "The password to check for authentication",
                     const.CONF_VAR_GETTER: lambda c, _: c[web_server.CONF_AUTH][
                         web_server.CONF_PASSWORD
@@ -306,12 +304,11 @@ _PRESETS = OrderedDict(
                     if web_server.CONF_AUTH in c
                     else "",
                     const.CONF_VAR_SETTER: lambda c, _: cg.MockObj(
-                        c[web_server.CONF_WEB_SERVER_BASE_ID]
+                        c[web_server.CONF_WEB_SERVER_BASE_ID], "->"
                     ).set_auth_password,
                 },
                 "web_server_log": {
                     const.CONF_VAR_TYPE: var.VT_BOOL,
-                    const.CONF_VAR_NAME: "Log",
                     const.CONF_VAR_HELP: "Turn on or off the log feature inside web server",
                     const.CONF_VAR_GETTER: lambda c, _: c[web_server.CONF_LOG],
                     const.CONF_VAR_SETTER: lambda _, o: o.set_expose_log,
