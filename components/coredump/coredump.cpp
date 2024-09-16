@@ -85,18 +85,23 @@ inline void write_html_begin(AsyncWebServerRequest *request, const char *css_url
     <meta name=viewport content="width=device-width,initial-scale=1,user-scalable=no">
     <meta name="color-scheme" content="light dark">)";
   html_begin += tags;
-  html_begin += "<title>" + title + "</title>";
-  html_begin += "</head><body><main><h1>" + title + "</h1>";
+  html_begin += "<title>";
+  html_begin += title;
+  html_begin += "</title>";
+  html_begin += "</head><body><main><h1>";
+  html_begin += title;
+  html_begin += "</h1><p>";
 #ifdef ESPHOME_PROJECT_NAME
-  html_begin += "<p>" ESPHOME_PROJECT_NAME ": " ESPHOME_PROJECT_VERSION "</p>";
+  html_begin += "" ESPHOME_PROJECT_NAME ": " ESPHOME_PROJECT_VERSION ", ";
 #endif
-  html_begin += "<p>ESPHome: " ESPHOME_VERSION "</p>";
-  html_begin += "<p>Compilation Time: " + App.get_compilation_time() + "</p>";
+  html_begin +=              "ESPHome: " ESPHOME_VERSION ", ";
+  html_begin += App.get_compilation_time();
+  html_begin += "</p>";
 
   write_html_chunk(request, html_begin.c_str());
 }
 
-inline void write_html_end(AsyncWebServerRequest *request) { write_html_chunk(request, R"(</main></body></html>)"); }
+inline void write_html_end(AsyncWebServerRequest *request) { write_html_chunk(request, "</main></body></html>"); }
 
 inline void write_html_link(AsyncWebServerRequest *request, const char *name, const char *url) {
   write_html_chunk(request, str_sprintf(R"(<a href="%s" role="button">%s</a> )", url, name));
@@ -106,9 +111,13 @@ inline void write_html_message(AsyncWebServerRequest *request, const std::string
   write_html_chunk(request, "<article>" + message + "</article>");
 }
 
-inline void write_html_message(AsyncWebServerRequest *request, const std::string &message1,
+inline void write_html_p(AsyncWebServerRequest *request, const std::string &message) {
+  write_html_chunk(request,message + "\n");
+}
+
+inline void write_html_p(AsyncWebServerRequest *request, const std::string &message1,
                                const std::string &message2) {
-  write_html_chunk(request, "<article>" + message1 + ": " + message2 + "</article>");
+  write_html_p(request,message1 + ": " + message2);
 }
 
 }  // namespace
@@ -135,28 +144,29 @@ void Coredump::index_(AsyncWebServerRequest *request) {
 
   esp_core_dump_summary_t summary;
   if (esp_core_dump_get_summary(&summary) == ESP_OK) {
+     write_html_chunk(request, "<pre>");
 #if ESP_IDF_VERSION_MAJOR > 5
     char panic_reason[200];
     if (esp_core_dump_get_panic_reason(panic_reason, sizeof(panic_reason))) {
-      write_html_message(request, "Panic reason", panic_reason);
+      write_html_p(request, "Panic reason", panic_reason);
     }
 #endif
-    write_html_message(request, "Exc TCB", str_snprintf("%08" PRIx32, 8, summary.exc_tcb));
-    write_html_message(request, "Exc Task", summary.exc_task);
-    write_html_message(request, "Exc PC", str_snprintf("%08" PRIx32, 8, summary.exc_pc));
+    write_html_p(request, "Exc TCB", str_snprintf("%08" PRIx32, 8, summary.exc_tcb));
+    write_html_p(request, "Exc Task", summary.exc_task);
+    write_html_p(request, "Exc PC", str_snprintf("%08" PRIx32, 8, summary.exc_pc));
 
-    if (summary.exc_bt_info.corrupted) {
-      write_html_message(request, "Backtrace is corrupted");
-    } else {
-      std::string backtrace;
-      for (int i = 0; i < summary.exc_bt_info.depth; i++) {
-        backtrace += str_snprintf("%08" PRIx32 " ", 9, summary.exc_bt_info.bt[i]);
-      }
-      write_html_message(request, "Backtrace", backtrace);
+    std::string backtrace;
+    for (int i = 0; i < summary.exc_bt_info.depth; i++) {
+      backtrace += str_snprintf("%08" PRIx32 " ", 9, summary.exc_bt_info.bt[i]);
     }
+    if (summary.exc_bt_info.corrupted) {
+      backtrace += "(corrupted)";
+    }
+    write_html_p(request, "Backtrace", backtrace);
 
-    write_html_message(request, "Core dump version", str_snprintf("0x%" PRIx32, 10, summary.core_dump_version));
-    write_html_message(request, "App ELF SHA2", reinterpret_cast<const char *>(summary.app_elf_sha256));
+    write_html_p(request, "Core dump version", str_snprintf("0x%" PRIx32, 10, summary.core_dump_version));
+    write_html_p(request, "App ELF SHA2", reinterpret_cast<const char *>(summary.app_elf_sha256));
+    write_html_chunk(request, "</pre>");
 
     write_html_message(request, "Select action");
     write_html_link(request, "Download", this->download_url_);
