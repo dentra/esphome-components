@@ -308,6 +308,10 @@ class AppForm extends Component {
 function App(props) {
   return html`<main>
     <h1>${props.title}</h1>
+    <p>
+      ${props.project_name && html`${props.project_name.replace(".", " ")}: ${props.project_version},`} ESPHome:
+      ${props.esphome_version}, ${props.compilation_time}
+    </p>
     <${AppForm} sections=${props.sections} menu=${props.menu} />
     <${FactoryResetConfirm} />
   </main>`
@@ -315,4 +319,15 @@ function App(props) {
 
 const data = await (await fetch("settings.json")).json()
 document.title = data.t + " settings"
-render(html`<${App} title=${document.title} sections=${transformSections(data.v)} menu=${data.m} />`, document.body)
+render(
+  html`<${App}
+    title=${document.title}
+    sections=${transformSections(data.v)}
+    menu=${data.m}
+    project_name=${data.pn}
+    project_version=${data.pv}
+    esphome_version=${data.ev}
+    compilation_time=${data.et}
+  />`,
+  document.body
+)

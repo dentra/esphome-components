@@ -1,5 +1,6 @@
 #include "esphome/core/log.h"
 #include "esphome/core/defines.h"
+#include "esphome/core/version.h"
 #include "esphome/core/helpers.h"
 
 #include "json_writer.h"
@@ -176,6 +177,13 @@ void Settings::handle_json_(AsyncWebServerRequest *request) {  // NOLINT(readabi
   auto s = JsonWriter(request->beginResponseStream("application/json"));
   s.start_object();
   s.add_kv("t", App.get_friendly_name().empty() ? App.get_name() : App.get_friendly_name());
+#ifdef ESPHOME_PROJECT_NAME
+  s.add_kv("pn", ESPHOME_PROJECT_NAME);
+  s.add_kv("pv", ESPHOME_PROJECT_VERSION);
+#endif
+  s.add_kv("ev", ESPHOME_VERSION);
+  s.add_kv("et", App.get_compilation_time());
+
   s.add_kv("m", this->menu_url_);
   s.start_array("v");
   bool is_first = true;  // NOLINT(misc-const-correctness)
