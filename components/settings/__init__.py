@@ -10,6 +10,7 @@ from esphome.const import (
     CONF_LAMBDA,
     CONF_PASSWORD,
     CONF_USERNAME,
+    PLATFORM_ESP32,
 )
 
 from . import const, cpp, presets, var
@@ -154,7 +155,7 @@ VARIABLE_SCHEMA = cv.Any(
         {
             cv.Optional(const.CONF_VAR_VALUE): VARIABLE_DATA,
             cv.Optional(const.CONF_VAR_SETTER): cv.lambda_,
-            cv.Optional(const.CONF_VAR_GETTER): cv.lambda_,
+            cv.Optional(const.CONF_VAR_GETTER): cv.returning_lambda,
             cv.Optional(const.CONF_VAR_TYPE): cv.one_of(*VAR_TYPE_ALIASES),
             cv.Optional(const.CONF_VAR_SECTION): cv.string,
             cv.Optional(const.CONF_VAR_NAME): cv.string,
@@ -197,7 +198,8 @@ async def _web_menu_add_item(config, var, name):
         pass
 
 
-CONFIG_SCHEMA = _web_menu_schema(
+CONFIG_SCHEMA = cv.All(
+    _web_menu_schema(
     {
         cv.GenerateID(): cv.declare_id(cpp.Settings),
         cv.GenerateID(web_server_base.CONF_WEB_SERVER_BASE_ID): cv.use_id(
@@ -223,7 +225,7 @@ CONFIG_SCHEMA = _web_menu_schema(
             cv.one_of(*presets.PRESETS, lower=True)
         ),
     }
-)
+), cv.only_on([PLATFORM_ESP32]),)
 
 
 def _add_resource(filename: str, resurce_name: str = ""):
