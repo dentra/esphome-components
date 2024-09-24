@@ -122,6 +122,14 @@ Supports all BLE Qingping devices.
 
 Execute any c++ code at end of setup process.
 
+## [Declaration](components/declaration/)
+
+Declare anything right in your yaml instead of separate header files.
+
+## [Onetime init](components/onetime_init/)
+
+Execute some parts of your code only once.
+
 ## Your thanks
 
 If this project was useful to you, you can buy me a Cup of coffee via
