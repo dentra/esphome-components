@@ -27,7 +27,7 @@ Example using depends:
 setup:
   depends: mqtt
   lambda: |-
-    // g_mqtt is defind with id in config
+    // g_mqtt is defined with id in config
     ESP_LOGI("setup", "MQTT prefix is %s", id(g_mqtt).get_topic_prefix());
 ```
 
@@ -37,7 +37,7 @@ Example using depends with alias:
 setup:
   depends: mqtt as my_mqtt
   lambda: |-
-    // my_mqtt may not be defind with id in config
+    // my_mqtt may not be defined with id in config
     ESP_LOGI("setup", "MQTT prefix is %s", my_mqtt->get_topic_prefix());
 ```
 
@@ -49,8 +49,8 @@ setup:
       - mqtt as my_mqtt
       - ota
     lambda: |-
-      // do something when only mqtt and ota exists in config
+      // do something when only mqtt and ota exists in then config
   - depends: [api, ota]
     lambda: |-
-      // do something when only api and ota exists in config
+      // do something when only api and ota exists in the config
 ```

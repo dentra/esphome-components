@@ -54,5 +54,6 @@ async def to_code(config):
         )
         if vars:
             vars += "\n"
-        content = cpp.indent_all_but_first_and_last(f"{{\n{vars}{content}\n}}")
+        line = lambda_.source.as_line_directive
+        content = cpp.indent_all_but_first_and_last(f"{{\n{line}\n{vars}{content}\n}}")
         cg.add(cg.RawStatement(content))
