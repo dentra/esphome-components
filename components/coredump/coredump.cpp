@@ -94,7 +94,7 @@ inline void write_html_begin(AsyncWebServerRequest *request, const char *css_url
 #ifdef ESPHOME_PROJECT_NAME
   html_begin += "" ESPHOME_PROJECT_NAME ": " ESPHOME_PROJECT_VERSION ", ";
 #endif
-  html_begin +=              "ESPHome: " ESPHOME_VERSION ", ";
+  html_begin += "ESPHome: " ESPHOME_VERSION ", ";
   html_begin += App.get_compilation_time();
   html_begin += "</p>";
 
@@ -112,12 +112,11 @@ inline void write_html_message(AsyncWebServerRequest *request, const std::string
 }
 
 inline void write_html_p(AsyncWebServerRequest *request, const std::string &message) {
-  write_html_chunk(request,message + "\n");
+  write_html_chunk(request, message + "\n");
 }
 
-inline void write_html_p(AsyncWebServerRequest *request, const std::string &message1,
-                               const std::string &message2) {
-  write_html_p(request,message1 + ": " + message2);
+inline void write_html_p(AsyncWebServerRequest *request, const std::string &message1, const std::string &message2) {
+  write_html_p(request, message1 + ": " + message2);
 }
 
 }  // namespace
@@ -144,7 +143,7 @@ void Coredump::index_(AsyncWebServerRequest *request) {
 
   esp_core_dump_summary_t summary;
   if (esp_core_dump_get_summary(&summary) == ESP_OK) {
-     write_html_chunk(request, "<pre>");
+    write_html_chunk(request, "<pre>");
 #if ESP_IDF_VERSION_MAJOR > 5
     char panic_reason[200];
     if (esp_core_dump_get_panic_reason(panic_reason, sizeof(panic_reason))) {
@@ -155,6 +154,7 @@ void Coredump::index_(AsyncWebServerRequest *request) {
     write_html_p(request, "Exc Task", summary.exc_task);
     write_html_p(request, "Exc PC", str_snprintf("%08" PRIx32, 8, summary.exc_pc));
 
+#ifdef __XTENSA__
     std::string backtrace;
     for (int i = 0; i < summary.exc_bt_info.depth; i++) {
       backtrace += str_snprintf("%08" PRIx32 " ", 9, summary.exc_bt_info.bt[i]);
@@ -163,6 +163,10 @@ void Coredump::index_(AsyncWebServerRequest *request) {
       backtrace += "(corrupted)";
     }
     write_html_p(request, "Backtrace", backtrace);
+#endif
+#ifdef __riscv
+#pragma message "Backtrace for RISC-V is not implemented"
+#endif
 
     write_html_p(request, "Core dump version", str_snprintf("0x%" PRIx32, 10, summary.core_dump_version));
     write_html_p(request, "App ELF SHA2", reinterpret_cast<const char *>(summary.app_elf_sha256));
