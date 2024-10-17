@@ -2,33 +2,40 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import cpp_generator as cpp
 from esphome.const import CONF_INTERNAL, CONF_LAMBDA
-from esphome.core import Lambda
 
 CONF_NAMESPACE = "namespace"
-
+CONF_INCLUDE = "include"
 
 DECLARATION_SCHEMA = cv.Schema(
     {
         cv.Optional(CONF_NAMESPACE): cv.ensure_list(cv.valid_name),
         cv.Optional(CONF_INTERNAL): cv.boolean,
-        cv.Required(CONF_LAMBDA): cv.lambda_,
+        cv.Optional(CONF_LAMBDA): cv.lambda_,
+        cv.Optional(CONF_INCLUDE): cv.ensure_list(cv.string),
     }
+).add_extra(
+    cv.has_at_least_one_key(
+        CONF_LAMBDA,
+        CONF_INCLUDE,
+    )
 )
 
-
-def _validate_declaration(conf):
-    if not isinstance(conf, dict):
-        conf = {CONF_LAMBDA: conf}
-    if not isinstance(conf[CONF_LAMBDA], Lambda):
-        conf[CONF_LAMBDA] = cv.lambda_(conf[CONF_LAMBDA])
-    return conf
-
-
-CONFIG_SCHEMA = cv.ensure_list(_validate_declaration)
+CONFIG_SCHEMA = cv.ensure_list(DECLARATION_SCHEMA)
 
 
 async def to_code(config):
+    includes = set()
+    # process includes first
     for conf in config:
+        for inc in conf.get(CONF_INCLUDE, []):
+            includes.add(inc)
+    for inc in includes:
+        cg.add_global(cg.RawStatement(f'#include "{inc}"'))
+
+    for conf in config:
+        if CONF_LAMBDA not in conf:
+            continue
+
         lambda_: cpp.LambdaExpression = await cg.process_lambda(conf[CONF_LAMBDA], [])
         content = lambda_.content
 

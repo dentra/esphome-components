@@ -7,6 +7,7 @@ Parameters:
 - namespace: Optional string or list of strings. Namespace to wrap lambda code.
 - internal: boolean. Wrap or not to private anonymous namespace. Defaults: true.
 - lambda: c++ code to be included in declaration.
+- include: one or list of includes.
 
 ## Configuration
 
