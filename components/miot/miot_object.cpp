@@ -5,7 +5,7 @@
 #if ESPHOME_LOG_LEVEL >= ESPHOME_LOG_LEVEL_DEBUG
 #define CHECK_MIID(miid) \
   if (this->id != miid) { \
-    ESP_LOGW(TAG, "BLEObject.id %04X does not match %04X (" #miid ")", this->id, miid); \
+    ESP_LOGW(TAG, "BLEObject.id %04" PRIX16 " does not match %04" PRIX16 " (" #miid ")", this->id, miid); \
     return {}; \
   }
 #else
@@ -39,7 +39,7 @@ optional<uint32_t> BLEObject::get_idle_time() const {
   CHECK_MIID(MIID_IDLE_TIME);
   const auto idle_time = this->get_uint32();
   if (idle_time.has_value()) {
-    ESP_LOGD(TAG, "Idle time: %u s", *idle_time);
+    ESP_LOGD(TAG, "Idle time: %" PRIu32 " s", *idle_time);
   }
   return idle_time;
 }
@@ -48,7 +48,7 @@ optional<uint32_t> BLEObject::get_timeout() const {
   CHECK_MIID(MIID_TIMEOUT);
   const auto timeout = this->get_uint32();
   if (timeout.has_value()) {
-    ESP_LOGD(TAG, "Timeout: %u s", *timeout);
+    ESP_LOGD(TAG, "Timeout: %" PRIu32 " s", *timeout);
   }
   return timeout;
 }
@@ -57,7 +57,7 @@ optional<uint32_t> BLEObject::get_motion_with_light_event() const {
   CHECK_MIID(MIID_MOTION_WITH_LIGHT_EVENT);
   const auto illuminance = this->get_uint24();
   if (illuminance.has_value()) {
-    ESP_LOGD(TAG, "Motion with light: %u lx", *illuminance);
+    ESP_LOGD(TAG, "Motion with light: %" PRIu32 " lx", *illuminance);
   }
   return illuminance;
 }
@@ -115,12 +115,12 @@ const TemperatureHumidity *BLEObject::get_temperature_humidity() const {
 std::string ButtonEvent::str() const {
   switch (this->type) {
     case ButtonEvent::BUTTON_CLICK:
-      return str_sprintf("Button click: %u", this->button.index);
+      return str_sprintf("Button click: %" PRIu16, this->button.index);
     case ButtonEvent::BUTTON_DOUBLE_CLICK:
-      return str_sprintf("Button double click: %u", this->button.index);
+      return str_sprintf("Button double click: %" PRIu16, this->button.index);
 
     case ButtonEvent::BUTTON_LONG_PRESS:
-      return str_sprintf("Button long press: %u", this->button.index);
+      return str_sprintf("Button long press: %" PRIu16, this->button.index);
 
     case ButtonEvent::KNOB: {
       uint8_t value = this->knob.short_press();
@@ -155,7 +155,7 @@ std::string ButtonEvent::str() const {
                          this->dimmer.value);
     }
     default:
-      return str_sprintf("Button unknown event %02" PRIx8 ": %04X", this->type, this->button.index);
+      return str_sprintf("Button unknown event %02" PRIx8 ": %04" PRIX16, this->type, this->button.index);
   }
 }
 
@@ -174,7 +174,7 @@ optional<float> BLEObject::get_illuminance() const {
   CHECK_MIID(MIID_ILLUMINANCE);
   const auto illuminance = this->get_uint24();
   if (illuminance.has_value()) {
-    ESP_LOGD(TAG, "Illuminance %u lx", *illuminance);
+    ESP_LOGD(TAG, "Illuminance %" PRIu32 " lx", *illuminance);
   }
   return *illuminance;
 }
@@ -183,7 +183,7 @@ optional<MIID> BLEObject::get_pairing_object() const {
   CHECK_MIID(MIID_PAIRING_EVENT);
   const auto event = this->get_uint16();
   if (event.has_value()) {
-    ESP_LOGD(TAG, "Paring object %04X", *event);
+    ESP_LOGD(TAG, "Paring object %04" PRIX16, *event);
   }
   return static_cast<MIID>(*event);
 }
@@ -275,9 +275,9 @@ optional<ToothbrushEvent> BLEObject::get_toothbrush_event() const {
   }
 
   if (toothbrush_event.type == ToothbrushEvent::BRUSHING_START) {
-    ESP_LOGD(TAG, "Toothbrush start event: timestamp=%d", toothbrush_event.timestamp);
+    ESP_LOGD(TAG, "Toothbrush start event: timestamp=%" PRIu32, toothbrush_event.timestamp);
   } else {
-    ESP_LOGD(TAG, "Toothbrush end event: timestamp=%d, score=%u", toothbrush_event.timestamp, toothbrush_event.score);
+    ESP_LOGD(TAG, "Toothbrush end event: timestamp=%" PRIu32 ", score=%" PRIu8, toothbrush_event.timestamp, toothbrush_event.score);
   }
 
   return toothbrush_event;
