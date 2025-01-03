@@ -9,17 +9,17 @@ static const char *const TAG = "energy_statistics";
 static const char *const GAP = "  ";
 
 void EnergyStatistics::dump_config() {
-  ESP_LOGCONFIG(TAG, "Energy statistics sensors");
-  if (this->energy_today_) {
+  ESP_LOGCONFIG(TAG, "Energy Statistics - Sensors");
+  if (this->energy_today_ && !this->energy_today_->is_internal()) {
     LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
   }
-  if (this->energy_yesterday_) {
+  if (this->energy_yesterday_ && !this->energy_yesterday_->is_internal()) {
     LOG_SENSOR(GAP, "Energy Yesterday", this->energy_yesterday_);
   }
-  if (this->energy_week_) {
+  if (this->energy_week_ && !this->energy_week_->is_internal()) {
     LOG_SENSOR(GAP, "Energy Week", this->energy_week_);
   }
-  if (this->energy_month_) {
+  if (this->energy_month_ && !this->energy_month_->is_internal()) {
     LOG_SENSOR(GAP, "Energy Month", this->energy_month_);
   }
 }
@@ -78,19 +78,19 @@ void EnergyStatistics::loop() {
 }
 
 void EnergyStatistics::process_(float total) {
-  if (this->energy_today_ && !std::isnan(this->energy_.start_today)) {
+  if (this->energy_today_ && !std::isnan(this->energy_.start_today) && !this->energy_today_->is_internal()) {
     this->energy_today_->publish_state(total - this->energy_.start_today);
   }
 
-  if (this->energy_yesterday_ && !std::isnan(this->energy_.start_yesterday)) {
+  if (this->energy_yesterday_ && !std::isnan(this->energy_.start_yesterday) && !this->energy_yesterday_->is_internal()) {
     this->energy_yesterday_->publish_state(this->energy_.start_today - this->energy_.start_yesterday);
   }
 
-  if (this->energy_week_ && !std::isnan(this->energy_.start_week)) {
+  if (this->energy_week_ && !std::isnan(this->energy_.start_week) && !this->energy_week_->is_internal()) {
     this->energy_week_->publish_state(total - this->energy_.start_week);
   }
 
-  if (this->energy_month_ && !std::isnan(this->energy_.start_month)) {
+  if (this->energy_month_ && !std::isnan(this->energy_.start_month) && !this->energy_month_->is_internal()) {
     this->energy_month_->publish_state(total - this->energy_.start_month);
   }
 
