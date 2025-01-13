@@ -200,32 +200,38 @@ async def _web_menu_add_item(config, var, name):
 
 CONFIG_SCHEMA = cv.All(
     _web_menu_schema(
-    {
-        cv.GenerateID(): cv.declare_id(cpp.Settings),
-        cv.GenerateID(web_server_base.CONF_WEB_SERVER_BASE_ID): cv.use_id(
-            web_server_base.WebServerBase,
-        ),
-        cv.Optional(CONF_BASE_URL): cv.string_strict,
-        cv.Optional(CONF_AUTH): cv.Schema(
-            {
-                cv.Required(CONF_USERNAME): cv.All(cv.string_strict, cv.Length(min=1)),
-                cv.Required(CONF_PASSWORD): cv.All(cv.string_strict, cv.Length(min=1)),
-            }
-        ),
-        cv.Optional(CONF_VARIABLES, default={}): cv.Schema(
-            {
-                cv.valid_name: cv.All(
-                    VARIABLE_SCHEMA,
-                    validate_variable,
-                )
-            }
-        ),
-        cv.Optional(CONF_LAMBDA): cv.lambda_,
-        cv.Optional(CONF_PRESETS): cv.ensure_list(
-            cv.one_of(*presets.PRESETS, lower=True)
-        ),
-    }
-), cv.only_on([PLATFORM_ESP32]),)
+        {
+            cv.GenerateID(): cv.declare_id(cpp.Settings),
+            cv.GenerateID(web_server_base.CONF_WEB_SERVER_BASE_ID): cv.use_id(
+                web_server_base.WebServerBase,
+            ),
+            cv.Optional(CONF_BASE_URL): cv.string_strict,
+            cv.Optional(CONF_AUTH): cv.Schema(
+                {
+                    cv.Required(CONF_USERNAME): cv.All(
+                        cv.string_strict, cv.Length(min=1)
+                    ),
+                    cv.Required(CONF_PASSWORD): cv.All(
+                        cv.string_strict, cv.Length(min=1)
+                    ),
+                }
+            ),
+            cv.Optional(CONF_VARIABLES, default={}): cv.Schema(
+                {
+                    cv.valid_name: cv.All(
+                        VARIABLE_SCHEMA,
+                        validate_variable,
+                    )
+                }
+            ),
+            cv.Optional(CONF_LAMBDA): cv.lambda_,
+            cv.Optional(CONF_PRESETS): cv.ensure_list(
+                cv.one_of(*presets.PRESETS, lower=True)
+            ),
+        }
+    ),
+    cv.only_on([PLATFORM_ESP32]),
+)
 
 
 def _add_resource(filename: str, resurce_name: str = ""):
