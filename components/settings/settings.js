@@ -143,7 +143,7 @@ function FormFields(props) {
           placeholder="${props.name}"
           min="0"
           max="${props.max}"
-          step="10"
+          step="1"
           aria-invalid=${this.state.invalid}
           required
           value=${this.state.value}
