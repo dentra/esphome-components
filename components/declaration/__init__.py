@@ -1,13 +1,14 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import cpp_generator as cpp
-from esphome.const import CONF_INTERNAL, CONF_LAMBDA
+from esphome.const import CONF_ID, CONF_INTERNAL, CONF_LAMBDA
 
 CONF_NAMESPACE = "namespace"
 CONF_INCLUDE = "include"
 
 DECLARATION_SCHEMA = cv.Schema(
     {
+        cv.Optional(CONF_ID): cv.declare_id(cg.uint8),
         cv.Optional(CONF_NAMESPACE): cv.ensure_list(cv.valid_name),
         cv.Optional(CONF_INTERNAL): cv.boolean,
         cv.Optional(CONF_LAMBDA): cv.lambda_,
