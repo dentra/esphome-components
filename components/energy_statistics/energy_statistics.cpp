@@ -6,32 +6,45 @@ namespace esphome {
 namespace energy_statistics {
 
 static const char *const TAG = "energy_statistics";
-static const char *const GAP = "  ";
+
+static const char *const PREF_V1 = "energy_statistics";
+static const char *const PREF_V2 = "energy_statistics_v2";
 
 void EnergyStatistics::dump_config() {
   ESP_LOGCONFIG(TAG, "Energy statistics sensors");
   if (this->energy_today_) {
-    LOG_SENSOR(GAP, "Energy Today", this->energy_today_);
+    LOG_SENSOR("  ", "Energy Today", this->energy_today_);
   }
   if (this->energy_yesterday_) {
-    LOG_SENSOR(GAP, "Energy Yesterday", this->energy_yesterday_);
+    LOG_SENSOR("  ", "Energy Yesterday", this->energy_yesterday_);
   }
   if (this->energy_week_) {
-    LOG_SENSOR(GAP, "Energy Week", this->energy_week_);
+    LOG_SENSOR("  ", "Energy Week", this->energy_week_);
   }
   if (this->energy_month_) {
-    LOG_SENSOR(GAP, "Energy Month", this->energy_month_);
+    LOG_SENSOR("  ", "Energy Month", this->energy_month_);
+  }
+  if (this->energy_year_) {
+    LOG_SENSOR("  ", "Energy Year", this->energy_year_);
   }
 }
 
 void EnergyStatistics::setup() {
   this->total_->add_on_state_callback([this](float state) { this->process_(state); });
 
-  this->pref_ = global_preferences->make_preference<energy_data_t>(fnv1_hash(TAG));
-
-  energy_data_t loaded{};
-  if (this->pref_.load(&loaded)) {
-    this->energy_ = loaded;
+  this->pref_ = global_preferences->make_preference<energy_data_t>(fnv1_hash(PREF_V2));
+  bool loaded = this->pref_.load(&this->energy_);
+  if (!loaded) {
+    // migrating from v1 data
+    loaded = global_preferences->make_preference<energy_data_v1_t>(fnv1_hash(PREF_V1)).load(&this->energy_);
+    if (loaded) {
+      this->energy_.start_year = this->energy_.start_month;
+      // save as v2
+      this->pref_.save(&this->energy_);
+      global_preferences->sync();
+    }
+  }
+  if (loaded) {
     auto total = this->total_->get_state();
     if (!std::isnan(total)) {
       this->process_(total);
@@ -52,6 +65,7 @@ void EnergyStatistics::loop() {
     return;
   }
 
+  // update stats first time or on next day
   if (t.day_of_year == this->energy_.current_day_of_year) {
     // nothing to do
     return;
@@ -70,6 +84,17 @@ void EnergyStatistics::loop() {
     if (t.day_of_month == 1) {
       this->energy_.start_month = total;
     }
+  }
+
+  // Intitialize all sensors. https://github.com/dentra/esphome-components/issues/65
+  if (this->energy_week_ && std::isnan(this->energy_.start_week)) {
+    this->energy_.start_week = this->energy_.start_yesterday;
+  }
+  if (this->energy_month_ && std::isnan(this->energy_.start_month)) {
+    this->energy_.start_month = this->energy_.start_yesterday;
+  }
+  if (this->energy_year_ && std::isnan(this->energy_.start_year)) {
+    this->energy_.start_year = this->energy_.start_yesterday;
   }
 
   this->energy_.current_day_of_year = t.day_of_year;
@@ -94,10 +119,8 @@ void EnergyStatistics::process_(float total) {
     this->energy_month_->publish_state(total - this->energy_.start_month);
   }
 
-  this->save_();
+  this->pref_.save(&this->energy_);
 }
-
-void EnergyStatistics::save_() { this->pref_.save(&(this->energy_)); }
 
 }  // namespace energy_statistics
 }  // namespace esphome

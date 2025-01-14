@@ -25,6 +25,7 @@ class EnergyStatistics : public Component {
   void set_energy_yesterday(Sensor *sensor) { this->energy_yesterday_ = sensor; }
   void set_energy_week(Sensor *sensor) { this->energy_week_ = sensor; }
   void set_energy_month(Sensor *sensor) { this->energy_month_ = sensor; }
+  void set_energy_year(Sensor *sensor) { this->energy_year_ = sensor; }
 
  protected:
   ESPPreferenceObject pref_;
@@ -38,22 +39,26 @@ class EnergyStatistics : public Component {
   Sensor *energy_yesterday_{nullptr};
   Sensor *energy_week_{nullptr};
   Sensor *energy_month_{nullptr};
+  Sensor *energy_year_{nullptr};
 
   // start day of week configuration
   int energy_week_start_day_{2};
   // start day of month configuration
   int energy_month_start_day_{1};
 
-  struct energy_data_t {
+  struct energy_data_v1_t {
     uint16_t current_day_of_year{0};
     float start_today{NAN};
     float start_yesterday{NAN};
     float start_week{NAN};
     float start_month{NAN};
+  };
+
+  struct energy_data_t : public energy_data_v1_t {
+    float start_year{NAN};
   } energy_;
 
   void process_(float total);
-  void save_();
 };  // class EnergyStatistics
 
 }  // namespace energy_statistics
