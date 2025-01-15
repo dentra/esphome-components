@@ -11,6 +11,15 @@ from esphome.const import (
     UNIT_KILOWATT_HOURS,
 )
 
+# Import custom ICONS from const.py
+from .const import (
+    ICON_TODAY,
+    ICON_YESTERDAY,
+    ICON_WEEK,
+    ICON_MONTH,
+    ICON_YEAR,
+)
+
 CODEOWNERS = ["@dentra"]
 
 DEPENDENCIES = ["time"]
@@ -32,30 +41,35 @@ CONFIG_SCHEMA = cv.Schema(
         cv.Required(CONF_TOTAL): cv.use_id(sensor.Sensor),
         cv.Optional(CONF_ENERGY_TODAY): sensor.sensor_schema(
             unit_of_measurement=UNIT_KILOWATT_HOURS,
+            icon=ICON_TODAY,
             accuracy_decimals=2,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_ENERGY_YESTERDAY): sensor.sensor_schema(
             unit_of_measurement=UNIT_KILOWATT_HOURS,
+            icon=ICON_YESTERDAY,
             accuracy_decimals=2,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_ENERGY_WEEK): sensor.sensor_schema(
             unit_of_measurement=UNIT_KILOWATT_HOURS,
+            icon=ICON_WEEK,
             accuracy_decimals=2,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_ENERGY_MONTH): sensor.sensor_schema(
             unit_of_measurement=UNIT_KILOWATT_HOURS,
+            icon=ICON_MONTH,
             accuracy_decimals=2,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ),
         cv.Optional(CONF_ENERGY_YEAR): sensor.sensor_schema(
             unit_of_measurement=UNIT_KILOWATT_HOURS,
+            icon=ICON_YEAR,
             accuracy_decimals=2,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
