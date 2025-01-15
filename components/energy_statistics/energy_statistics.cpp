@@ -84,6 +84,10 @@ void EnergyStatistics::loop() {
     if (t.day_of_month == 1) {
       this->energy_.start_month = total;
     }
+    // at first day of year we start a new year calculation
+    if (t.day_of_year == 1) {
+      this->energy_.start_year = total;
+    }    
   }
 
   // Intitialize all sensors. https://github.com/dentra/esphome-components/issues/65
