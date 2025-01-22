@@ -118,7 +118,11 @@ void EnergyStatistics::process_(float total) {
   if (this->energy_month_ && !std::isnan(this->energy_.start_month)) {
     this->energy_month_->publish_state(total - this->energy_.start_month);
   }
-
+  
+  if (this->energy_year_ && !std::isnan(this->energy_.start_year)) {
+    this->energy_year_->publish_state(total - this->energy_.start_year);
+  }
+  
   this->pref_.save(&this->energy_);
 }
 
