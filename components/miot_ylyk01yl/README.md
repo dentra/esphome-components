@@ -5,6 +5,7 @@
 > At this moment it is not supported Xiaomi Cloud key extraction for this device. But you could to get it with [miot_ylxx0xyl_pair](../miot_ylxx0xyl_pair).
 
 Sample configuration:
+
 ```yaml
 external_components:
   - source: github://dentra/esphome-components
@@ -13,7 +14,7 @@ sensor:
   - platform: miot_ylyk01yl
     # String (Required), device MAC-address.
     mac_address: "device-mac-address"
-    # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
+    # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automatically get the bindkey.
     bindkey: "device-bind-key"
     # List, Automation (Optional), The automation activated when you clicked specified button
     on_click:
@@ -28,10 +29,9 @@ sensor:
       # String (Required), The button name (case insensitive):
       #     on, off, dimmable or sun or moon, plus or +, moonlight or M, minus or -
       - button: "+"
-      # List, Any automation
+        # List, Any automation
         then:
-           - logger.log: button PLUS long press
-
+          - logger.log: button PLUS long press
 ```
 
 thanks to @Slavissy

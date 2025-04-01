@@ -39,14 +39,13 @@ partitions:
     subtype: nvs
     # size, required filed for all non-default partition entries
     size: 0x5000
-    # offset field: in most cases calculated automaticaly
+    # offset field: in most cases calculated automatically
     offset: 0x9000
 
   phy_init:
     # override default partition entry name
     name: my_phy
 ```
-
 
 ## Minimal example
 
@@ -84,8 +83,8 @@ partitions:
   coredump:
 ```
 
-
 ## Full example
+
 You can completely control all of partition entry fields.
 
 ```yaml

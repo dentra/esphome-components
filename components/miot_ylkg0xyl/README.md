@@ -1,6 +1,7 @@
 # Yeelight Smart Bluetooth Wireless Dimmer Wall Light Switch Remote Control (YLKG08YL/YLKG07YL)
 
 Sample configuration:
+
 ```yaml
 external_components:
   - source: github://dentra/esphome-components
@@ -9,7 +10,7 @@ sensor:
   - platform: miot_ylkg0xyl
     # String (Required), device MAC-address.
     mac_address: "$device_mac_address"
-    # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
+    # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automatically get the bindkey.
     bindkey: "$device_bindkey"
     # List, Automation (Optional), The automation activated when you make specified action
     on_short_press:
@@ -41,7 +42,6 @@ sensor:
           - logger.log:
               format: knob was pressed and rotating right on %u
               args: ["x"]
-
 ```
 
 thanks to @xrays72

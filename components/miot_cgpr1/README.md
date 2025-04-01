@@ -2,11 +2,12 @@
 
 <img src="miot_cgpr1.png" alt="CGPR1" width="200"/>
 
-> You colud automaticaly get bindkey from Xiaomi Cloud by configuring `xiaomi_account` property in [MIOT](../miot/) platform.
+> You could automatically get bindkey from Xiaomi Cloud by configuring `xiaomi_account` property in [MIOT](../miot/) platform.
 
 > You could also configure this device via [Qingping](../qingping/) platform.
 
 Sample configuration:
+
 ```yaml
 external_components:
   - source: github://dentra/esphome-components
@@ -15,7 +16,7 @@ binary_sensor:
   - platform: miot_cgpr1
     # String (Required), device MAC-address.
     mac_address: "device-mac-address"
-    # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
+    # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automatically get the bindkey.
     bindkey: "device-bind-key"
     # String, (Optional), the name of binary sensor.
     name: "$name Motion"
@@ -32,15 +33,16 @@ binary_sensor:
     # BinarySensor (Optional), Light intensivity: on - strong light, off - weak light.
     light:
       name: "$name Light"
-    # Sensor (Optional), Battey Level, %.
+    # Sensor (Optional), Battery Level, %.
     battery_level:
       name: "$name Battery Level"
-    # Sensor (Optional), Battey Voltage, V.
+    # Sensor (Optional), Battery Voltage, V.
     battery_voltage:
       name: "$name Battery Voltage"
 ```
 
 Now signal strength of a BLE device (RSSI) is not a part of this component, but you could easily add it:
+
 ```yaml
 sensor:
   - platform: ble_rssi
