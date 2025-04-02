@@ -273,6 +273,12 @@ struct BLEObject {
    * @return toothbrush_event
    */
   optional<ToothbrushEvent> get_toothbrush_event() const;
+
+  optional<bool> get_motion() const;
+
+  optional<float> get_motion_with_illuminance() const;
+
+  optional<uint16_t> get_no_motion_time() const;
 };
 
 }  // namespace miot

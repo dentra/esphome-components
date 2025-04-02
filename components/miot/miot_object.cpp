@@ -283,5 +283,32 @@ optional<ToothbrushEvent> BLEObject::get_toothbrush_event() const {
   return toothbrush_event;
 }
 
+optional<bool> BLEObject::get_motion() const {
+  CHECK_MIID(MIID_MOTION_EVENT);
+  const auto motion = this->get_bool();
+  if (motion.has_value()) {
+    ESP_LOGD(TAG, "Motion: %s", YESNO(*motion));
+  }
+  return motion;
+}
+
+optional<float> BLEObject::get_motion_with_illuminance() const {
+  CHECK_MIID(MIID_MOTION_WITH_ILLUMINANCE);
+  const auto illuminance = this->get_float();
+  if (illuminance.has_value()) {
+    ESP_LOGD(TAG, "Motion with illuminance: %.2f lx", *illuminance);
+  }
+  return illuminance;
+}
+
+optional<uint16_t> BLEObject::get_no_motion_time() const {
+  CHECK_MIID(MIID_NO_MOTION_TIME);
+  const auto time = this->get_uint16();
+  if (time.has_value()) {
+    ESP_LOGD(TAG, "No motion time: %u s", *time);
+  }
+  return time;
+}
+
 }  // namespace miot
 }  // namespace esphome

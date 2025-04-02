@@ -452,7 +452,7 @@ enum MIID : uint16_t {
   //
   // The duration of the idle time, in seconds.
   //
-  // Note: If someone moves, reportd the unmoved property with 0 time.
+  // Note: If someone moves, reported the unmoved property with 0 time.
   MIID_IDLE_TIME = 0x1017,
 
   // Light intensity.
@@ -649,6 +649,16 @@ enum MIID : uint16_t {
   // https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.t9
   // https://home.miot-spec.com/spec/miaomiaoce.sensor_ht.o2
   MIID_MIAOMIAOCE_HUMIDITY_1002 = 0x4C02,
+
+  // Motion detected with Illuminance in lux.
+  //
+  // float illuminance;
+  MIID_MOTION_WITH_ILLUMINANCE = 0x4A08,
+
+  // Time in seconds of no motion.
+  //
+  // uint16_t time;
+  MIID_NO_MOTION_TIME = 0x4818,
 };
 
 // Frame Control.
