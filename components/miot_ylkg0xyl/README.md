@@ -9,9 +9,9 @@ external_components:
 sensor:
   - platform: miot_ylkg0xyl
     # String (Required), device MAC-address.
-    mac_address: "$device_mac_address"
+    mac_address: !secret device_mac_address
     # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automatically get the bindkey.
-    bindkey: "$device_bindkey"
+    bindkey: !secret device_bind_key
     # List, Automation (Optional), The automation activated when you make specified action
     on_short_press:
       # List, Any automation

@@ -41,7 +41,6 @@ wifi:
   password: $wifi_password
   # Enable fallback hotspot (captive portal) in case wifi connection fails
   ap:
-    ssid: "$friendly_name Hotspot"
     password: $wifi_ap_password
   fast_connect: true
 
@@ -81,126 +80,126 @@ tuya:
 
 switch:
   # Uncomment next 5 lines to expose main switch to HA
-  #  - platform: "tuya"
+  #  - platform: tuya
   #    id: sw_power
   #    name: None
   #    switch_datapoint: $dp_switch
-  #    icon: "mdi:power"
+  #    icon: mdi:power
   # Uncomment next 5 lines if you want a switch to query the device working status by forces update values from Tuya MCU
-  # - platform: "uart"
+  # - platform: uart
   #   id: sw_tuya_query_status
   #   data: [0x55, 0xaa, 0x00, 0x08, 0x00, 0x00, 0x07]
-  #   name: "Force update"
+  #   name: Force update
   #   icon: mdi:reload
 
 text_sensor:
-  - platform: "template"
+  - platform: template
     id: current_tariff
-    name: "Current Tariff"
-    icon: "mdi:theme-light-dark"
+    name: Current Tariff
+    icon: mdi:theme-light-dark
     entity_category: diagnostic
 
 # Create sensors
 sensor:
   # total
-  - platform: "tuya"
+  - platform: tuya
     id: total
-    name: "Total"
+    name: Total
     sensor_datapoint: $dp_total
     accuracy_decimals: 3
     filters:
       - multiply: 0.001
     unit_of_measurement: "kWh"
-    icon: "mdi:sigma"
-    device_class: "energy"
+    icon: mdi:sigma
+    device_class: energy
 
     state_class: total_increasing
     entity_category: diagnostic
 
   # active power
-  - platform: "tuya"
+  - platform: tuya
     id: power
-    name: "Active Power"
+    name: Active Power
     sensor_datapoint: $dp_power
     accuracy_decimals: 1
     filters:
       - multiply: 0.1
     unit_of_measurement: "W"
-    icon: "mdi:flash"
-    device_class: "power"
+    icon: mdi:flash
+    device_class: power
     state_class: measurement
 
   # current
-  - platform: "tuya"
+  - platform: tuya
     id: current
-    name: "Current"
+    name: Current
     sensor_datapoint: $dp_current
     accuracy_decimals: 3
     filters:
       - multiply: 0.001
     unit_of_measurement: "A"
-    icon: "mdi:current-ac"
-    device_class: "current"
+    icon: mdi:current-ac
+    device_class: current
     state_class: measurement
 
   # voltage
-  - platform: "tuya"
+  - platform: tuya
     id: voltage
-    name: "Voltage"
+    name: Voltage
     sensor_datapoint: $dp_voltage
     accuracy_decimals: 1
     filters:
       - multiply: 0.1
     unit_of_measurement: "V"
-    icon: "mdi:sine-wave"
-    device_class: "voltage"
+    icon: mdi:sine-wave
+    device_class: voltage
     state_class: measurement
 
-  - platform: "energy_monitoring"
+  - platform: energy_monitoring
     id: mon
     power: power
     voltage: voltage
     current: current
     apparent_power:
-      name: "Apparent Power"
+      name: Apparent Power
       filters:
         - throttle_average: 60s
         - filter_out: nan
     reactive_power:
-      name: "Reactive Power"
+      name: Reactive Power
       filters:
         - throttle_average: 60s
         - filter_out: nan
     power_factor:
-      name: "Power Factor"
-      # icon: "mdi:angle-acute"
+      name: Power Factor
+      # icon: mdi:angle-acute
       # unit_of_measurement: "%"
       filters:
         - throttle_average: 60s
         - filter_out: nan
 
-  - platform: "energy_statistics"
+  - platform: energy_statistics
     id: stat
     total: total
     energy_today:
       id: today
-      name: "Energy Today"
+      name: Energy Today
 
-  - platform: "energy_tariffs"
+  - platform: energy_tariffs
     id: tariffs
     total: total
     time_offset:
-      name: "Time Offset"
+      name: Time Offset
       id: time_offset
     tariffs:
-      - name: "Peak Tariff"
+      - name: Peak Tariff
         id: peak
-        icon: "mdi:weather-sunny"
+        icon: mdi:weather-sunny
         service: peak_set
-      - name: "Off-Peak Tariff"
+      - name: Off-Peak Tariff
         id: offpeak
-        icon: "mdi:weather-night"
-        time: "23:00-07:00"
+        icon: mdi:weather-night
+        time: 23:00-07:00
         service: offpeak_set
     on_tariff:
       lambda: |-
@@ -214,8 +213,8 @@ sensor:
       - uart.write: [0x55, 0xaa, 0x00, 0x08, 0x00, 0x00, 0x07]
 
   - platform: uptime
-    name: "Uptime"
+    name: Uptime
     device_class: duration
 
   - platform: wifi_signal
-    name: "WiFi Signal"
+    name: WiFi Signal

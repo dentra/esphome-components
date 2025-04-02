@@ -6,6 +6,7 @@ With enabled indicator you can monitor crashes right from your Home Assistant.
 > For ESP-IDF please use [coredump](../coredump/) component.
 
 ## Advanced usage
+
 Connect to you ESP8266 and find crash backtrace information in the log.
 Copy stack frames and decode with `xtensa-lx106-elf-addr2line -aipfC -e $elf ...` command.
 
@@ -13,10 +14,10 @@ Copy stack frames and decode with `xtensa-lx106-elf-addr2line -aipfC -e $elf ...
 
 ```yaml
 # Example configuration entry.
-...
+ ...
 external_components:
   - source: github://dentra/esphome-components
-...
+ ...
 crash_info:
   id: crash_info_obj
   # Optional, uint32. The number of stack frames to be saved.

@@ -12,24 +12,26 @@
 This platform implements parsing Qingping BLE advertisements and exposing them as sensors or binary sensors.
 
 Supported known data points:
- * Temperature
- * Humidity
- * Battery
- * Door/Window/Opening
- * Door/Window/Opening problem
- * Pressure
- * Motion
- * Illuminance
- * Light
- * PM 2.5
- * PM 10
- * Carbon Dioxide (CO2)
+
+- Temperature
+- Humidity
+- Battery
+- Door/Window/Opening
+- Door/Window/Opening problem
+- Pressure
+- Motion
+- Illuminance
+- Light
+- PM 2.5
+- PM 10
+- Carbon Dioxide (CO2)
 
 Also supports any other type via automation or feature request.
 
 Provide explorier feature to get data without knowing MAC-address or supported data points.
 
 Minimal sample configuration:
+
 ```yaml
 # Load component implementation and code generation helpers from github.
 external_components:
@@ -38,7 +40,7 @@ external_components:
 
 # Define qingping BLE listener on specified MAC-address.
 qinping:
-  mac_address: "11:22:33:44:55:66"
+  mac_address: 11:22:33:44:55:66
 
 sensor:
   - platform: qingping
@@ -49,7 +51,6 @@ binary_sensor:
   - platform: qingping
     type: light
     name: Light
-
 ```
 
 > [!NOTE]
@@ -76,15 +77,15 @@ external_components:
 qingping:
   - id: qp_th
     # MAC-address is required for specific defice.
-    mac_address: "11:22:33:44:55:66"
+    mac_address: 11:22:33:44:55:66
   - id: qp_air_monitor
     # MAC-address is required for specific defice.
-    mac_address: "11:22:33:44:55:77"
+    mac_address: 11:22:33:44:55:77
     # Log all processed packets
     verbose: true
   - id: qp_new_device
     # MAC-address is required for specific defice.
-    mac_address: "11:22:33:44:55:88"
+    mac_address: 11:22:33:44:55:88
     # Log all processed packets
     verbose: true
     on_state:
@@ -139,34 +140,37 @@ sensor:
 ```
 
 ### Configuration variables:
- * `id` (Optional, [ID]): Manually specify the ID for this hub.
- * `mac_address` (Optional, MAC Address): The MAC address to track for this hub.
- Note that mac_address is required if `explorer` or `verbose` is not present.
+
+- `id` (Optional, [ID]): Manually specify the ID for this hub.
+- `mac_address` (Optional, MAC Address): The MAC address to track for this hub.
+  Note that mac_address is required if `explorer` or `verbose` is not present.
 
 ### Automations:
- * `on_state` (Optional, [Automation]): An automation to perform when a new BLE device state change is received.
+
+- `on_state` (Optional, [Automation]): An automation to perform when a new BLE device state change is received.
 
 ### Advanced options:
- * `use_beacon_mac` (Optional, boolean): If true uses MAC-address from the beacon. Default: False.
- * `verbose` (Optional, boolean): If true enables verbose output to log. . Default: False.
- * `explorer` (Optional, Schema): Can automatically creates sensors and binary sensors based on
+
+- `use_beacon_mac` (Optional, boolean): If true uses MAC-address from the beacon. Default: False.
+- `verbose` (Optional, boolean): If true enables verbose output to log. . Default: False.
+- `explorer` (Optional, Schema): Can automatically creates sensors and binary sensors based on
 
 ### explorer variables:
 
 All explorer variables are present by default, you can exclude unnecessary ones by setting them to None or False.
 
- * `temperature` (Optional, string): The name of created temperature sensor. Default: Temperature.
- * `humidity` (Optional, string): The name of created humidity sensor. Default: Humidity.
- * `battery_level` (Optional, string): The name of created battery level sensor. Default: Battery Level.
- * `door` (Optional, string): The name of created door binary sensor. Default: Door.
- * `door_left_open` (Optional, string): The name of created door left open binary sensor. Default: Door Left Open.
- * `pressure` (Optional, string): The name of created pressure sensor. Default: Pressure.
- * `motion` (Optional, string): The name of created motion binary sensor. Default: Motion.
- * `illuminance` (Optional, string): The name of created illuminance sensor. Default: Illuminance.
- * `light` (Optional, string): The name of created light binary sensor. Default: Light.
- * `pm10` (Optional, string): The name of created pm 10 sensor. Default: PM 10.
- * `pm25` (Optional, string): The name of created pm 2.5 sensor. Default: PM 2.5.
- * `co2` (Optional, string): The name of created co2 sensor. Default: Carbon Dioxide.
+- `temperature` (Optional, string): The name of created temperature sensor. Default: Temperature.
+- `humidity` (Optional, string): The name of created humidity sensor. Default: Humidity.
+- `battery_level` (Optional, string): The name of created battery level sensor. Default: Battery Level.
+- `door` (Optional, string): The name of created door binary sensor. Default: Door.
+- `door_left_open` (Optional, string): The name of created door left open binary sensor. Default: Door Left Open.
+- `pressure` (Optional, string): The name of created pressure sensor. Default: Pressure.
+- `motion` (Optional, string): The name of created motion binary sensor. Default: Motion.
+- `illuminance` (Optional, string): The name of created illuminance sensor. Default: Illuminance.
+- `light` (Optional, string): The name of created light binary sensor. Default: Light.
+- `pm10` (Optional, string): The name of created pm 10 sensor. Default: PM 10.
+- `pm25` (Optional, string): The name of created pm 2.5 sensor. Default: PM 2.5.
+- `co2` (Optional, string): The name of created co2 sensor. Default: Carbon Dioxide.
 
 ## Configuring platform `binary_sensor`
 
@@ -183,21 +187,23 @@ binary_sensor:
 ```
 
 ### Configuration variables:
- * `type` (Rquired, string) - type of the binary sensor, see below.
- * `qingping_id` (Optional, [ID]) - id of qingping hub. You can skip this parameter if you have only one hub.
- * `id` (Optional, [ID]): Manually specify the ID for this binary sensor.
- * `name` (Optional, string): The name of the binary sensor.
- * All other options from [binary_sensor].
+
+- `type` (Required, string) - type of the binary sensor, see below.
+- `qingping_id` (Optional, [ID]) - id of qingping hub. You can skip this parameter if you have only one hub.
+- `id` (Optional, [ID]): Manually specify the ID for this binary sensor.
+- `name` (Optional, string): The name of the binary sensor.
+- All other options from [binary_sensor].
 
 ### Configuration types:
- * `door`
- * `window`
- * `opening`
- * `door_problem`
- * `window_problem`
- * `opening_problem`
- * `motion`
- * `light`
+
+- `door`
+- `window`
+- `opening`
+- `door_problem`
+- `window_problem`
+- `opening_problem`
+- `motion`
+- `light`
 
 ## Configuring platform `sensor`
 
@@ -214,25 +220,26 @@ sensor:
 ```
 
 ### Configuration variables:
- * `type` (Rquired, string) - type of the sensor, see below.
- * `qingping_id` (Optional, [ID]) - id of qingping hub. You can skip this parameter if you have only one hub.
- * `id` (Optional, [ID]): Manually specify the ID for this sensor.
- * `name` (Optional, string): The name of the sensor.
- * All other options from [sensor].
+
+- `type` (Required, string) - type of the sensor, see below.
+- `qingping_id` (Optional, [ID]) - id of qingping hub. You can skip this parameter if you have only one hub.
+- `id` (Optional, [ID]): Manually specify the ID for this sensor.
+- `name` (Optional, string): The name of the sensor.
+- All other options from [sensor].
 
 ### Configuration types:
 
- * `temperature`
- * `humidity`
- * `battery_level` / `battery`
- * `pressure`
- * `illuminance` / `light`
- * `packet`
- * `pm25` / `pm_25` / `pm_2_5`
- * `pm10` / `pm_10`
- * `co2` / `carbon_dioxide`
-
+- `temperature`
+- `humidity`
+- `battery_level` / `battery`
+- `pressure`
+- `illuminance` / `light`
+- `packet`
+- `pm25` / `pm_25` / `pm_2_5`
+- `pm10` / `pm_10`
+- `co2` / `carbon_dioxide`
 
 ## Your thanks
+
 If this project was useful to you, you can buy me a Cup of coffee via
-[PayPal], [Card2Card], [Boosty] subscripion or or just star the project :)
+[PayPal], [Card2Card], [Boosty] subscription or or just star the project :)

@@ -1,8 +1,8 @@
-from esphome.cpp_types import Component
-from esphome.core import Lambda
-from esphome import automation
+import logging
+
 import esphome.codegen as cg
 import esphome.config_validation as cv
+from esphome import automation
 from esphome.components import binary_sensor, esp32_ble_tracker, sensor, text_sensor
 from esphome.const import (
     CONF_BATTERY_LEVEL,
@@ -10,6 +10,8 @@ from esphome.const import (
     CONF_ID,
     CONF_LAMBDA,
     CONF_MAC_ADDRESS,
+    CONF_NAME,
+    CONF_PLATFORM,
     CONF_THEN,
     CONF_TRIGGER_ID,
     DEVICE_CLASS_BATTERY,
@@ -20,11 +22,16 @@ from esphome.const import (
     UNIT_PERCENT,
     UNIT_VOLT,
 )
+from esphome.core import Lambda
+from esphome.cpp_types import Component
+
 from .. import xiaomi_account  # pylint: disable=relative-beyond-top-level
 
 CODEOWNERS = ["@dentra"]
 ESP_PLATFORMS = [PLATFORM_ESP32]
 AUTO_LOAD = ["esp32_ble_tracker", "sensor"]
+
+_LOGGER = logging.getLogger(__name__)
 
 CONF_MIOT_ID = "miot_id"
 CONF_ON_MIOT_ADVERTISE = "on_miot_advertise"
@@ -84,19 +91,25 @@ CONFIG_SCHEMA = (
 MIOT_BLE_DEVICE_SCHEMA = cv.Schema(
     {
         cv.GenerateID(CONF_MIOT_ID): cv.use_id(MiBeaconTracker),
-        cv.Optional(CONF_BATTERY_LEVEL): sensor.sensor_schema(
-            unit_of_measurement=UNIT_PERCENT,
-            accuracy_decimals=0,
-            device_class=DEVICE_CLASS_BATTERY,
-            state_class=STATE_CLASS_MEASUREMENT,
-            entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        cv.Optional(CONF_BATTERY_LEVEL): cv.maybe_simple_value(
+            sensor.sensor_schema(
+                unit_of_measurement=UNIT_PERCENT,
+                accuracy_decimals=0,
+                device_class=DEVICE_CLASS_BATTERY,
+                state_class=STATE_CLASS_MEASUREMENT,
+                entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+            ),
+            key=CONF_NAME,
         ),
-        cv.Optional(CONF_BATTERY_VOLTAGE): sensor.sensor_schema(
-            unit_of_measurement=UNIT_VOLT,
-            accuracy_decimals=3,
-            device_class=DEVICE_CLASS_VOLTAGE,
-            state_class=STATE_CLASS_MEASUREMENT,
-            entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+        cv.Optional(CONF_BATTERY_VOLTAGE): cv.maybe_simple_value(
+            sensor.sensor_schema(
+                unit_of_measurement=UNIT_VOLT,
+                accuracy_decimals=3,
+                device_class=DEVICE_CLASS_VOLTAGE,
+                state_class=STATE_CLASS_MEASUREMENT,
+                entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+            ),
+            key=CONF_NAME,
         ),
     }
 ).extend(MIOT_BLE_DEVICE_CORE_SCHEMA)
@@ -164,3 +177,9 @@ async def to_code(config):
         if conf.get(CONF_DEBUG, False):
             cg.add(trigger.set_debug(True))
         await automation.build_automation(trigger, [(BLEObjectConstRef, "x")], conf)
+
+
+def deprecated(config: dict, new_platform: str):
+    _LOGGER.warning(
+        "%s was deprecated, please use %s instead.", config[CONF_PLATFORM], new_platform
+    )

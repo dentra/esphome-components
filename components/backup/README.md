@@ -9,12 +9,13 @@ Save your ESPHome device configuration in firmware and and recover it if you los
 > WARNING: Command line substitutions, custom components and includes are not supported yet!
 
 The configuration is very simple. Look at a sample below:
+
 ```yaml
 # Full example of configuration entry
-...
+ ...
 external_components:
   - source: github://dentra/esphome-components
-...
+ ...
 backup:
   auth:
     username: !secret web_username
@@ -22,8 +23,9 @@ backup:
   force_update: false
 ```
 
-##  Configuration variables:
-* **auth** (*Optional*): Enables basic authentication with username and password.
- * **username** (**Required**, string): The username to use for authentication.
- * **password** (**Required**, string): The password to check for authentication.
-* **force_update** (*Optional*, boolean): Unnecessary but might be needed when you changes in separated files are not detected properly. Default is False.
+## Configuration variables:
+
+- **auth** (_Optional_): Enables basic authentication with username and password.
+- **username** (**Required**, string): The username to use for authentication.
+- **password** (**Required**, string): The password to check for authentication.
+- **force_update** (_Optional_, boolean): Unnecessary but might be needed when you changes in separated files are not detected properly. Default is False.

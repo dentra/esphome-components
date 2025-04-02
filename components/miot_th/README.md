@@ -23,20 +23,20 @@ external_components:
 sensor:
   - platform: miot_th
     # String (Required), device MAC-address.
-    mac_address: "device-mac-address"
+    mac_address: !secret device_mac_address
     # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automatically get the bindkey.
-    bindkey: "device-bind-key"
+    bindkey: !secret device_bind_key
     # String, (Optional), the name of sensor.
-    name: "$name Temperature"
+    name: Temperature
     # Sensor (Optional), Humidity, %
     humidity:
-      name: "$name Humidity"
+      name: Humidity
     # Sensor (Optional), Battery Level, %
     battery_level:
-      name: "$name Battery Level"
+      name: Battery Level
     # Sensor (Optional), Battery Voltage, V
     battery_voltage:
-      name: "$name Battery Voltage"
+      name: Battery Voltage
 ```
 
 Now signal strength of a BLE device (RSSI) is not a part of this component, but you could easily add it:
@@ -44,13 +44,13 @@ Now signal strength of a BLE device (RSSI) is not a part of this component, but 
 ```yaml
 sensor:
   - platform: ble_rssi
-    mac_address: "device-mac-address"
-    name: "$name RSSI"
+    mac_address: !secret device_mac_address
+    name: RSSI
 ```
 
 ## Adding new device to component
 
-Configure [miot](../miot/) compoent and send me evets from your toothbrush.
+Configure [miot](../miot/) component and send me events from your toothbrush.
 
 ```yaml
 miot:

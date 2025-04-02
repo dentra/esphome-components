@@ -26,9 +26,9 @@ miot:
 
   on_miot_advertise:
     # String (Required), device MAC-address
-    mac_address: "device-mac-address"
+    mac_address: !secret device_mac_address
     # String, (Optional), device bind key
-    bindkey: "device-bind-key"
+    bindkey: !secret device_bind_key
     # enable debug BLE messages, DO NOT USE IN PRODUCTION
     debug: true
     then:
@@ -44,9 +44,9 @@ external_components:
 miot:
   on_miot_advertise:
     # String (Required), device MAC-address.
-    mac_address: "device-mac-address"
+    mac_address: !secret device_mac_address
     # String, (Optional), device bind key
-    bindkey: "device-bind-key"
+    bindkey: !secret device_bind_key
     # enable debug BLE messages, DO NOT USE IN PRODUCTION
     debug: true
     then:

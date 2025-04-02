@@ -2,31 +2,31 @@
 
 Adds tariff support to your energy meter.
 
-> You can take a look at sample of usage of Energy\* components in configuartion for `ZMAi-90` energy meter based on `TYWE3S`: [zmai90.yaml](../zmai90.yaml)
+> You can take a look at sample of usage of Energy\* components in configuration for `ZMAi-90` energy meter based on `TYWE3S`: [zmai90.yaml](../zmai90.yaml)
 
 > Detailed description will be provided soon...
 
 ```yaml
 # Example configuration entry
-...
+ ...
 external_components:
   - source: github://dentra/esphome-components
-...
-- platform: "energy_tariffs"
+ ...
+- platform: energy_tariffs
     id: tariffs
     total: total
     time_offset:
-      name: "Time Offset"
+      name: Time Offset
     tariffs:
-      - name: "Peak Tariff"
+      - name: Peak Tariff
         id: peak
-        icon: "mdi:weather-sunny"
+        icon: mdi:weather-sunny
         service: peak_set
         initial_value: 10.0
-      - name: "Off-Peak Tariff"
+      - name: Off-Peak Tariff
         id: offpeak
-        icon: "mdi:weather-night"
-        time: "23:00-07:00"
+        icon: mdi:weather-night
+        time: 23:00-07:00
         service: offpeak_set
     on_tariff:
       lambda: |-
@@ -40,10 +40,10 @@ external_components:
       - uart.write: [0x55, 0xaa, 0x00, 0x08, 0x00, 0x00, 0x07]
 
 text_sensor:
-  - platform: "template"
+  - platform: template
     id: current_tariff
-    name: "Current Tariff"
-    icon: "mdi:theme-light-dark"
+    name: Current Tariff
+    icon: mdi:theme-light-dark
     entity_category: diagnostic
 ```
 
@@ -86,7 +86,7 @@ From [lambdas](https://esphome.io/guides/automations.html#config-lambda), you ca
   sensor:
     - platform: template
       id: time_offset
-      name: "$name Time Offset"
+      name: Time Offset
       icon: mdi:clock-fast
       accuracy_decimals: 0
       unit_of_measurement: "s"
@@ -100,7 +100,7 @@ From [lambdas](https://esphome.io/guides/automations.html#config-lambda), you ca
     - platform: template
       sensors:
         my_node_time:
-          friendly_name: "My Node Time"
+          friendly_name: My Node Time
           icon_template: mdi:clock-outline
           value_template: >-
             {{ (as_timestamp(now()) + states('sensor.my_node_time_offset')|int) | timestamp_custom("%H:%M:%S") }}
@@ -114,7 +114,7 @@ From [lambdas](https://esphome.io/guides/automations.html#config-lambda), you ca
 
 > Description will be provided soon...
 
-## Correct values without Home Assitant service
+## Correct values without Home Assistant service
 
 ```yaml
 number:

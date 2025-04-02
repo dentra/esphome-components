@@ -1,10 +1,11 @@
-# EraClean Refrigerator Odor Eliminator Max (CWBS-01)
+# EraClean Refrigerator Odor Eliminator Max (CWBS-01) aka EraClean Intelligent deodorizer (era.airp.cwb03)
 
 > This component is in beta stage.
 
-This component is using active bluetooth device connection, so do not set updtate interval less to save your device battery life.
+This component is using active bluetooth device connection, so do not set update interval less to save your device battery life.
 
 Sample configuration:
+
 ```yaml
 external_components:
   - source: github://dentra/esphome-components
@@ -13,7 +14,6 @@ ota:
   on_begin:
     then:
       - lambda: id(ble_client_deodorizer).set_enabled(false);
-
 
 xiaomi_account:
   username: !secret xiaomi_username
@@ -28,32 +28,31 @@ ble_client:
 binary_sensor:
   - platform: miot_cwbs01
     ble_client_id: ble_client_deodorizer
-    name: "${name} State"
+    name: State
     # Optional
     version:
-       name: "${name} Version"
+      name: Version
     # Optional, switch power
     power:
-      name: "${name} Power"
+      name: Power
     # Optional, switch cycle
     cycle:
-      name: "${name} Cycle"
+      name: Cycle
     # Optional, select mode
     mode:
-      name: "${name} Mode"
+      name: Mode
     # Optional, select scene
     scene:
-      name: "${name} Scene"
+      name: Scene
     # Optional, state of power plug
     charging:
-      name: "${name} Charging"
+      name: Charging
     # Optional, battery level %
     battery_level:
-      name: "${name} Battery Level"
+      name: Battery Level
     # Optional, internal device state
     error:
-      name: "${name} Error"
+      name: Error
     # Optional, Time: The interval that the device state should be checked. Defaults to 1 hour.
     update_interval: 1h
 ```
-

@@ -47,6 +47,7 @@ CONFIG_SCHEMA = (
 
 async def to_code(config):
     """Code generation entry point"""
+    miot.deprecated(config, "miot_motion")
     var = await miot.new_binary_sensor_device(config)
     if CONF_LIGHT in config:
         sens = await binary_sensor.new_binary_sensor(config[CONF_LIGHT])

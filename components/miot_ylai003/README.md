@@ -13,15 +13,15 @@ external_components:
 sensor:
   - platform: miot_ylai003
     # String (Required), device MAC-address.
-    mac_address: "device-mac-address"
+    mac_address: !secret device_mac_address
     # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automatically get the bindkey.
-    bindkey: "device-bind-key"
+    bindkey: !secret device_bind_key
     # Sensor (Optional), Battery Level, % (not 100% sure that is working, please let me know it so)
     battery_level:
-      name: "$name Battery Level"
+      name: Battery Level
     # Sensor (Optional), Battery Voltage, V (not 100% sure that is working, please let me know it so)
     battery_voltage:
-      name: "$name Battery Voltage"
+      name: Battery Voltage
     # List, Automation (Optional), The automation activated when you click the button
     on_click:
       then:

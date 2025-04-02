@@ -1,17 +1,13 @@
-import logging
+from .. import miot  # pylint: disable=relative-beyond-top-level
 from ..miot_th import sensor as miot_th
-from esphome.const import CONF_PLATFORM
 
-_LOGGER = logging.getLogger(__name__)
 
 CODEOWNERS = ["@dentra"]
-AUTO_LOAD = ["miot_th"] + miot_th.AUTO_LOAD
+AUTO_LOAD = ["miot_th"]
 CONFIG_SCHEMA = miot_th.CONFIG_SCHEMA
 
 
 async def to_code(config):
     """Code generation entry point"""
-    platform = config[CONF_PLATFORM]
-    _LOGGER.warning("%s was deprecated, please use miot_th instead.", platform)
+    miot.deprecated(config, "miot_th")
     await miot_th.to_code(config)
-

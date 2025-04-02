@@ -1,6 +1,6 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import sensor, binary_sensor
+from esphome.components import binary_sensor, sensor
 from esphome.const import (
     CONF_IDLE_TIME,
     CONF_ILLUMINANCE,
@@ -14,6 +14,7 @@ from esphome.const import (
     UNIT_LUX,
     UNIT_SECOND,
 )
+
 from .. import miot  # pylint: disable=relative-beyond-top-level
 
 CODEOWNERS = ["@dentra"]
@@ -55,6 +56,9 @@ CONFIG_SCHEMA = (
 
 async def to_code(config):
     """Code generation entry point"""
+
+    miot.deprecated(config, "miot_motion")
+
     var = await miot.new_binary_sensor_device(config)
     if CONF_LIGHT in config:
         sens = await binary_sensor.new_binary_sensor(config[CONF_LIGHT])

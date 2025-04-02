@@ -9,6 +9,7 @@ from esphome.const import (
     UNIT_CELSIUS,
     UNIT_PERCENT,
 )
+
 from .. import miot  # pylint: disable=relative-beyond-top-level
 
 CODEOWNERS = ["@dentra"]
