@@ -48,7 +48,7 @@ CONF_DOOR_LEFT_OPEN = "door_left_open"
 CONF_PM10 = "pm10"
 CONF_PM25 = "pm25"
 
-string_or_none = cv.Any(cv.none, cv.string)
+string_or_none = cv.Any(cv.boolean_false, cv.none, cv.string)
 
 EXPLORER_SCHEMA = cv.Schema(
     {
@@ -119,9 +119,7 @@ CONFIG_SCHEMA = cv.All(
                 cv.Optional(CONF_USE_BEACON_MAC): cv.boolean,
                 cv.Optional(CONF_VERBOSE): cv.boolean,
                 cv.Optional(CONF_EXPLORER): EXPLORER_SCHEMA,
-                cv.Optional(CONF_ON_STATE): cgp.automation_schema(
-                    QingpingStateTrigger
-                ),
+                cv.Optional(CONF_ON_STATE): cgp.automation_schema(QingpingStateTrigger),
             }
         )
         .extend(esp32_ble_tracker.ESP_BLE_DEVICE_SCHEMA)
