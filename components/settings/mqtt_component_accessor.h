@@ -57,6 +57,8 @@ class MQTTClientComponentAccessor : public mqtt::MQTTClientComponent {
     this->set_shutdown_message(this->mk_topic_(topic, this->shutdown_message_));
   }
 
+  const std::string &get_broker_address() const { return this->credentials_.address; }
+
  protected:
   inline static bool trim_pred_(const char c) { return std::isspace(c) || c == '/'; }
 
