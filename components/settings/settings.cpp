@@ -345,5 +345,21 @@ void Settings::load(void (*on_load)(const nvs_flash::NvsFlash &nvs)) {
   this->nvs_.close();
 }
 
+bool Settings::set_value(const std::string &key, const std::string &value) {
+  std::string hash_key = str_snprintf("%08x", 8, fnv1_hash(key));
+
+  for (auto const &x : this->items_) {
+    if (hash_key == x.key) {
+      this->nvs_.open(NVS_NS, true);
+      bool res = this->save_pv_(x, value.c_str());
+      this->nvs_.commit();
+      this->nvs_.close();
+      return res;
+    }
+  }
+
+  return false;
+}
+
 }  // namespace settings
 }  // namespace esphome

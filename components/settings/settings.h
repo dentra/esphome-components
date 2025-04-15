@@ -85,6 +85,9 @@ class Settings : public AsyncWebHandler, public Component {
   void set_password(const char *password) { this->password_ = password; }
   void set_menu_url(const char *value) { this->menu_url_ = value; }
 
+  /// find settings by key (not hash) and update it value.
+  bool set_value(const std::string &key, const std::string &value);
+
  protected:
   nvs_flash::NvsFlash nvs_;
   const char *menu_url_{};
