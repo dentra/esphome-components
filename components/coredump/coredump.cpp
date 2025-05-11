@@ -28,9 +28,14 @@ void Coredump::dump_config() {
 }
 
 void Coredump::setup() {
-  ESP_LOGCONFIG(TAG, "Setting up coredump handler...");
+  ESP_LOGI(TAG, "Setting up coredump handler...");
   this->base_->init();
   this->base_->add_handler(this);
+  const esp_partition_t* coredump_partition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_COREDUMP, NULL);
+  if(coredump_partition == NULL){
+    ESP_LOGE(TAG, "Coredump partition is missing");
+    this->partition_err = true;
+  }
 }
 
 bool Coredump::canHandle(AsyncWebServerRequest *request) {
@@ -40,6 +45,9 @@ bool Coredump::canHandle(AsyncWebServerRequest *request) {
   auto url = request->url();
   if (url == this->index_url_) {
     return true;
+  }
+  if (this->partition_err){
+    return false;
   }
   if (url == this->download_url_) {
     return true;
@@ -72,8 +80,28 @@ inline void write_html_chunk(AsyncWebServerRequest *request, const std::string &
   httpd_resp_send_chunk(*request, html.c_str(), html.length());
 }
 
-inline void write_html_begin(AsyncWebServerRequest *request, const char *css_url, const char *redirect_url = nullptr) {
-  auto tags = str_sprintf(R"(<link rel="stylesheet" href="%s">)", css_url);
+inline void write_html_end(AsyncWebServerRequest *request) { write_html_chunk(request, "</main></body></html>"); }
+
+inline void write_html_link(AsyncWebServerRequest *request, const char *name, const char *url) {
+  write_html_chunk(request, str_sprintf(R"(<a href="%s" role="button">%s</a> )", url, name));
+}
+
+inline void write_html_message(AsyncWebServerRequest *request, const std::string &message) {
+  write_html_chunk(request, "<article>" + message + "</article>");
+}
+
+inline void write_html_p(AsyncWebServerRequest *request, const std::string &message) {
+  write_html_chunk(request, message + "\n");
+}
+
+inline void write_html_p(AsyncWebServerRequest *request, const std::string &message1, const std::string &message2) {
+  write_html_p(request, message1 + ": " + message2);
+}
+
+}  // namespace
+
+void Coredump::write_html_begin(AsyncWebServerRequest *request, const char *redirect_url) {
+  auto tags = str_sprintf(R"(<link rel="stylesheet" href="%s">)", this->css_url_);
   if (redirect_url) {
     tags.append(str_sprintf(R"(<meta http-equiv="refresh" content="3;url=%s">)", redirect_url));
   }
@@ -98,33 +126,17 @@ inline void write_html_begin(AsyncWebServerRequest *request, const char *css_url
   html_begin += App.get_compilation_time();
   html_begin += "</p>";
 
+  if (this->partition_err) {
+    html_begin += "<p><strong>Coredump partition is missing</strong></p>";
+  }
+
   write_html_chunk(request, html_begin.c_str());
 }
-
-inline void write_html_end(AsyncWebServerRequest *request) { write_html_chunk(request, "</main></body></html>"); }
-
-inline void write_html_link(AsyncWebServerRequest *request, const char *name, const char *url) {
-  write_html_chunk(request, str_sprintf(R"(<a href="%s" role="button">%s</a> )", url, name));
-}
-
-inline void write_html_message(AsyncWebServerRequest *request, const std::string &message) {
-  write_html_chunk(request, "<article>" + message + "</article>");
-}
-
-inline void write_html_p(AsyncWebServerRequest *request, const std::string &message) {
-  write_html_chunk(request, message + "\n");
-}
-
-inline void write_html_p(AsyncWebServerRequest *request, const std::string &message1, const std::string &message2) {
-  write_html_p(request, message1 + ": " + message2);
-}
-
-}  // namespace
 
 void Coredump::crash_(AsyncWebServerRequest *request) {
   request->beginResponse(200, "text/html");
 
-  write_html_begin(request, this->css_url_, this->index_url_);
+  this->write_html_begin(request, this->index_url_);
   write_html_message(request, "Generated");
   write_html_link(request, "Return", this->index_url_);
   write_html_end(request);
@@ -139,7 +151,7 @@ void Coredump::crash_(AsyncWebServerRequest *request) {
 
 void Coredump::index_(AsyncWebServerRequest *request) {
   request->beginResponse(200, "text/html");
-  write_html_begin(request, this->css_url_);
+  this->write_html_begin(request, this->index_url_);
 
   esp_core_dump_summary_t summary;
   if (esp_core_dump_get_summary(&summary) == ESP_OK) {
@@ -175,7 +187,7 @@ void Coredump::index_(AsyncWebServerRequest *request) {
     write_html_message(request, "Select action");
     write_html_link(request, "Download", this->download_url_);
     write_html_link(request, "Erase", this->erase_url_);
-  } else {
+  } else if (!this->partition_err) {
     write_html_message(request, "Great! There is no crash report yet.");
 #ifdef USE_COREDUMP_ENABLE_TEST_CRASH
     write_html_link(request, "Click on this button to cause a crash", this->crash_url_);
@@ -192,7 +204,7 @@ void Coredump::index_(AsyncWebServerRequest *request) {
 void Coredump::erase_(AsyncWebServerRequest *request) {
   request->beginResponse(200, "text/html");
 
-  write_html_begin(request, this->css_url_, this->index_url_);
+  this->write_html_begin(request, this->index_url_);
 
   esp_core_dump_image_erase();
   if (esp_core_dump_image_check() == ESP_OK) {
