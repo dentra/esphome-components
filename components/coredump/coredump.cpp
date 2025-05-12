@@ -221,8 +221,8 @@ void Coredump::download_(AsyncWebServerRequest *request) {
 #ifdef ESPHOME_PROJECT_NAME
   response->addHeader("Content-Disposition", "attachment;filename=coredump-" ESPHOME_PROJECT_VERSION ".elf");
 #else
-  response->addHeader("Content-Disposition",
-                      ("attachment;filename=coredump-" + App.get_compilation_time() + ".elf").c_str());
+  auto content_disposition_value = "attachment;filename=\"coredump-" + App.get_compilation_time() + ".elf\"";
+  response->addHeader("Content-Disposition", content_disposition_value.c_str());
 #endif
 
   char buf[CHUNK_SIZE];
