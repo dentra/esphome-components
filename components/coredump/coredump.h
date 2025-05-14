@@ -32,6 +32,11 @@ class Coredump : public Component, public AsyncWebHandler {
   void erase_(AsyncWebServerRequest *request);
   void crash_(AsyncWebServerRequest *request);
   void download_(AsyncWebServerRequest *request);
+
+  void write_html_begin(AsyncWebServerRequest *request, const char *redirect_url = nullptr);
+
+ private:
+  bool partition_err = {false};
 };
 
 }  // namespace coredump
