@@ -89,9 +89,9 @@ def valid_button_pin(value):
 
 
 CONFIG_SCHEMA = (
-    switch.SWITCH_SCHEMA.extend(
+    switch.switch_schema(ZMAi90v1)
+    .extend(
         {
-            cv.GenerateID(): cv.declare_id(ZMAi90v1),
             cv.Optional(CONF_SWITCH_PIN, default=DEFAULT_SWITCH_PIN): valid_switch_pin,
             cv.Optional(CONF_BUTTON_PIN, default=DEFAULT_BUTTON_PIN): valid_button_pin,
             cv.Optional(CONF_BUTTON): binary_sensor.binary_sensor_schema(

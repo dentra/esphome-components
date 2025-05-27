@@ -1,12 +1,11 @@
+import esphome.codegen as cg
+import esphome.config_validation as cv
+from esphome.components import ble_client, miot, miot_client, text_sensor
 from esphome.const import (
-    CONF_ICON,
     CONF_ID,
     CONF_VERSION,
 )
 from esphome.cpp_types import Component
-import esphome.codegen as cg
-import esphome.config_validation as cv
-from esphome.components import miot, miot_client, text_sensor, ble_client
 
 CODEOWNERS = ["@dentra"]
 AUTO_LOAD = ["miot", "miot_client", "text_sensor", "ble_client"]
@@ -22,15 +21,12 @@ MiotYLxx0xYLNode = miot_ylxx0xyl_ns.class_(
 )
 
 CONFIG_SCHEMA = (
-    text_sensor.TEXT_SENSOR_SCHEMA.extend(
+    text_sensor.text_sensor_schema(MiotYLxx0xYLPair)
+    .extend(
         {
-            cv.GenerateID(): cv.declare_id(MiotYLxx0xYLPair),
             cv.GenerateID(miot.CONF_MIOT_ID): cv.use_id(miot.MiBeaconTracker),
-            cv.Optional(CONF_VERSION): text_sensor.TEXT_SENSOR_SCHEMA.extend(
-                {
-                    cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
-                    cv.Optional(CONF_ICON, default=ICON_VERSION): cv.icon,
-                }
+            cv.Optional(CONF_VERSION): text_sensor.text_sensor_schema(
+                text_sensor.TextSensor, icon=ICON_VERSION
             ),
             cv.Optional(miot.CONF_PRODUCT_ID): cv.uint16_t,
         }

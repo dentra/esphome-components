@@ -250,42 +250,42 @@ class PC:
     async def new_switch(self, config: dict):
         return await self.new_component(config, switch.new_switch)
 
-    def climate_schema(self, climate_class: cg.MockObjClass, ext_schema: dict = None):
-        def _climate_climate_schema(
-            climate_class: cg.MockObjClass, ext_schema: dict = None
-        ) -> cv.Schema:
-            schema = climate.CLIMATE_SCHEMA.extend(
-                {cv.GenerateID(): cv.declare_id(climate_class)}
-            )
-            if ext_schema:
-                schema = schema.extend(ext_schema)
-            return schema
-
-        return self.component_schema(_climate_climate_schema(climate_class, ext_schema))
+    def climate_schema(
+        self,
+        climate_class: cg.MockObjClass,
+        *,
+        entity_category: str = cv.UNDEFINED,
+        icon: str = cv.UNDEFINED,
+        ext_schema: dict = None,
+    ):
+        return self.component_schema(
+            climate.climate_schema(
+                climate_class, entity_category=entity_category, icon=icon
+            ),
+            ext_schema=ext_schema,
+        )
 
     async def new_climate(self, config: dict):
-        async def _climate_new_climate(config: dict, *args):
-            var = cg.new_Pvariable(config[CONF_ID], *args)
-            await climate.register_climate(var, config)
-            return var
+        return await self.new_component(config, climate.new_climate)
 
-        return await self.new_component(config, _climate_new_climate)
-
-    def fan_schema(self, fan_class: cg.MockObjClass, ext_schema: dict = None):
-        def _fan_fan_schema(
-            fan_class: cg.MockObjClass, ext_schema: dict = None
-        ) -> cv.Schema:
-            schema = fan.FAN_SCHEMA.extend({cv.GenerateID(): cv.declare_id(fan_class)})
-            if ext_schema:
-                schema = schema.extend(ext_schema)
-            return schema
-
-        return self.component_schema(_fan_fan_schema(fan_class, ext_schema))
+    def fan_schema(
+        self,
+        fan_class: cg.MockObjClass,
+        *,
+        entity_category: str = cv.UNDEFINED,
+        icon: str = cv.UNDEFINED,
+        default_restore_mode: str = cv.UNDEFINED,
+        ext_schema: dict = None,
+    ):
+        return self.component_schema(
+            fan.fan_schema(
+                fan_class,
+                entity_category=entity_category,
+                icon=icon,
+                default_restore_mode=default_restore_mode,
+            ),
+            ext_schema=ext_schema,
+        )
 
     async def new_fan(self, config: dict):
-        async def _fan_new_fan(config: dict, *args):
-            var = cg.new_Pvariable(config[CONF_ID], *args)
-            await fan.register_fan(var, config)
-            return var
-
-        return await self.new_component(config, _fan_new_fan)
+        return await self.new_component(config, fan.new_fan)

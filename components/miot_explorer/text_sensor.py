@@ -1,9 +1,8 @@
-from esphome.const import CONF_NAME
-from esphome.components.esp32_ble_tracker import CONF_ESP32_BLE_ID
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import miot, text_sensor, sensor
+from esphome.components import miot, sensor, text_sensor
 from esphome.const import (
+    CONF_NAME,
     ENTITY_CATEGORY_DIAGNOSTIC,
     STATE_CLASS_MEASUREMENT,
     UNIT_PERCENT,
@@ -19,18 +18,21 @@ MiotExplorer = miot_explorer_ns.class_(
     "MiotExplorer", miot.MiotComponent, text_sensor.TextSensor
 )
 
-CONFIG_SCHEMA = text_sensor.TEXT_SENSOR_SCHEMA.extend(
-    {
-        cv.GenerateID(): cv.declare_id(MiotExplorer),
-        cv.Required(CONF_NAME): cv.string,
-        cv.Optional(CONF_CONSUMABLE): sensor.sensor_schema(
-            unit_of_measurement=UNIT_PERCENT,
-            accuracy_decimals=0,
-            state_class=STATE_CLASS_MEASUREMENT,
-            entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-        ),
-    }
-).extend(miot.MIOT_BLE_DEVICE_SCHEMA)
+CONFIG_SCHEMA = (
+    text_sensor.text_sensor_schema(MiotExplorer)
+    .extend(
+        {
+            cv.Required(CONF_NAME): cv.string,
+            cv.Optional(CONF_CONSUMABLE): sensor.sensor_schema(
+                unit_of_measurement=UNIT_PERCENT,
+                accuracy_decimals=0,
+                state_class=STATE_CLASS_MEASUREMENT,
+                entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+            ),
+        }
+    )
+    .extend(miot.MIOT_BLE_DEVICE_SCHEMA)
+)
 
 
 async def to_code(config):

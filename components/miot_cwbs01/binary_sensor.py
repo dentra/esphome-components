@@ -1,32 +1,31 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import (
-    sensor,
-    text_sensor,
-    switch,
     binary_sensor,
-    select,
     ble_client,
     esp32_ble_tracker,
+    select,
+    sensor,
+    switch,
+    text_sensor,
     time,
 )
 from esphome.const import (
-    CONF_ENTITY_CATEGORY,
-    CONF_ICON,
+    CONF_BATTERY_LEVEL,
     CONF_ID,
+    CONF_MODE,
+    CONF_POWER,
     CONF_TIME_ID,
     CONF_VERSION,
-    CONF_POWER,
-    CONF_MODE,
-    CONF_BATTERY_LEVEL,
     DEVICE_CLASS_BATTERY,
     DEVICE_CLASS_BATTERY_CHARGING,
     DEVICE_CLASS_POWER,
     DEVICE_CLASS_PROBLEM,
     ENTITY_CATEGORY_DIAGNOSTIC,
-    UNIT_PERCENT,
     STATE_CLASS_MEASUREMENT,
+    UNIT_PERCENT,
 )
+
 from .. import miot_client  # pylint: disable=relative-beyond-top-level
 
 CODEOWNERS = ["@dentra"]
@@ -80,35 +79,15 @@ CONFIG_SCHEMA = (
         {
             cv.Optional(miot_client.CONF_MIOT_CLIENT_DEBUG): cv.boolean,
             cv.GenerateID(CONF_TIME_ID): cv.use_id(time.RealTimeClock),
-            cv.Optional(CONF_VERSION): text_sensor.TEXT_SENSOR_SCHEMA.extend(
-                {
-                    cv.GenerateID(): cv.declare_id(text_sensor.TextSensor),
-                    cv.Optional(CONF_ICON, default="mdi:git"): cv.icon,
-                    cv.Optional(
-                        CONF_ENTITY_CATEGORY, default=ENTITY_CATEGORY_DIAGNOSTIC
-                    ): cv.entity_category,
-                }
+            cv.Optional(CONF_VERSION): text_sensor.text_sensor_schema(
+                text_sensor.TextSensor,
+                icon="mdi:git",
+                entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
             ),
-            cv.Optional(CONF_POWER): switch.SWITCH_SCHEMA.extend(
-                {
-                    cv.GenerateID(): cv.declare_id(MiotCWBS01PowerSwitch),
-                }
-            ),
-            cv.Optional(CONF_MODE): select.SELECT_SCHEMA.extend(
-                {
-                    cv.GenerateID(): cv.declare_id(MiotCWBS01ModeSelect),
-                }
-            ),
-            cv.Optional(CONF_CYCLE): switch.SWITCH_SCHEMA.extend(
-                {
-                    cv.GenerateID(): cv.declare_id(MiotCWBS01CycleSwitch),
-                }
-            ),
-            cv.Optional(CONF_SCENE): select.SELECT_SCHEMA.extend(
-                {
-                    cv.GenerateID(): cv.declare_id(MiotCWBS01SceneSelect),
-                }
-            ),
+            cv.Optional(CONF_POWER): switch.switch_schema(MiotCWBS01PowerSwitch),
+            cv.Optional(CONF_MODE): select.select_schema(MiotCWBS01ModeSelect),
+            cv.Optional(CONF_CYCLE): switch.switch_schema(MiotCWBS01CycleSwitch),
+            cv.Optional(CONF_SCENE): select.select_schema((MiotCWBS01SceneSelect)),
             cv.Optional(CONF_CHARGING): binary_sensor.binary_sensor_schema(
                 device_class=DEVICE_CLASS_BATTERY_CHARGING,
                 entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
