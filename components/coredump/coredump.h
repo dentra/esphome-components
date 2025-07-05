@@ -16,7 +16,7 @@ class Coredump : public Component, public AsyncWebHandler {
   void dump_config() override;
   float get_setup_priority() const override { return setup_priority::WIFI - 1.0f; }
 
-  bool canHandle(AsyncWebServerRequest *request) override;
+  bool canHandle(AsyncWebServerRequest *request) const override;
   void handleRequest(AsyncWebServerRequest *request) override;
 
  protected:
