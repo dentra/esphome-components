@@ -38,7 +38,7 @@ void Coredump::setup() {
   }
 }
 
-bool Coredump::canHandle(AsyncWebServerRequest *request) {
+bool Coredump::canHandle(AsyncWebServerRequest *request) const {
   if (request->method() != HTTP_GET) {
     return false;
   }
