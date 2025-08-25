@@ -27,7 +27,7 @@ void Backup::dump_config() {
   }
 }
 
-bool Backup::canHandle(AsyncWebServerRequest *request) {
+bool Backup::canHandle(AsyncWebServerRequest *request) const {
   return request->method() == HTTP_GET && request->url() == URL;
 }
 
