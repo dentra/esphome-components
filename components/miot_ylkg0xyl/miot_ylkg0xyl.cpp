@@ -6,7 +6,19 @@ namespace miot_ylkg0xyl {
 
 static const char *const TAG = "miot_ylkg0xyl";
 
-void MiotYLKG0XYL::dump_config() { this->dump_config_(TAG, "YLKG07YL/YLKG08YL"); }
+void MiotYLKG0XYL::dump_config() {
+  const char* device_name;
+  switch (this->product_id_) {
+    case PRODUCT_ID_MJGDYK01YL:
+      device_name = "MJGDYK01YL";
+      break;
+    case PRODUCT_ID_YLKG0xYL:
+    default:
+      device_name = "YLKG07YL/YLKG08YL";
+      break;
+  }
+  this->dump_config_(TAG, device_name);
+}
 
 bool MiotYLKG0XYL::process_object_(const miot::BLEObject &obj) {
   switch (obj.id) {

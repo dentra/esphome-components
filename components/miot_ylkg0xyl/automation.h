@@ -20,6 +20,7 @@ enum MiotYLKG0XYLEvent {
 class MiotYLKG0XYLTrigger : public Trigger<uint8_t>, public miot::MiotListener {
  public:
   explicit MiotYLKG0XYLTrigger(MiotYLKG0XYLEvent event) : event_(event) { this->product_id_ = PRODUCT_ID_YLKG0xYL; }
+  MiotYLKG0XYLTrigger(MiotYLKG0XYLEvent event, uint16_t product_id) : event_(event) { this->product_id_ = product_id; }
 
  protected:
   MiotYLKG0XYLEvent event_;
