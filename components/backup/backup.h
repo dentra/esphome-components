@@ -25,7 +25,7 @@ class Backup : public Component, public AsyncWebHandler {
 
   bool using_auth() { return this->username_ != nullptr && this->password_ != nullptr; }
 
-  bool canHandle(AsyncWebServerRequest *request) override;
+  bool canHandle(AsyncWebServerRequest *request) const override;
   void handleRequest(AsyncWebServerRequest *request) override;
 
  protected:
