@@ -1,4 +1,4 @@
-# Yeelight Smart Bluetooth Wireless Dimmer Wall Light Switch Remote Control (YLKG08YL/YLKG07YL)
+# Yeelight Smart Bluetooth Wireless Dimmer Wall Light Switch Remote Control (YLKG08YL/YLKG07YL/MJGDYK01YL)
 
 Sample configuration:
 
@@ -12,6 +12,8 @@ sensor:
     mac_address: !secret device_mac_address
     # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automatically get the bindkey.
     bindkey: !secret device_bind_key
+    # Number (Optional), device product ID. Use 0x15CE for MJGDYK01YL, leave unset for YLKG07YL/YLKG08YL
+    # product_id: 0x15CE
     # List, Automation (Optional), The automation activated when you make specified action
     on_short_press:
       # List, Any automation

@@ -4,6 +4,7 @@ Supported models are:
 
 - Remote (YLYK01YL)
 - Dimmer (YLKG07YL/YLKG08YL)
+- Monitor Light Bar Remote (MJGDYK01YL)
 - Bathroom Heater Remote (YLYB01YL-BHFRC)
 - Fan Remote (YLYK01YL-VENFAN)
 - Ventilator Fan Remote (YLYK01YL-FANCL)
@@ -27,7 +28,7 @@ text_sensor:
     # Sesnor (Optional), sensor do display version.
     version:
       name: miot_ylxx0xyl_pair Version
-    # uint16 (Optional), product id to pair. defaults to 0, means auto for one of 0x0153, 0x03B6, 0x03BF, 0x04E6, 0x068E
+    # uint16 (Optional), product id to pair. defaults to 0, means auto for one of 0x0153, 0x03B6, 0x15CE, 0x03BF, 0x04E6, 0x068E
     #                    can be used to obtain beakonkey from unsupported devices.
     #product_id: 0
 ```
