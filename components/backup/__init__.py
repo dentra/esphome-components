@@ -47,6 +47,7 @@ def _dump_config():
     cfg = strip_default_ids(cfg)
     return dump(cfg, True)
 
+
 @coroutine_with_priority(40.0)
 async def to_code(config):
     paren = await cg.get_variable(config[CONF_WEB_SERVER_BASE_ID])
@@ -55,6 +56,7 @@ async def to_code(config):
     await cg.register_component(var, config)
 
     if CONF_AUTH in config:
+        cg.add_define("USE_WEBSERVER_AUTH")
         username = config[CONF_AUTH][CONF_USERNAME]
         if username:
             cg.add(var.set_username(username))
@@ -66,9 +68,13 @@ async def to_code(config):
     print(tx_config)
     gz_config = gzip.compress(tx_config.encode("utf-8"))
     arr_size = len(gz_config)
-    arr_data = ', '.join(f"0x{x:02x}" for x in gz_config)
+    arr_data = ", ".join(f"0x{x:02x}" for x in gz_config)
 
-    cg.add_global(cg.RawExpression(f"const uint8_t ESPHOME_BACKUP_DATA[{arr_size}] PROGMEM = {{{arr_data}}}"))
+    cg.add_global(
+        cg.RawExpression(
+            f"const uint8_t ESPHOME_BACKUP_DATA[{arr_size}] PROGMEM = {{{arr_data}}}"
+        )
+    )
     cg.add_global(cg.RawExpression(f"const size_t ESPHOME_BACKUP_SIZE = {arr_size}"))
 
     _LOGGER.info("Backup config will take: %u bytes", arr_size)
