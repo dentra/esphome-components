@@ -24,6 +24,9 @@ from esphome.const import (
     CONF_TYPE_ID,
     CONF_UNIT_OF_MEASUREMENT,
 )
+from esphome.const import (
+    __version__ as ESPHOME_VERSION,
+)
 
 CONF_COMPONENT_CLASS = "component_class"
 
@@ -131,7 +134,14 @@ class PC:
 
         await cg.register_component(var, config)
 
-        cg.add(var.set_component_source(self._get_component_source(config)))
+        component_source = self._get_component_source(config)
+
+        if cv.Version.parse(ESPHOME_VERSION) >= cv.Version.parse("2025.9.0"):
+            from esphome.cpp_generator import LogStringLiteral
+
+            component_source = LogStringLiteral(component_source)
+
+        cg.add(var.set_component_source(component_source))
         return var
 
     def _get_component_source(self, config: dict):
