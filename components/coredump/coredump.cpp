@@ -28,11 +28,12 @@ void Coredump::dump_config() {
 }
 
 void Coredump::setup() {
-  ESP_LOGI(TAG, "Setting up coredump handler...");
+  ESP_LOGV(TAG, "Setting up coredump handler...");
   this->base_->init();
   this->base_->add_handler(this);
-  const esp_partition_t* coredump_partition = esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_COREDUMP, NULL);
-  if(coredump_partition == NULL){
+  const esp_partition_t *coredump_partition =
+      esp_partition_find_first(ESP_PARTITION_TYPE_DATA, ESP_PARTITION_SUBTYPE_DATA_COREDUMP, nullptr);
+  if (coredump_partition == nullptr) {
     ESP_LOGE(TAG, "Coredump partition is missing");
     this->partition_err = true;
   }
@@ -46,7 +47,7 @@ bool Coredump::canHandle(AsyncWebServerRequest *request) const {
   if (url == this->index_url_) {
     return true;
   }
-  if (this->partition_err){
+  if (this->partition_err) {
     return false;
   }
   if (url == this->download_url_) {
