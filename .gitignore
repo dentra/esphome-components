@@ -1,6 +1,6 @@
 .DS_Store
 
-/.esphome/
+/.esphome
 /.platformio
 /config/
 **/.pioenvs/
@@ -17,8 +17,9 @@
 /esphome
 /.pio
 /.venv
-/.build/
-/.vscode/
+/.build
+/.vscode
+/.nosync
 /components-research
 
 CMakeListsPrivate.txt
