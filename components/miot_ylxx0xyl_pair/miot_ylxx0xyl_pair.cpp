@@ -20,6 +20,7 @@ static bool is_ylxx0xyl(uint16_t product_id) {
     case 0x03BF:  // YLYB01YL-BHFRC    Bathroom Heater Remote
     case 0x04E6:  // YLYK01YL-VENFAN   Fan Remote
     case 0x068E:  // YLYK01YL-FANCL    Ventilator Fan Remote
+    case 0x15CE:  // MJGDYK01YL        Monitor Light Bar 1S Remote
       return true;
   }
   return false;
