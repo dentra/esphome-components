@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <string>
+#include <algorithm>
 
 namespace esphome {
 namespace dtu {
@@ -10,9 +11,17 @@ namespace dtu {
 /// @param predicate to test trimmed characters, by default checks with isspace.
 template<typename... Predicate> constexpr inline void str_ltrim_ref(std::string &s, Predicate... predicate) {
   if constexpr (sizeof...(Predicate) == 1) {
+#if __cplusplus >= 202002L
+    s.erase(s.cbegin(), std::ranges::find_if_not(s, std::forward<Predicate>(predicate)...));
+#else
     s.erase(s.cbegin(), std::find_if_not(s.cbegin(), s.cend(), std::forward<Predicate>(predicate)...));
+#endif
   } else if constexpr (sizeof...(Predicate) == 0) {
+#if __cplusplus >= 202002L
+    s.erase(s.cbegin(), std::ranges::find_if_not(s, [](char c) { return std::isspace(c); }));
+#else
     s.erase(s.cbegin(), std::find_if_not(s.cbegin(), s.cend(), [](char c) { return std::isspace(c); }));
+#endif
   } else {
     static_assert(sizeof...(Predicate) > 1, "invalid predicate parameter");
   }
@@ -22,9 +31,17 @@ template<typename... Predicate> constexpr inline void str_ltrim_ref(std::string 
 /// @param predicate to test trimmed characters, by default checks with isspace.
 template<typename... Predicate> constexpr inline void str_rtrim_ref(std::string &s, Predicate... predicate) {
   if constexpr (sizeof...(Predicate) == 1) {
+#if __cplusplus >= 202002L
+    s.erase(std::ranges::find_if_not(s.rbegin(), s.rend(), std::forward<Predicate>(predicate)...).base(), s.end());
+#else
     s.erase(std::find_if_not(s.rbegin(), s.rend(), std::forward<Predicate>(predicate)...).base(), s.end());
+#endif
   } else if constexpr (sizeof...(Predicate) == 0) {
+#if __cplusplus >= 202002L
+    s.erase(std::ranges::find_if_not(s.rbegin(), s.rend(), [](char c) { return std::isspace(c); }).base(), s.end());
+#else
     s.erase(std::find_if_not(s.rbegin(), s.rend(), [](char c) { return std::isspace(c); }).base(), s.end());
+#endif
   } else {
     static_assert(sizeof...(Predicate) > 1, "invalid predicate parameter");
   }
