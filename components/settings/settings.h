@@ -4,6 +4,7 @@
 #include "esphome/core/application.h"
 #include "esphome/core/component.h"
 #include "esphome/core/preferences.h"
+#include "esphome/core/version.h"
 #include "esphome/components/web_server_base/web_server_base.h"
 #include "../nvs/nvs.h"
 
@@ -72,7 +73,11 @@ class Settings : public AsyncWebHandler, public Component {
   void setup() override;
   float get_setup_priority() const override { return setup_priority::AFTER_WIFI; }
 
-  bool canHandle(AsyncWebServerRequest *request) override;
+  bool canHandle(AsyncWebServerRequest *request)
+#if ESPHOME_VERSION_CODE >= VERSION_CODE(2025, 7, 0)
+      const
+#endif
+      override;
   void handleRequest(AsyncWebServerRequest *request) override;
 
   void register_variable(VarInfo &&info) { this->items_.push_back(std::move(info)); }
@@ -111,12 +116,17 @@ class Settings : public AsyncWebHandler, public Component {
   bool save_pv_(const VarInfo &x, const char *param) const;
 
   template<typename T> inline T get_value_(const char *key, T (*const fn)()) const {
-    SETTINGS_TRACE(this->get_component_source(), "get_value_ for %s", key);
+#if ESPHOME_VERSION_CODE < VERSION_CODE(2025, 9, 0)
+    const char *component_source = this->get_component_source();
+#else
+    const char *component_source = LOG_STR_ARG(this->get_component_log_str());
+#endif
+    SETTINGS_TRACE(component_source, "get_value_ for %s", key);
     auto opt = this->nvs_.get<T>(key);
     if (opt.has_value()) {
       return opt.value();
     }
-    SETTINGS_TRACE(this->get_component_source(), "no stored value found");
+    SETTINGS_TRACE(component_source, "no stored value found");
     return fn();
   }
 
@@ -132,7 +142,12 @@ class Settings : public AsyncWebHandler, public Component {
   inline bool parse_number_set_value_(const char *key, const char *param, VariableType type, T (*const fn)()) const {
     const auto opt = parse_number<T>(param);
     if (!opt.has_value()) {
-      ESP_LOGW(this->get_component_source(), "Invalid %s number of type %u value: %s", key, type, param);
+#if ESPHOME_VERSION_CODE < VERSION_CODE(2025, 9, 0)
+      const char *component_source = this->get_component_source();
+#else
+      const char *component_source = LOG_STR_ARG(this->get_component_log_str());
+#endif
+      ESP_LOGW(component_source, "Invalid %s number of type %u value: %s", key, type, param);
       return false;
     }
     this->set_value_(key, fn, opt.value());

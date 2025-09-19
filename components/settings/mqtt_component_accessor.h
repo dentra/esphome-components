@@ -36,7 +36,11 @@ class MQTTClientComponentAccessor : public mqtt::MQTTClientComponent {
         s.append(suffix);
       }
     }
+#if ESPHOME_VERSION_CODE >= VERSION_CODE(2025, 2, 0)
+    this->set_topic_prefix(s, "");
+#else
     this->set_topic_prefix(s);
+#endif
   }
 
   const std::string log_message_topic() const { return this->unprefix_(this->log_message_.topic); }

@@ -2,6 +2,7 @@ from collections import OrderedDict
 from typing import Any
 
 import esphome.codegen as cg
+import esphome.config_validation as cv
 from esphome.components import api, esp32, mqtt, uart, web_server, wifi
 from esphome.const import (
     CONF_AREA,
@@ -13,6 +14,9 @@ from esphome.const import (
     CONF_NAME,
     CONF_WEB_SERVER,
     CONF_WIFI,
+)
+from esphome.const import (
+    __version__ as ESPHOME_VERSION,
 )
 from esphome.core import CORE
 from esphome.core.config import CONF_NAME_ADD_MAC_SUFFIX
@@ -318,7 +322,9 @@ _PRESETS = OrderedDict(
                     const.CONF_VAR_TYPE: var.VT_BOOL,
                     const.CONF_VAR_NAME: "OTA",
                     const.CONF_VAR_HELP: "Turn on or off the OTA feature inside web server. Strongly not suggested without enabled authentication settings",
-                    const.CONF_VAR_GETTER: lambda c, _: c[web_server.CONF_OTA],
+                    const.CONF_VAR_GETTER: lambda c, _: c.get(
+                        web_server.CONF_OTA, False
+                    ),
                     const.CONF_VAR_SETTER: lambda _, o: o.set_allow_ota,
                 },
             }
@@ -349,6 +355,31 @@ def _node_setter(config, App: cg.MockObj):
     node_name_add_mac_suffix = _add_load_nvs_var(
         nvs, KEY_NODE_NAME_ADD_MAC_SUFFIX, cg.bool_, ss
     )
+
+    pre_setup_params = [
+        cgp.ConditionalExperession(
+            node_name.has_value(),
+            node_name.value(),
+            config[CONF_NAME],
+        ),
+        config[CONF_FRIENDLY_NAME],
+        config.get(CONF_COMMENT, ""),
+        cg.RawExpression('__DATE__ ", " __TIME__'),
+        cgp.ConditionalExperession(
+            node_name_add_mac_suffix.has_value(),
+            node_name_add_mac_suffix.value(),
+            config[CONF_NAME_ADD_MAC_SUFFIX],
+        ),
+    ]
+
+    # 2025.6.x
+    # void pre_setup(const std::string &name, const std::string &friendly_name, const char *area, const char *comment, const char *compilation_time, bool name_add_mac_suffix)
+    # 2025.7.x
+    # void pre_setup(const std::string &name, const std::string &friendly_name, const char *comment, const char *compilation_time, bool name_add_mac_suffix)
+
+    if cv.Version.parse(ESPHOME_VERSION) < cv.Version.parse("2025.7.0"):
+        pre_setup_params.insert(2, config.get(CONF_AREA, ""))
+
     ss.append(
         cgp.IfStatement(
             f"{node_name.has_value()} || {node_name_add_mac_suffix.has_value()}",
@@ -365,22 +396,7 @@ def _node_setter(config, App: cg.MockObj):
                         node_name_add_mac_suffix.value(),
                     ),
                 ),
-                App.pre_setup(
-                    cgp.ConditionalExperession(
-                        node_name.has_value(),
-                        node_name.value(),
-                        config[CONF_NAME],
-                    ),
-                    config[CONF_FRIENDLY_NAME],
-                    config[CONF_AREA],
-                    config.get(CONF_COMMENT, ""),
-                    cg.RawExpression('__DATE__ ", " __TIME__'),
-                    cgp.ConditionalExperession(
-                        node_name_add_mac_suffix.has_value(),
-                        node_name_add_mac_suffix.value(),
-                        config[CONF_NAME_ADD_MAC_SUFFIX],
-                    ),
-                ),
+                App.pre_setup(*pre_setup_params),
             ],
         )
     )

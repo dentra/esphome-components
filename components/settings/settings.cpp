@@ -49,7 +49,11 @@ void Settings::redirect_home_(AsyncWebServerRequest *request) {
   }
 }
 
-bool Settings::canHandle(AsyncWebServerRequest *request) {
+bool Settings::canHandle(AsyncWebServerRequest *request)
+#if ESPHOME_VERSION_CODE >= VERSION_CODE(2025, 7, 0)
+    const
+#endif
+{
 #ifdef USE_ARDUINO
   // arduino returns String but not std::string
   return request->url().startsWith(this->base_url_.c_str());
@@ -60,10 +64,11 @@ bool Settings::canHandle(AsyncWebServerRequest *request) {
 
 void Settings::handleRequest(AsyncWebServerRequest *request) {  // NOLINT(readability-non-const-parameter)
   SETTINGS_TRACE(TAG, "Handle request method %u, url: %s", request->method(), request->url().c_str());
-
+#ifdef USE_WEBSERVER_AUTH
   if (!request->authenticate(this->username_, this->password_)) {
     return request->requestAuthentication();
   }
+#endif
 
 #ifdef USE_ARDUINO
   // arduino returns String but not std::string
@@ -104,15 +109,25 @@ void Settings::handleRequest(AsyncWebServerRequest *request) {  // NOLINT(readab
 }
 
 void Settings::handle_js_(AsyncWebServerRequest *request) {  // NOLINT(readability-non-const-parameter)
+#if ESPHOME_VERSION_CODE >= VERSION_CODE(2025, 7, 0)
+  auto *response =
+      request->beginResponse(200, "text/javascript", ESPHOME_WEBSERVER_SETTINGS_JS, ESPHOME_WEBSERVER_SETTINGS_JS_SIZE);
+#else
   auto *response = request->beginResponse_P(200, "text/javascript", ESPHOME_WEBSERVER_SETTINGS_JS,
                                             ESPHOME_WEBSERVER_SETTINGS_JS_SIZE);
+#endif
   response->addHeader("Content-Encoding", "gzip");
   request->send(response);
 }
 
 void Settings::handle_html_(AsyncWebServerRequest *request) {  // NOLINT(readability-non-const-parameter)
+#if ESPHOME_VERSION_CODE >= VERSION_CODE(2025, 7, 0)
+  auto *response =
+      request->beginResponse(200, "text/html", ESPHOME_WEBSERVER_SETTINGS_HTML, ESPHOME_WEBSERVER_SETTINGS_HTML_SIZE);
+#else
   auto *response =
       request->beginResponse_P(200, "text/html", ESPHOME_WEBSERVER_SETTINGS_HTML, ESPHOME_WEBSERVER_SETTINGS_HTML_SIZE);
+#endif
   response->addHeader("Content-Encoding", "gzip");
   request->send(response);
 }

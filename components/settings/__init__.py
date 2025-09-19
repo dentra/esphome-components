@@ -252,6 +252,7 @@ async def to_code(config):
     await cg.register_component(settings, config)
 
     if CONF_AUTH in config:
+        cg.add_define("USE_WEBSERVER_AUTH")
         cg.add(settings.set_username(config[CONF_AUTH][CONF_USERNAME]))
         cg.add(settings.set_password(config[CONF_AUTH][CONF_PASSWORD]))
 
