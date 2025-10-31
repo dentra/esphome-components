@@ -65,9 +65,9 @@ class VPortBLENode : public ble_client::BLEClientNode {
 };
 
 /// interface io_t {
-///   using on_frame_type = etl::delegate<void(const frame_spec_t &frame, size_t size)>;
+///   using on_frame_type = std::function<void(const frame_spec_t &frame, size_t size)>;
 ///   void set_on_frame(on_frame_type &&reader);
-///   using on_ready_type = etl::delegate<void()>;
+///   using on_ready_type = std::function<void()>;
 ///   void set_on_ready(on_ready_type &&reader);
 ///   void write(const uint8_t *data, size_t size);
 /// };
@@ -84,9 +84,8 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
 
  public:
   VPortBLEComponentImpl(io_t *io) : super_t(io) {
-    using this_t = typename std::remove_pointer<decltype(this)>::type;
-    this->io_->set_on_frame(io_t::on_frame_type::template create<this_t, &this_t::on_frame_>(*this));
-    this->io_->set_on_ready(io_t::on_ready_type::template create<this_t, &this_t::on_ready_>(*this));
+    this->io_->set_on_frame([this](const frame_spec_t &frame, size_t size) { this->on_frame_(frame, size); });
+    this->io_->set_on_ready([this]() { this->on_ready_(); });
   }
 
   void set_persistent_connection(bool persistent_connection) { this->persistent_connection_ = persistent_connection; }

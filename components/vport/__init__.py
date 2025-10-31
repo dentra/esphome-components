@@ -5,8 +5,6 @@ from esphome.components import ble_client, uart
 from esphome.const import CONF_ID
 from esphome.cpp_generator import MockObjClass
 
-AUTO_LOAD = ["etl"]
-
 IS_PLATFORM_COMPONENT = True
 
 CONF_VPORT_ID = "vport_id"

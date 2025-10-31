@@ -1,13 +1,13 @@
 #pragma once
 
 #include <cinttypes>
+#include <array>
+#include <vector>
 
 #include "esphome/core/defines.h"
 #include "esphome/core/component.h"
 #include "esphome/core/helpers.h"
 #include "esphome/core/log.h"
-
-#include "etl/circular_buffer.h"
 
 #include "vport.h"
 
@@ -32,6 +32,40 @@ template<class impl_t> class VPortQComponent : public impl_t {
 
   static constexpr const char *COMMAND_INTERVAL_NAME = "command";
 
+  template<size_t N> class QRingBuffer {
+   public:
+    void push(const uint8_t *data, size_t size) {
+      if (this->size_ == N) {
+        this->head_ = (this->head_ + 1) % N;
+        this->size_--;
+      }
+
+      this->data_[this->tail_].assign(data, data + size);
+
+      this->tail_ = (this->tail_ + 1) % N;
+      this->size_++;
+    }
+
+    const std::vector<uint8_t> &front() const { return this->data_[this->head_]; }
+
+    void pop() {
+      if (!empty()) {
+        this->head_ = (this->head_ + 1) % N;
+        this->size_--;
+      }
+    }
+
+    bool empty() const { return this->size_ == 0; }
+    size_t size() const { return this->size_; }
+    size_t capacity() const { return N; }
+
+   protected:
+    std::array<std::vector<uint8_t>, N> data_;
+    size_t head_ = 0;
+    size_t tail_ = 0;
+    size_t size_ = 0;
+  };
+
  public:
   VPortQComponent(io_t *io) : impl_t(io) {}
 
@@ -39,7 +73,7 @@ template<class impl_t> class VPortQComponent : public impl_t {
 
   void write(const frame_spec_t &frame, size_t size) override {
     const auto *data = reinterpret_cast<const uint8_t *>(&frame);
-    this->awaited_.push(std::vector<uint8_t>(data, data + size));
+    this->awaited_.push(data, size);
   }
 
   void call_setup() override {
@@ -58,7 +92,7 @@ template<class impl_t> class VPortQComponent : public impl_t {
 
  protected:
   uint32_t command_interval_{};
-  etl::circular_buffer<std::vector<uint8_t>, USE_VPORT_COMMAND_QUEUE_SIZE> awaited_;
+  QRingBuffer<USE_VPORT_COMMAND_QUEUE_SIZE> awaited_;
 
   void q_process_() {
     if (this->awaited_.empty()) {
@@ -70,7 +104,7 @@ template<class impl_t> class VPortQComponent : public impl_t {
       return;
     }
 
-    ESP_LOGV("vport_queue", "Processing: %zu of max %zu", this->awaited_.size(), this->awaited_.max_size());
+    ESP_LOGV("vport_queue", "Processing: %zu of max %zu", this->awaited_.size(), this->awaited_.capacity());
 
     const auto &el = this->awaited_.front();
     const auto *frame = reinterpret_cast<const frame_spec_t *>(el.data());

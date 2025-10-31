@@ -12,7 +12,7 @@ namespace vport {
 #define VPORT_UART_LOG(port_name) VPORT_LOG(port_name)
 
 // interface UartIO {
-//   using reader_type = etl::delegate<void(const frame_spec_t &frame, size_t size)>;
+//   using reader_type = std::function<void(const frame_spec_t &frame, size_t size)>;
 //   void set_reader(reader_type &&reader);
 //   void write(const uint8_t *data, size_t size);
 //   void poll();

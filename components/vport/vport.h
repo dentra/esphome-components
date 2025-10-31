@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstddef>
 #include <vector>
 #include "esphome/core/defines.h"
 
@@ -28,7 +29,7 @@ template<typename frame_spec_t> class VPortListener {
  public:
   using frame_spec_type = frame_spec_t;
 
-  /// Activated once connection estabilished.
+  /// Activated once connection established.
   virtual void on_ready() {}
   /// Fired every time a frame is received.
   virtual void on_frame(const frame_spec_t &frame, size_t size) = 0;
@@ -71,7 +72,7 @@ template<class frame_spec_t> class VPort : public VPortBase {
 };
 
 // interface IO {
-//   using on_frame_type = etl::delegate<void(const frame_spec_t &frame, size_t size)>;
+//   using on_frame_type = std::function<void(const frame_spec_t &frame, size_t size)>;
 //   void set_on_frame(on_frame_type &&reader);
 //   void write(const uint8_t *data, size_t size);
 // };
@@ -80,7 +81,7 @@ template<class io_t, class frame_spec_t> class VPortIO : public VPort<frame_spec
 
  public:
   explicit VPortIO(io_t *io) : io_(io) {
-    this->io_->set_on_frame(io_t::on_frame_type::template create<vport_t, &vport_t::fire_frame>(*this));
+    this->io_->set_on_frame([this](const frame_spec_t &frame, size_t size) { this->fire_frame(frame, size); });
   }
 
   void write(const frame_spec_t &frame, size_t size) override {
