@@ -13,9 +13,7 @@ CONFIG_SCHEMA = cv.All(
 @coroutine_with_priority(CoroPriority.BUS)
 async def to_code(config):
     cg.add_library(
-        "bblanchon/ArduinoJson",
-        "7.4.2",
-        "https://github.com/bblanchon/ArduinoJson",
+        "ArduinoJson", None, "https://github.com/bblanchon/ArduinoJson#v7.4.2"
     )
     cg.add_define("USE_JSON")
     cg.add_global(json_ns.using)
