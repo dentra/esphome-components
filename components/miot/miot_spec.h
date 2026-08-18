@@ -617,6 +617,13 @@ enum MIID : uint16_t {
   // https://miot-spec.org/miot-spec-v2/spec/property?type=urn:miot-spec-v2:property:battery-level:00000014
   MIID_MIAOMIAOCE_BATTERY_1003 = 0x4803,
 
+  // SJWS02LM
+  // https://home.miot-spec.com/spec/xiaomi.flood.oh83w
+  MIID_XIAOMI_FLOOD_2_BOTTOM     = 0x4806,  // Bottom status (01=Wet, 00=Dry)
+  MIID_XIAOMI_FLOOD_2_TOP_EVENT  = 0x4A68,  // Submersion event arguments (0,1,2,3)
+  MIID_XIAOMI_FLOOD_2_TOP_PROP   = 0x487B,  // Top dripping status (01=Wet, 00=Dry)
+  MIID_XIAOMI_FLOOD_2_BATTERY    = 0x4C03,  // Battery level percentage
+
   // MiaoMiaoce Low Battery.
   MIID_MIAOMIAOCE_LOW_BATTERY = 0x4A01,
 
