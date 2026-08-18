@@ -280,6 +280,12 @@ struct BLEObject {
    */
   optional<ToothbrushEvent> get_toothbrush_event() const;
 
+  /**
+   * Value for MIID_XIAOMI_FLOOD_2_BATTERY.
+   * @return battery level in %
+   */
+  optional<uint8_t> get_xiaomi_flood_2_battery_level() const;
+
   optional<bool> get_motion() const;
 
   optional<float> get_motion_with_illuminance() const;

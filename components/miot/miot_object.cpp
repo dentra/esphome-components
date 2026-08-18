@@ -3,17 +3,23 @@
 #include "miot_object.h"
 
 #if ESPHOME_LOG_LEVEL >= ESPHOME_LOG_LEVEL_DEBUG
-#define CHECK_MIID(miid) \
-  if (this->id != miid) { \
-    ESP_LOGW(TAG, "BLEObject.id %04" PRIX16 " does not match %04" PRIX16 " (" #miid ")", this->id, miid); \
-    return {}; \
-  }
+#define CHECK_MIID(...) \
+  do { \
+    bool _match = false; \
+    uint16_t _allowed[] = { __VA_ARGS__ }; \
+    for (auto _a : _allowed) { \
+      if (this->id == _a) { _match = true; break; } \
+    } \
+    if (!_match) { \
+      ESP_LOGW(TAG, "BLEObject.id %04" PRIX16 " does not match allowed IDs (%s)", this->id, #__VA_ARGS__); \
+      return {}; \
+    } \
+  } while(0)
 #else
-#define CHECK_MIID(miid)
+#define CHECK_MIID(...)
 #endif
 
-namespace esphome {
-namespace miot {
+namespace esphome::miot {
 
 static const char *const TAG = "miot.object";
 
@@ -63,12 +69,46 @@ optional<uint32_t> BLEObject::get_motion_with_light_event() const {
 }
 
 optional<bool> BLEObject::get_flooding() const {
-  CHECK_MIID(MIID_FLOODING);
-  const auto flooding = this->get_bool();
-  if (flooding.has_value()) {
-    ESP_LOGD(TAG, "Flooding: %s", YESNO(*flooding));
+  CHECK_MIID(MIID_FLOODING, MIID_XIAOMI_FLOOD_2_BOTTOM, MIID_XIAOMI_FLOOD_2_TOP_PROP, MIID_XIAOMI_FLOOD_2_TOP_EVENT);
+  // Process original MIID_FLOODING (sjws01lm)
+  if (this->id == MIID_FLOODING) {
+    const auto flooding = this->get_bool();
+    if (flooding.has_value()) {
+      ESP_LOGD(TAG, "Flooding: %s", YESNO(*flooding));
+    }
+    return flooding;
   }
-  return flooding;
+
+  // Process Xiaomi Flood Detector 2 bottom contacts property (0x4806)
+  if (this->id == MIID_XIAOMI_FLOOD_2_BOTTOM) {
+    const auto status = this->get_uint8();
+    if (status.has_value()) {
+      return *status != 0; 
+    }
+  }
+
+  // Process Xiaomi Flood Detector 2 top dripping property (0x487B)
+  if (this->id == MIID_XIAOMI_FLOOD_2_TOP_PROP) {
+    const auto status = this->get_uint8();
+    if (status.has_value()) {
+      return *status != 0; 
+    }
+  }
+
+  // Process Xiaomi Flood Detector 2 standard event arguments (0x4A68)
+  if (this->id == MIID_XIAOMI_FLOOD_2_TOP_EVENT) {
+    const auto event_arg = this->get_uint8();
+    if (event_arg.has_value()) {
+      if (*event_arg == 0 || *event_arg == 2) {
+        return true;  // Alarm event types -> ON
+      }
+      if (*event_arg == 1 || *event_arg == 3) {
+        return false; // Cleared event types -> OFF
+      }
+    }
+  }
+
+  return {};
 }
 
 optional<bool> BLEObject::get_light_intensity() const {
@@ -283,6 +323,15 @@ optional<ToothbrushEvent> BLEObject::get_toothbrush_event() const {
   return toothbrush_event;
 }
 
+optional<uint8_t> BLEObject::get_xiaomi_flood_2_battery_level() const {
+  CHECK_MIID(MIID_XIAOMI_FLOOD_2_BATTERY);
+  auto battery_level = this->get_uint8();
+  if (battery_level.has_value()) {
+    ESP_LOGD(TAG, "Battery level: %" PRIu8 " %%", *battery_level);
+  }
+  return battery_level;
+}
+
 optional<bool> BLEObject::get_motion() const {
   CHECK_MIID(MIID_MOTION_EVENT);
   const auto motion = this->get_bool();
@@ -310,5 +359,4 @@ optional<uint16_t> BLEObject::get_no_motion_time() const {
   return time;
 }
 
-}  // namespace miot
-}  // namespace esphome
+}  // namespace esphome::miot

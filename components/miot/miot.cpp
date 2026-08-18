@@ -221,6 +221,19 @@ bool MiotComponent::process_default_(const miot::BLEObject &obj) {
         }
       }
       break;
+    case MIID_XIAOMI_FLOOD_2_BATTERY:
+      if (this->battery_level_ || this->battery_voltage_) {
+        auto battery_level = obj.get_xiaomi_flood_2_battery_level();
+        if (battery_level.has_value()) {
+          if (this->battery_level_) {
+            this->battery_level_->publish_state(*battery_level);
+          }
+          if (this->battery_voltage_) {
+            this->battery_voltage_->publish_state(battery_to_voltage(*battery_level));
+          }
+        }
+      }
+      break;
     default:
       return this->process_unhandled_(obj);
   }
