@@ -1,5 +1,6 @@
 
 #include "esphome/core/log.h"
+#include "esphome/core/version.h"
 #include "miot_client.h"
 
 namespace esphome {
@@ -226,7 +227,13 @@ esphome::ble_client::BLECharacteristic *MiotClient::get_char(const esp32_ble_tra
                                                              bool log_not_found) {
   auto res = this->parent()->get_characteristic(srv, chr);
   if (res == nullptr && log_not_found) {
+#if ESPHOME_VERSION_CODE < VERSION_CODE(2026, 2, 0)
     ESP_LOGE(TAG, "Can't discover characteristics %s at service %s", chr.to_string().c_str(), srv.to_string().c_str());
+#else
+    char chr_uuid[esp32_ble::UUID_STR_LEN];
+    char srv_uuid[esp32_ble::UUID_STR_LEN];
+    ESP_LOGE(TAG, "Can't discover characteristics %s at service %s", chr.to_str(chr_uuid), srv.to_str(srv_uuid));
+#endif
   }
   return res;
 }
