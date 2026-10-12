@@ -58,7 +58,7 @@ async def setup_automation(
 ):
     for conf in config.get(key, []):
         trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], var)
-        await automation.build_automation(trigger, args, conf)
+        await automation.build_automation(trigger, list(args), conf)
 
 
 async def setup_binary_sensor(config: dict, key: str, setter):
