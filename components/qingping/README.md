@@ -161,6 +161,9 @@ All explorer variables are present by default, you can exclude unnecessary ones 
 
 - `temperature` (Optional, string): The name of created temperature sensor. Default: Temperature.
 - `humidity` (Optional, string): The name of created humidity sensor. Default: Humidity.
+- `max_devices` (Optional, int): The maximum number of devices to create sensors for, from 1 to 64.
+  Each device gets its own set of sensors, named with the last two bytes of its MAC-address as a suffix.
+  Ignored if the hub has `mac_address`. Default: 5.
 - `battery_level` (Optional, string): The name of created battery level sensor. Default: Battery Level.
 - `door` (Optional, string): The name of created door binary sensor. Default: Door.
 - `door_left_open` (Optional, string): The name of created door left open binary sensor. Default: Door Left Open.

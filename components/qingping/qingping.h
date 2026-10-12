@@ -10,6 +10,9 @@
 
 #include "qingping_beacon.h"
 
+#define MAC_FMT "%02X:%02X:%02X:%02X:%02X:%02X"
+#define MAC_FMT_PARAMS(mac) mac[5], mac[4], mac[3], mac[2], mac[1], mac[0]
+
 namespace esphome {
 namespace qingping {
 
@@ -35,9 +38,12 @@ class Qingping : public espbt::ESPBTDeviceListener, public Component {
     return this->address_ == 0 ? nullptr : reinterpret_cast<const uint8_t *>(&this->address_);
   }
   const uint64_t &get_address() const { return this->address_; }
+  /// Address of the device whose beacon is being processed now.
+  const uint64_t &get_current_address() const { return this->current_address_; }
 
  protected:
   uint64_t address_{};
+  uint64_t current_address_{};
   bool use_beacon_mac_{};
   bool verbose_{};
   std::set<uint64_t> mac_exclude_;

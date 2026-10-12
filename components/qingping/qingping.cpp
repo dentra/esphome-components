@@ -9,9 +9,6 @@ namespace qingping {
 
 static const char *const TAG = "qingping";
 
-#define MAC_FMT "%02X:%02X:%02X:%02X:%02X:%02X"
-#define MAC_FMT_PARAMS(mac) mac[5], mac[4], mac[3], mac[2], mac[1], mac[0]
-
 bool Qingping::parse_device(const espbt::ESPBTDevice &device) {
   const auto address = device.address_uint64();
   for (const auto &service_data : device.get_service_datas()) {
@@ -61,6 +58,7 @@ bool Qingping::process_beacon_(const uint64_t &address, const std::vector<uint8_
     ESP_LOGD(TAG, "           Data: %s", format_hex_pretty(dp_data, dp_size).c_str());
   }
 
+  this->current_address_ = addr;
   return this->process_dp_(dp_data, dp_size);
 }
 

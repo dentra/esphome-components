@@ -33,40 +33,56 @@ static const char *const UNIT_PERCENT = "%";
 static const char *const UNIT_LUX = "lx";
 static const char *const UNIT_HECTOPASCAL = "hPa";
 
-template<class T> class QPExplorerEntity : public T {
- public:
-  explicit QPExplorerEntity(std::string &&name, std::string &&obj_id)
-      : qp_name_(std::move(name)), qp_obj_id_(std::move(obj_id)) {
-    this->set_name(this->qp_name_.c_str());
-    this->set_object_id(this->qp_obj_id_.c_str());
-  }
-
- protected:
-  std::string qp_name_;
-  std::string qp_obj_id_;
-};
-
-using QPExplorerSensor = QPExplorerEntity<sensor::Sensor>;
-using QPExplorerBinarySensor = QPExplorerEntity<binary_sensor::BinarySensor>;
-
 void QingpingExplorer::dump_config() {
   ESP_LOGCONFIG(TAG, "Qingping Explorer:");
   this->dump_config_(TAG);
+  ESP_LOGCONFIG(TAG, "  Max devices: %u", this->max_devices_);
+}
+
+bool QingpingExplorer::check_device_() {
+  auto address = this->qp_->get_address();
+  if (address == 0) {
+    address = this->qp_->get_current_address();
+  }
+  this->address_ = address;
+
+  for (auto device : this->devices_) {
+    if (device == address) {
+      return true;
+    }
+  }
+
+  if (this->devices_.size() >= this->max_devices_) {
+    if (!this->max_devices_warned_) {
+      this->max_devices_warned_ = true;
+      auto *mac = reinterpret_cast<const uint8_t *>(&address);
+      ESP_LOGW(TAG, "Max devices %u reached, ignoring " MAC_FMT " and others", this->max_devices_,
+               MAC_FMT_PARAMS(mac));
+    }
+    return false;
+  }
+
+  this->devices_.push_back(address);
+  return true;
 }
 
 bool QingpingExplorer::update_(const QPDataPoint &dp) {
+  if (!this->check_device_()) {
+    return false;
+  }
+
   switch (dp.type) {
     case QPID::TH: {
       auto *value = dp.cast<QPDataTH>();
       if (value == nullptr) {
         return false;
       }
-      if (this->name_temperature_) {
-        this->update_sensor_(this->name_temperature_, DEVICE_CLASS_TEMPERATURE, UNIT_CELSIUS, 1,
+      if (this->temperature_.name) {
+        this->update_sensor_(this->temperature_, DEVICE_CLASS_TEMPERATURE, UNIT_CELSIUS, 1,
                              value->get_temperature());
       }
-      if (this->name_humidity_) {
-        this->update_sensor_(this->name_humidity_, DEVICE_CLASS_HUMIDITY, UNIT_PERCENT, 1, value->get_humidity());
+      if (this->humidity_.name) {
+        this->update_sensor_(this->humidity_, DEVICE_CLASS_HUMIDITY, UNIT_PERCENT, 1, value->get_humidity());
       }
       break;
     }
@@ -76,8 +92,8 @@ bool QingpingExplorer::update_(const QPDataPoint &dp) {
       if (value == nullptr) {
         return false;
       }
-      if (this->name_battery_) {
-        this->update_binary_sensor_(this->name_battery_, DEVICE_CLASS_BATTERY, value->get_battery_level());
+      if (this->battery_level_.name) {
+        this->update_sensor_(this->battery_level_, DEVICE_CLASS_BATTERY, UNIT_PERCENT, 0, value->get_battery_level());
       }
       break;
     }
@@ -87,11 +103,11 @@ bool QingpingExplorer::update_(const QPDataPoint &dp) {
       if (value == nullptr) {
         return false;
       }
-      if (this->name_door_) {
-        this->update_binary_sensor_(this->name_door_, DEVICE_CLASS_DOOR, value->get_door_state());
+      if (this->door_.name) {
+        this->update_binary_sensor_(this->door_, DEVICE_CLASS_DOOR, value->get_door_state());
       }
-      if (this->name_door_left_open_) {
-        this->update_binary_sensor_(this->name_door_left_open_, DEVICE_CLASS_PROBLEM,
+      if (this->door_left_open_.name) {
+        this->update_binary_sensor_(this->door_left_open_, DEVICE_CLASS_PROBLEM,
                                     value->get_door_left_open_problem());
       }
       break;
@@ -102,8 +118,8 @@ bool QingpingExplorer::update_(const QPDataPoint &dp) {
       if (value == nullptr) {
         return false;
       }
-      if (this->name_pressure_) {
-        this->update_sensor_(this->name_pressure_, DEVICE_CLASS_PRESSURE, UNIT_HECTOPASCAL, 1, value->get_pressure());
+      if (this->pressure_.name) {
+        this->update_sensor_(this->pressure_, DEVICE_CLASS_PRESSURE, UNIT_HECTOPASCAL, 1, value->get_pressure());
       }
       break;
     }
@@ -113,11 +129,11 @@ bool QingpingExplorer::update_(const QPDataPoint &dp) {
       if (value == nullptr) {
         return false;
       }
-      if (this->name_motion_) {
-        this->update_binary_sensor_(this->name_motion_, DEVICE_CLASS_MOTION, value->get_motion_state());
+      if (this->motion_.name) {
+        this->update_binary_sensor_(this->motion_, DEVICE_CLASS_MOTION, value->get_motion_state());
       }
-      if (this->name_illuminance_) {
-        this->update_sensor_(this->name_illuminance_, DEVICE_CLASS_ILLUMINANCE, UNIT_LUX, 0, value->get_illuminance());
+      if (this->illuminance_.name) {
+        this->update_sensor_(this->illuminance_, DEVICE_CLASS_ILLUMINANCE, UNIT_LUX, 0, value->get_illuminance());
       }
       break;
     }
@@ -127,8 +143,8 @@ bool QingpingExplorer::update_(const QPDataPoint &dp) {
       if (value == nullptr) {
         return false;
       }
-      if (this->name_illuminance_) {
-        this->update_sensor_(this->name_illuminance_, DEVICE_CLASS_ILLUMINANCE, UNIT_LUX, 0, value->get_illuminance());
+      if (this->illuminance_.name) {
+        this->update_sensor_(this->illuminance_, DEVICE_CLASS_ILLUMINANCE, UNIT_LUX, 0, value->get_illuminance());
       }
       break;
     }
@@ -143,8 +159,8 @@ bool QingpingExplorer::update_(const QPDataPoint &dp) {
       if (value == nullptr) {
         return false;
       }
-      if (this->name_light_) {
-        this->update_binary_sensor_(this->name_light_, DEVICE_CLASS_LIGHT, value->get_light_state());
+      if (this->light_.name) {
+        this->update_binary_sensor_(this->light_, DEVICE_CLASS_LIGHT, value->get_light_state());
       }
       break;
     }
@@ -154,12 +170,12 @@ bool QingpingExplorer::update_(const QPDataPoint &dp) {
       if (value == nullptr) {
         return false;
       }
-      if (this->name_pm25_) {
-        this->update_sensor_(this->name_pm25_, DEVICE_CLASS_PM25, UNIT_MICROGRAMS_PER_CUBIC_METER, 0,
+      if (this->pm25_.name) {
+        this->update_sensor_(this->pm25_, DEVICE_CLASS_PM25, UNIT_MICROGRAMS_PER_CUBIC_METER, 0,
                              value->get_pm25());
       }
-      if (this->name_pm10_) {
-        this->update_sensor_(this->name_pm10_, DEVICE_CLASS_PM10, UNIT_MICROGRAMS_PER_CUBIC_METER, 0,
+      if (this->pm10_.name) {
+        this->update_sensor_(this->pm10_, DEVICE_CLASS_PM10, UNIT_MICROGRAMS_PER_CUBIC_METER, 0,
                              value->get_pm10());
       }
       break;
@@ -170,8 +186,8 @@ bool QingpingExplorer::update_(const QPDataPoint &dp) {
       if (value == nullptr) {
         return false;
       }
-      if (this->name_co2_) {
-        this->update_sensor_(this->name_co2_, DEVICE_CLASS_CARBON_DIOXIDE, UNIT_PARTS_PER_MILLION, 0, value->get_co2());
+      if (this->co2_.name) {
+        this->update_sensor_(this->co2_, DEVICE_CLASS_CARBON_DIOXIDE, UNIT_PARTS_PER_MILLION, 0, value->get_co2());
       }
       break;
     }
@@ -182,12 +198,12 @@ bool QingpingExplorer::update_(const QPDataPoint &dp) {
   return true;
 }
 
-void QingpingExplorer::update_binary_sensor_(const char *name, const char *device_class, bool state) {
-  auto obj_name = this->gen_obj_name(this->qp_->get_mac(), name);
+void QingpingExplorer::update_binary_sensor_(const QPExplorerEntityConf &conf, const char *device_class, bool state) {
+  auto obj_name = this->gen_obj_name(reinterpret_cast<const uint8_t *>(&this->address_), conf.name);
   auto obj_id = this->gen_obj_id(obj_name);
 
   for (auto *binary_sensor : this->binary_sensors_) {
-    if (binary_sensor->get_object_id() == obj_id) {
+    if (binary_sensor->get_qp_obj_id() == obj_id) {
       if (state != binary_sensor->state) {
         binary_sensor->publish_state(state);
       }
@@ -197,22 +213,24 @@ void QingpingExplorer::update_binary_sensor_(const char *name, const char *devic
 
   ESP_LOGI(TAG, "New binary sensor: %s", obj_name.c_str());
 
-  auto *binary_sensor = new QPExplorerBinarySensor(std::move(obj_name), std::move(obj_id));
+  auto *binary_sensor = new QPExplorerBinarySensor(std::move(obj_name), std::move(obj_id), conf.fields);
   this->binary_sensors_.push_back(binary_sensor);
 
+#if ESPHOME_VERSION_CODE < VERSION_CODE(2026, 3, 0)
   binary_sensor->set_device_class(device_class);
+#endif
 
   App.register_binary_sensor(binary_sensor);
   binary_sensor->publish_state(state);
 }
 
-void QingpingExplorer::update_sensor_(const char *name, const char *device_class, const char *uom,
+void QingpingExplorer::update_sensor_(const QPExplorerEntityConf &conf, const char *device_class, const char *uom,
                                       int8_t accuracy_decimals, float state) {
-  auto obj_name = this->gen_obj_name(this->qp_->get_mac(), name);
+  auto obj_name = this->gen_obj_name(reinterpret_cast<const uint8_t *>(&this->address_), conf.name);
   auto obj_id = this->gen_obj_id(obj_name);
 
   for (auto *sensor : this->sensors_) {
-    if (sensor->get_object_id() == obj_id) {
+    if (sensor->get_qp_obj_id() == obj_id) {
       if (sensor->get_force_update() || state != sensor->state) {
         sensor->publish_state(state);
       }
@@ -222,11 +240,13 @@ void QingpingExplorer::update_sensor_(const char *name, const char *device_class
 
   ESP_LOGI(TAG, "New sensor: %s", obj_name.c_str());
 
-  auto *sensor = new QPExplorerSensor(std::move(obj_name), std::move(obj_id));
+  auto *sensor = new QPExplorerSensor(std::move(obj_name), std::move(obj_id), conf.fields);
   this->sensors_.push_back(sensor);
 
+#if ESPHOME_VERSION_CODE < VERSION_CODE(2026, 3, 0)
   sensor->set_device_class(device_class);
   sensor->set_unit_of_measurement(uom);
+#endif
   sensor->set_accuracy_decimals(accuracy_decimals);
   sensor->set_state_class(sensor::StateClass::STATE_CLASS_MEASUREMENT);
 
