@@ -1,0 +1,30 @@
+packages:
+  common: !include ../common/esp32.yaml
+  ble: !include ../common/ble.yaml
+
+qingping:
+  - id: qp_air_monitor
+    mac_address: 54:48:E6:8F:57:77
+    verbose: true
+    on_state:
+      lambda: |-
+        ESP_LOGD("test", "state");
+  - id: qp_explorer
+    use_beacon_mac: true
+    verbose: true
+    explorer:
+      max_devices: 3
+      door_left_open: None
+      door: False
+      battery_level: False
+      pressure: off
+      motion: Motion
+      illuminance: disabled
+      light: "True"
+
+sensor:
+  - platform: qingping
+    type: co2
+    name: CO2
+    id: co2_value
+    qingping_id: qp_air_monitor

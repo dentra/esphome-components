@@ -1,0 +1,17 @@
+packages:
+  common: !include ../common/esp32.yaml
+  ble: !include ../common/ble.yaml
+
+binary_sensor:
+  - platform: miot_toothbrush
+    mac_address: "00:00:00:00:00:00"
+    bindkey: "00000000000000000000000000000000"
+    name: Brush occupancy
+    score:
+      name: Score
+    brushing_time:
+      name: Brushing Time
+    consumable_level:
+      name: Consumable Level
+    battery_level:
+      name: Battery Level

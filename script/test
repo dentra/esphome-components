@@ -1,0 +1,113 @@
+#!/usr/bin/env bash
+# Run component tests from tests/<component>/test*.yaml.
+#
+# Usage: script/test [-c|--compile] [filter...]
+#   -c, --compile  full compile instead of code generation only
+#   filter         component directory names or test file paths
+#
+# A test file may restrict ESPHome version with a header line:
+#   # esphome: <2026.3.0
+
+set -u
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+esphome="$root/.venv/bin/esphome"
+python="$root/.venv/bin/python"
+logs="$root/build.tmp/tests"
+
+export ESPHOME_DATA_DIR="$root/build.tmp/esphome"
+export ESPHOME_NOGITIGNORE=true
+
+mode=--only-generate
+filters=()
+for arg in "$@"; do
+  case "$arg" in
+    -c | --compile) mode= ;;
+    -h | --help)
+      sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'
+      exit 0
+      ;;
+    *) filters+=("$arg") ;;
+  esac
+done
+
+if [ ! -x "$esphome" ]; then
+  echo "esphome not found in .venv, run: uv sync" >&2
+  exit 1
+fi
+
+version=$("$python" -c 'from esphome.const import __version__; print(__version__)')
+
+tests=()
+if [ ${#filters[@]} -eq 0 ]; then
+  for f in "$root"/tests/*/test*.yaml; do
+    case "$f" in
+      "$root"/tests/common/*) ;;
+      *) tests+=("$f") ;;
+    esac
+  done
+else
+  for flt in "${filters[@]}"; do
+    if [ -f "$flt" ]; then
+      tests+=("$(cd "$(dirname "$flt")" && pwd)/$(basename "$flt")")
+    elif [ -d "$root/tests/$flt" ]; then
+      for f in "$root/tests/$flt"/test*.yaml; do
+        tests+=("$f")
+      done
+    else
+      echo "no tests for: $flt" >&2
+      exit 1
+    fi
+  done
+fi
+
+# Prints version spec from the test header or nothing.
+version_spec() {
+  sed -n 's/^# esphome: *//p' "$1" | head -1
+}
+
+# Returns 0 if current ESPHome version matches the spec.
+version_match() {
+  "$python" -c 'import sys; from packaging.specifiers import SpecifierSet; sys.exit(sys.argv[2] not in SpecifierSet(sys.argv[1]))' "$1" "$version"
+}
+
+mkdir -p "$logs"
+echo "ESPHome $version, mode: ${mode:-compile}, logs: ${logs#"$root/"}"
+
+passed=0
+failed=0
+skipped=0
+failures=()
+for f in "${tests[@]}"; do
+  rel=${f#"$root/tests/"}
+  name=$(dirname "$rel")
+  variant=$(basename "$rel" .yaml)
+  variant=${variant#test}
+  variant=${variant#.}
+  id="test-${name//_/-}${variant:+-$variant}"
+  log="$logs/$id.log"
+
+  spec=$(version_spec "$f")
+  if [ -n "$spec" ] && ! version_match "$spec"; then
+    printf 'SKIP  %s (esphome %s)\n' "$rel" "$spec"
+    skipped=$((skipped + 1))
+    continue
+  fi
+
+  start=$(date +%s)
+  # shellcheck disable=SC2086
+  if "$esphome" -s node_name "$id" compile $mode "$f" >"$log" 2>&1; then
+    printf 'OK    %s (%ss)\n' "$rel" $(($(date +%s) - start))
+    passed=$((passed + 1))
+  else
+    printf 'FAIL  %s (%ss), log: %s\n' "$rel" $(($(date +%s) - start)) "${log#"$root/"}"
+    failed=$((failed + 1))
+    failures+=("$rel")
+  fi
+done
+
+echo "passed: $passed, failed: $failed, skipped: $skipped"
+for f in ${failures[@]+"${failures[@]}"}; do
+  echo "  $f"
+done
+[ $failed -eq 0 ]

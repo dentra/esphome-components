@@ -1,0 +1,19 @@
+substitutions:
+  node_name: test
+
+esphome:
+  name: ${node_name}
+
+logger:
+api:
+ota:
+  - platform: esphome
+    id: ota_esphome
+
+wifi:
+  ssid: test
+  password: test12345
+
+external_components:
+  - source: ../../components
+    refresh: 0s

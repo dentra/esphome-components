@@ -1,0 +1,7 @@
+# esphome: <2026.3.0
+packages:
+  common: !include ../common/esp32.yaml
+
+otax:
+  enabled:
+    name: OTA

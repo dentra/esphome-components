@@ -1,0 +1,6 @@
+packages:
+  main: !include test.yaml
+
+esp32:
+  framework:
+    type: esp-idf

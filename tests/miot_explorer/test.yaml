@@ -1,0 +1,19 @@
+packages:
+  common: !include ../common/esp32.yaml
+  ble: !include ../common/ble.yaml
+
+ble_client:
+  - mac_address: "00:00:00:00:00:00"
+    id: remote_ble_client_id
+
+text_sensor:
+  - platform: miot_explorer
+    mac_address: "00:00:00:00:00:00"
+    bindkey: "00000000000000000000000000000000"
+    name: None
+    battery_level:
+      name: Battery Level
+    battery_voltage:
+      name: Battery Voltage
+    consumable:
+      name: Consumable

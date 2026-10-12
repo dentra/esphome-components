@@ -12,12 +12,13 @@
 
 *.pyc
 
-/secrets.yaml
+.esphome/
+secrets.yaml
 
 /esphome
 /.pio
 /.venv
-/.build
+/build.tmp
 /.vscode
 /.nosync
 /components-research

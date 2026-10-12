@@ -1,0 +1,14 @@
+packages:
+  common: !include ../common/esp32.yaml
+  ble: !include ../common/ble.yaml
+
+ble_client:
+  - mac_address: "00:00:00:00:00:00"
+    id: remote_ble_client_id
+
+text_sensor:
+  - platform: miot_ylxx0xyl_pair
+    name: Bindkey
+    ble_client_id: remote_ble_client_id
+    version:
+      name: Version

@@ -1,0 +1,78 @@
+packages:
+  common: !include ../common/esp8266.yaml
+
+logger:
+  baud_rate: 0
+
+crash_info:
+
+uart:
+  rx_pin: GPIO03
+  tx_pin: GPIO01
+  baud_rate: 9600
+  parity: EVEN
+
+switch:
+  - platform: zmai90v1
+    name: Switch
+    restore_mode: ALWAYS_OFF
+    button:
+      name: Button
+      id: button
+      bind_to_switch: true
+    energy:
+      name: Energy
+      id: total
+    voltage:
+      name: Voltage
+    current:
+      name: Current
+    active_power:
+      name: Active Power
+    reactive_power:
+      name: Reactive Power
+    apparent_power:
+      name: Apparent Power
+    power_factor:
+      name: Power Factor
+    frequency:
+      name: Frequency
+    update_interval: 30s
+
+time:
+  - platform: sntp
+
+sensor:
+  - platform: energy_tariffs
+    id: tariffs
+    total: total
+    time_offset:
+      name: Time Offset
+    tariffs:
+      - name: Peak Tariff
+        id: peak
+        icon: mdi:weather-sunny
+        service: peak_set
+        initial_value: 10.0
+      - name: Off-Peak Tariff
+        id: offpeak
+        icon: mdi:weather-night
+        time: 23:00-07:00
+        service: offpeak_set
+    on_tariff:
+      lambda: |-
+        if (x == id(peak)) {
+          id(current_tariff).publish_state("peak");
+        } else if (x == id(offpeak)) {
+          id(current_tariff).publish_state("off-peak");
+        } else {
+          id(current_tariff).publish_state("unknown");
+        }
+    on_before_tariff:
+      - uart.write: [0x55, 0xaa, 0x00, 0x08, 0x00, 0x00, 0x07]
+
+text_sensor:
+  - platform: template
+    id: current_tariff
+    name: Current Tariff
+    entity_category: diagnostic

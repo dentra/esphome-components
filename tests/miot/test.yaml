@@ -1,0 +1,242 @@
+substitutions:
+  device_mac_address: "00:00:00:00:00:00"
+  device_bindkey: "00000000000000000000000000000000"
+
+packages:
+  common: !include ../common/esp32.yaml
+  ble: !include ../common/ble.yaml
+
+esphome:
+  on_boot:
+    - lambda: |-
+        uint64_t address = 0x112233445566L;
+        id(miot_th_sensor).set_address(address);
+        uint8_t bindkey[16]{
+          0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,
+          0x09,0x0A,0x0b,0x0c,0x0d,0x0e,0x0f,0x10,
+        };
+        id(miot_th_sensor).set_bindkey(bindkey);
+
+binary_sensor:
+  - platform: miot_cgpr1
+    # String (Required), device MAC-address.
+    mac_address: $device_mac_address
+    # String, (Optional), device bind key
+    bindkey: $device_bindkey
+    # String, (Optional), the name of binary sensor
+    # String, (Optional), the name of binary sensor
+    name: miot_cgpr1 Motion
+    # Boolean, (Optional), detect no motion as soon as possible (Usually when idle_time = 0). Default is false
+    detect_no_motion_asap: true
+    # Sensor (Optional), Illuminance, lux
+    illuminance:
+      name: miot_cgpr1 Illuminance
+    # Sensor (Optional), Time in seconds of inactivity
+    idle_time:
+      name: miot_cgpr1 Idle Time
+    # BinarySensor (Optional), Light intensivity: on - strong light, off - weak light
+    light:
+      name: miot_cgpr1 Light
+    # Sensor (Optional), Battey Level, %
+    battery_level:
+      name: miot_cgpr1 Battery Level
+    # Sensor (Optional), Battey Voltage, V
+    battery_voltage:
+      name: miot_cgpr1 Battery Voltage
+
+  - platform: miot_kettle
+    # String (Required), device MAC-address.
+    mac_address: "$device_mac_address"
+    # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
+    bindkey: "$device_bindkey"
+    # String, (Optional), the name of binary sensor
+    name: miot_kettle Water Boil Power
+    # Sensor (Optional), Temperature, °C
+    temperature:
+      name: miot_kettle Water Boil Temperature
+
+  - platform: miot_mccgq02hl
+    mac_address: "E4:AA:EC:34:77:53"
+    bindkey: $device_bindkey
+    name: miot_mccgq02hl Door/Window Sensor
+    light:
+      name: miot_mccgq02hl Light
+    alert:
+      name: miot_mccgq02hl Alert
+    battery_level:
+      name: miot_mccgq02hl Battery Level
+
+  - platform: miot_mjyd02yla
+    # String (Required), device MAC-address.
+    mac_address: $device_mac_address
+    # String, (Optional), device bind key. Will use [xiaomi_account](../miot/) if absent.
+    bindkey: "$device_bindkey"
+    # String, (Optional), the name of binary sensor
+    name: miot_mjyd02yla Motion
+    # BinarySensor (Optional), Light intensivity: on - strong light, off - weak light
+    light:
+      name: miot_mjyd02yla Light
+    # Sensor (Optional), Time in seconds of inactivity
+    idle_time:
+      name: miot_mjyd02yla Idle Time
+    # Sensor (Optional), Battey Level, %
+    battery_level:
+      name: miot_mjyd02yla Battery Level
+
+  - platform: miot_rtcgq02lm
+    # String (Required), device MAC-address.
+    mac_address: $device_mac_address
+    # String, (Optional), device bind key
+    bindkey: $device_bindkey
+    # String, (Optional), the name of binary sensor
+    name: miot_rtcgq02lm Motion Sensor 2
+    # BinarySensor (Optional), device configured timeout
+    timeout:
+      name: miot_rtcgq02lm Timeout
+    # Sensor (Optional), Time in seconds of inactivity
+    idle_time:
+      name: miot_rtcgq02lm Idle Time
+    # BinarySensor (Optional), Light intensivity: on - strong light, off - weak light
+    light:
+      name: miot_rtcgq02lm Light
+    # Sensor (Optional), Battey Level, %
+    battery_level:
+      name: miot_rtcgq02lm Battery Level
+
+  - platform: miot_motion
+    mac_address: $device_mac_address
+    bindkey: $device_bindkey
+    name: Motion Sensor
+    timeout: 5s
+    idle_time: miot_motion Idle Time
+    light: miot_motion Light
+    illuminance: miot_motion Illuminance
+    battery_level: miot_motion Battery Level
+
+sensor:
+  - platform: miot_th
+    mac_address: $device_mac_address
+    bindkey: $device_bindkey
+    name: miot_th Temperature
+    id: miot_th_sensor
+    humidity:
+      name: miot_th Humidity
+    battery_level:
+      name: miot_th Battery Level
+    battery_voltage:
+      name: miot_th Battery Voltage
+
+  - platform: miot_thermogigro
+    mac_address: $device_mac_address
+    bindkey: $device_bindkey
+    name: miot_thermogigro Temperature
+    humidity:
+      name: miot_thermogigro Humidity
+    battery_level:
+      name: miot_thermogigro Battery Level
+    battery_voltage:
+      name: miot_thermogigro Battery Voltage
+
+  - platform: miot_mhoc303
+    mac_address: $device_mac_address
+    bindkey: $device_bindkey
+    name: miot_mhoc303 Temperature
+    humidity:
+      name: miot_mhoc303 Humidity
+    battery_level:
+      name: miot_mhoc303 Battery Level
+
+  - platform: miot_ylai003
+    mac_address: $device_mac_address
+    bindkey: $device_bindkey
+    battery_level:
+      name: miot_ylai003 Battery Level
+    on_click:
+      then:
+        - logger.log: button was clicked
+    on_double_click:
+      then:
+        - logger.log: button was double clicked
+    on_long_press:
+      then:
+        - logger.log: button was long pressed
+
+  - platform: miot_ylkg0xyl
+    # String (Required), device MAC-address.
+    mac_address: "$device_mac_address"
+    # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
+    bindkey: "$device_bindkey"
+    # List, Automation (Optional), The automation activated when you clicked specified button
+    on_short_press:
+      # List, Any automation
+      - then:
+          - logger.log:
+              format: knob was short pressed %u times
+              args: ["x"]
+    on_long_press:
+      - then:
+          - logger.log: knob was long pressed
+    on_rotate_left:
+      - then:
+          - logger.log:
+              format: knob was rotating left on %u
+              args: ["x"]
+    on_rotate_right:
+      - then:
+          - logger.log:
+              format: knob was rotating right on %u
+              args: ["x"]
+    on_rotate_left_pressed:
+      - then:
+          - logger.log:
+              format: knob was pressed and rotating left on %u
+              args: ["x"]
+    on_rotate_right_pressed:
+      - then:
+          - logger.log:
+              format: knob was pressed and rotating right on %u
+              args: ["x"]
+
+  - platform: miot_xmmfo1jqd
+    # String (Required), device MAC-address.
+    mac_address: "$device_mac_address"
+    # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
+    bindkey: "$device_bindkey"
+    # List, Automation (Optional), The automation activated when you clicked specified button
+    on_twist:
+      # String (Required), The button name (case insensitive): clockwise or counterclockwise
+      - button: "clockwise"
+        # List, Any automation
+        then:
+          - logger.log: twisted clockwise
+      - button: "counterclockwise"
+        # List, Any automation
+        then:
+          - logger.log: twisted counterclockwise
+
+  - platform: miot_ylyk01yl
+    # String (Required), device MAC-address.
+    mac_address: "$device_mac_address"
+    # String, (Optional), device bind key. Will use "xiaomi_account" from "miot" if absent to automaticaly get the bindkey.
+    bindkey: "$device_bindkey"
+    # List, Automation (Optional), The automation activated when you clicked specified button
+    on_click:
+      # String (Required), The button name (case insensitive):
+      #     on, off, dimmable or sun or moon, plus or +, moonlight or M, minus or -
+      - button: "on"
+        # List, Any automation
+        then:
+          - logger.log: button ON click
+          - homeassistant.service:
+              service: light.toggle
+              data:
+                entity_id: light.kidsroom_lamp
+    # List, Automation (Optional), The automation activated when you log pressed specified button
+    on_long_press:
+      # String (Required), The button name (case insensitive):
+      #     on, off, dimmable or sun or moon, plus or +, moonlight or M, minus or -
+      - button: "+"
+        # List, Any automation
+        then:
+          - logger.log: button PLUS long press
+

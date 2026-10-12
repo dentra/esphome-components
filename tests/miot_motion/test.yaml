@@ -1,0 +1,29 @@
+packages:
+  common: !include ../common/esp32.yaml
+  ble: !include ../common/ble.yaml
+
+globals:
+  - id: someone_inside
+    type: bool
+    restore_value: no
+    initial_value: "false"
+
+binary_sensor:
+  - platform: miot_motion
+    mac_address: "00:00:00:00:00:00"
+    bindkey: "00000000000000000000000000000000"
+    name: Motion
+    device_class: motion
+    timeout: 30s
+    on_press:
+      then:
+        - lambda: |-
+            id(someone_inside) = id(light_motion).state;
+    light:
+      name: Motion Light
+      id: light_motion
+      device_class: light
+    on_release:
+      then:
+        - lambda: |-
+            id(someone_inside) = false;

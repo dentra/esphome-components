@@ -1,0 +1,15 @@
+packages:
+  common: !include ../common/esp32-idf.yaml
+  ble: !include ../common/ble.yaml
+
+sensor:
+  - platform: miot_th
+    mac_address: A4:C1:38:2C:8A:FF
+    bindkey: "00000000000000000000000000000000"
+    name: Temperature
+    humidity:
+      name: Humidity
+    battery_level:
+      name: Battery Level
+    battery_voltage:
+      name: Battery Voltage

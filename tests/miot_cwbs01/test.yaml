@@ -1,0 +1,41 @@
+packages:
+  common: !include ../common/esp32.yaml
+  ble: !include ../common/ble.yaml
+
+ota:
+  - id: !extend ota_esphome
+    on_begin:
+      then:
+        - lambda: id(ble_client_deodorizer).set_enabled(false);
+
+ble_client:
+  - mac_address: EC:4D:3E:BB:E9:09
+    id: ble_client_deodorizer
+
+switch:
+  - platform: ble_client
+    ble_client_id: ble_client_deodorizer
+    name: cwbs01 enabled
+
+binary_sensor:
+  - platform: miot_cwbs01
+    ble_client_id: ble_client_deodorizer
+    name: State
+    power:
+      name: Power
+    mode:
+      name: Mode
+    cycle:
+      name: Cycle
+    scene:
+      name: Scene
+    charging:
+      name: Charging
+    error:
+      name: Error
+    battery_level:
+      name: Battery Level
+    update_interval: 1h
+
+time:
+  - platform: sntp
