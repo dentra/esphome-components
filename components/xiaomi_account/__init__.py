@@ -1,4 +1,7 @@
 import logging
+import re
+from pathlib import Path
+
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.core import CORE
@@ -21,16 +24,34 @@ CONF_TOKEN = "token"
 
 DEFAULT_SERVERS = ["cn", "de", "us", "ru", "tw", "sg", "in", "i2"]
 
-CONFIG_SCHEMA = cv.Schema(
-    {
-        cv.Required(CONF_USERNAME): cv.string_strict,
-        cv.Required(CONF_PASSWORD): cv.string_strict,
-        cv.Optional(CONF_UPDATE_INTERVAL, default="1d"): cv.update_interval,
-        cv.Optional(CONF_SERVERS, default=DEFAULT_SERVERS): cv.All(
-            cv.ensure_list(cv.one_of(*DEFAULT_SERVERS, lower=True)),
-            cv.Length(min=1),
-        ),
-    }
+# cv.sensitive is not available in older ESPHome versions
+_sensitive = getattr(cv, "sensitive", lambda inner: inner)
+
+
+def _deprecated_password(config):
+    if CONF_PASSWORD in config:
+        _LOGGER.warning(
+            "%s.%s is deprecated and ignored, login is performed with QR code",
+            CONF_XIAOMI_ACCOUNT,
+            CONF_PASSWORD,
+        )
+    return config
+
+
+CONFIG_SCHEMA = cv.All(
+    cv.Schema(
+        {
+            # used only to separate stored login sessions of different accounts
+            cv.Optional(CONF_USERNAME): cv.string_strict,
+            cv.Optional(CONF_PASSWORD): _sensitive(cv.string_strict),
+            cv.Optional(CONF_UPDATE_INTERVAL, default="1d"): cv.update_interval,
+            cv.Optional(CONF_SERVERS, default=DEFAULT_SERVERS): cv.All(
+                cv.ensure_list(cv.one_of(*DEFAULT_SERVERS, lower=True)),
+                cv.Length(min=1),
+            ),
+        }
+    ),
+    _deprecated_password,
 )
 
 
@@ -121,12 +142,14 @@ def _get_xiaomi_account() -> XiaomiAccount:
     if conf is None:
         return
 
+    session_name = re.sub(r"[^\w.@-]", "_", conf.get(CONF_USERNAME, "default"))
     _XIAOMI_ACCOUNT = XiaomiAccount(
-        username=conf[CONF_USERNAME],
-        password=conf[CONF_PASSWORD],
         servers=conf[CONF_SERVERS],
+        session_file=Path(CORE.data_dir) / CONF_XIAOMI_ACCOUNT / f"{session_name}.json",
         storage_path=CORE.build_path,
         update_interval=conf[CONF_UPDATE_INTERVAL].total_seconds,
+        # dashboard log has gaps between lines and themed colors, text QR is unreadable there
+        render_qr=not CORE.dashboard,
     )
 
     return _XIAOMI_ACCOUNT

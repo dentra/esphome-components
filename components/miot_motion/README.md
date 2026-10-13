@@ -15,8 +15,6 @@ external_components:
   - source: github://dentra/esphome-components
 
 xiaomi_account:
-  username: !secret xiaomi_username
-  password: !secret xiaomi_password
   servers: cn
 
 binary_sensor:

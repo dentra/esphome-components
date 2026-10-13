@@ -16,8 +16,6 @@ ota:
       - lambda: id(ble_client_deodorizer).set_enabled(false);
 
 xiaomi_account:
-  username: !secret xiaomi_username
-  password: !secret xiaomi_password
   servers: cn
   update_interval: 24h
 
