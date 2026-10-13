@@ -99,19 +99,5 @@ EnergyTariff *EnergyTariffs::get_tariff_(const ESPTime &time) const {
   return def;
 }
 
-void EnergyTariffs::add_on_tariff_callback(std::function<void(Sensor *)> &&callback) {
-  if (!this->tariff_callback_) {
-    this->tariff_callback_ = new CallbackManager<void(Sensor *)>();
-  }
-  this->tariff_callback_->add(std::move(callback));
-}
-
-void EnergyTariffs::add_on_before_tariff_callback(std::function<void()> &&callback) {
-  if (!this->before_tariff_callback_) {
-    this->before_tariff_callback_ = new CallbackManager<void()>();
-  }
-  this->before_tariff_callback_->add(std::move(callback));
-}
-
 }  // namespace energy_tariffs
 }  // namespace esphome

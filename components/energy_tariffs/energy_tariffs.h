@@ -40,8 +40,19 @@ class EnergyTariffs : public Component {
 
   EnergyTariff *get_current_tariff() const { return this->current_tariff_; }
 
-  void add_on_tariff_callback(std::function<void(Sensor *)> &&callback);
-  void add_on_before_tariff_callback(std::function<void()> &&callback);
+  template<typename F> void add_on_tariff_callback(F &&callback) {
+    if (!this->tariff_callback_) {
+      this->tariff_callback_ = new CallbackManager<void(Sensor *)>();
+    }
+    this->tariff_callback_->add(std::forward<F>(callback));
+  }
+
+  template<typename F> void add_on_before_tariff_callback(F &&callback) {
+    if (!this->before_tariff_callback_) {
+      this->before_tariff_callback_ = new CallbackManager<void()>();
+    }
+    this->before_tariff_callback_->add(std::forward<F>(callback));
+  }
 
  protected:
   ESPPreferenceObject rtc_;
