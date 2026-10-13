@@ -6,6 +6,9 @@
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/number/number.h"
 #include "esphome/components/time/real_time_clock.h"
+#ifdef USE_BINARY_SENSOR
+#include "esphome/components/binary_sensor/binary_sensor.h"
+#endif
 
 #include "energy_tariff.h"
 
@@ -38,6 +41,16 @@ class EnergyTariffs : public Component {
 
   void add_tariff(EnergyTariff *s) { this->tariffs_.push_back(s); }
 
+  // Add holiday date, year 0 means every year.
+  void add_holiday(uint8_t day, uint8_t month, uint16_t year) {
+    this->holidays_.push_back(encode_date_(day, month, year));
+  }
+  // Day of week (1 is Sunday) used for tariff selection on holidays.
+  void set_holiday_as(uint8_t day_of_week) { this->holiday_as_ = day_of_week; }
+#ifdef USE_BINARY_SENSOR
+  void set_holiday(binary_sensor::BinarySensor *holiday) { this->holiday_ = holiday; }
+#endif
+
   EnergyTariff *get_current_tariff() const { return this->current_tariff_; }
 
   template<typename F> void add_on_tariff_callback(F &&callback) {
@@ -61,6 +74,12 @@ class EnergyTariffs : public Component {
   // input sensors
   Sensor *total_{};
   number::Number *time_offset_{};
+#ifdef USE_BINARY_SENSOR
+  binary_sensor::BinarySensor *holiday_{};
+#endif
+
+  std::vector<uint32_t> holidays_;
+  uint8_t holiday_as_{1};
 
   // exposed sensors
   std::vector<EnergyTariff *> tariffs_;
@@ -68,6 +87,7 @@ class EnergyTariffs : public Component {
   EnergyTariff *current_tariff_{};
 
   float last_total_{NAN};
+  bool before_tariff_triggered_{};
 
   CallbackManager<void(Sensor *)> *tariff_callback_{};
   CallbackManager<void()> *before_tariff_callback_{};
@@ -75,6 +95,12 @@ class EnergyTariffs : public Component {
   void process_(float total);
 
   EnergyTariff *get_tariff_(const ESPTime &time) const;
+
+  bool is_holiday_(const ESPTime &time) const;
+
+  static uint32_t encode_date_(uint8_t day, uint8_t month, uint16_t year) {
+    return (uint32_t(year) << 16) | (uint32_t(month) << 8) | day;
+  }
 };  // class EnergyTariffs
 
 }  // namespace energy_tariffs

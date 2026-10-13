@@ -1,8 +1,12 @@
+import datetime
+import re
+
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import automation
-from esphome.components import number, sensor, time
+from esphome.components import binary_sensor, number, sensor, time
 from esphome.const import (
+    CONF_DAYS_OF_WEEK,
     CONF_ID,
     CONF_INITIAL_VALUE,
     CONF_MODE,
@@ -30,6 +34,9 @@ CONF_TIME_OFFSET = "time_offset"
 CONF_TIME_OFFSET_SERVICE = "time_offset_service"
 CONF_ON_TARIFF = "on_tariff"
 CONF_ON_BEFORE_TARIFF = "on_before_tariff"
+CONF_HOLIDAYS = "holidays"
+CONF_HOLIDAY_AS = "holiday_as"
+CONF_HOLIDAY = "holiday"
 
 ICON_CURRENT_TARIFF = "mdi:theme-light-dark"
 ICON_TARIFF = ICON_CURRENT_TARIFF
@@ -85,6 +92,81 @@ def validate_tariff_time(value):
     return value
 
 
+HOLIDAY_ERROR = "Holiday {} should be DD.MM or YYYY-MM-DD format"
+
+DAYS_OF_WEEK = {"SUN": 1, "MON": 2, "TUE": 3, "WED": 4, "THU": 5, "FRI": 6, "SAT": 7}
+
+
+def validate_holiday(value):
+    """Validate and transform holiday to (day, month, year), year 0 means every year."""
+    # unquoted values are parsed by YAML as float or date, and float loses
+    # trailing zero (12.10 becomes 12.1), so only strings are allowed
+    if not isinstance(value, str):
+        raise cv.Invalid(
+            f"Holiday {value} should be quoted, e.g. \"25.12\" or \"2026-04-03\""
+        )
+
+    if match := re.fullmatch(r"(\d{1,2})\.(\d{1,2})", value):
+        day, month, year = int(match[1]), int(match[2]), 0
+    elif match := re.fullmatch(r"(\d{4})-(\d{1,2})-(\d{1,2})", value):
+        day, month, year = int(match[3]), int(match[2]), int(match[1])
+    else:
+        raise cv.Invalid(HOLIDAY_ERROR.format(value))
+
+    try:
+        # leap year allows 29.02 for every year holidays
+        datetime.date(year or 2000, month, day)
+    except ValueError as err:
+        raise cv.Invalid(HOLIDAY_ERROR.format(value)) from err
+
+    return (day, month, year)
+
+
+def validate_day_of_week(value):
+    """Validate day of week name or number (1 is Sunday) and return its number."""
+    if isinstance(value, str):
+        value = value.strip().upper()
+        if value in DAYS_OF_WEEK:
+            return DAYS_OF_WEEK[value]
+    try:
+        day = int(value)
+    except (TypeError, ValueError):
+        raise cv.Invalid(
+            f"Day of week {value} should be one of {', '.join(DAYS_OF_WEEK)} or 1-7"
+        ) from None
+    if not 1 <= day <= 7:
+        raise cv.Invalid(f"Day of week {value} is out of range 1-7")
+    return day
+
+
+def validate_days_of_week(value):
+    """Validate days of week as list or comma separated string of days and ranges."""
+    if value == "*":
+        return list(range(1, 8))
+    if not isinstance(value, list):
+        value = cv.string(value).split(",")
+    days = set()
+    for part in value:
+        if isinstance(part, str) and "-" in part:
+            begin, _, end = part.partition("-")
+            if "-" in end:
+                raise cv.Invalid(f"Days of week range {part} should be DAY-DAY format")
+            begin, end = validate_day_of_week(begin), validate_day_of_week(end)
+            if begin <= end:
+                days.update(range(begin, end + 1))
+            else:
+                # wrapped range, e.g. FRI-MON
+                days.update(range(begin, 8))
+                days.update(range(1, end + 1))
+        else:
+            days.add(validate_day_of_week(part))
+    return sorted(days)
+
+
+def is_default_tariff(tariff):
+    return CONF_TIME not in tariff and CONF_DAYS_OF_WEEK not in tariff
+
+
 def validate_tariffs(config):
     if CONF_TARIFFS not in config:
         return config
@@ -95,17 +177,17 @@ def validate_tariffs(config):
         return config
 
     for tariff in tariffs:
-        if CONF_TIME in tariff:
+        if not is_default_tariff(tariff):
             count -= 1
 
     if count == 0:
         raise cv.Invalid(
-            "One tariff (usually peak) is required to be default (without time)"
+            "One tariff (usually peak) is required to be default (without time and days_of_week)"
         )
 
     if count > 1:
         raise cv.Invalid(
-            "Only one tariff (usually peak) must be default (without time)"
+            "Only one tariff (usually peak) must be default (without time and days_of_week)"
         )
 
     return config
@@ -123,6 +205,7 @@ TARIFF_SCHEMA = sensor.sensor_schema(
         cv.Optional(CONF_TIME): cv.All(
             cv.ensure_list(validate_tariff_time), cv.Length(min=1, max=3)
         ),
+        cv.Optional(CONF_DAYS_OF_WEEK): validate_days_of_week,
         cv.Optional(CONF_SERVICE): cv.valid_name,
         cv.Optional(CONF_INITIAL_VALUE): cv.float_,
     }
@@ -149,6 +232,9 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_TARIFFS): cv.All(
                 cv.ensure_list(TARIFF_SCHEMA), cv.Length(min=1, max=4)
             ),
+            cv.Optional(CONF_HOLIDAYS): cv.ensure_list(validate_holiday),
+            cv.Optional(CONF_HOLIDAY_AS, default="SUN"): validate_day_of_week,
+            cv.Optional(CONF_HOLIDAY): cv.use_id(binary_sensor.BinarySensor),
             cv.Optional(CONF_ON_TARIFF): automation.validate_automation(
                 {
                     cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(TariffChangeTrigger),
@@ -207,6 +293,11 @@ async def to_code(config):
     # if CONF_TIME_OFFSET_SERVICE in config:
     #     cg.add(var.set_time_offset_service(config[CONF_TIME_OFFSET_SERVICE]))
 
+    await setup_input(config, CONF_HOLIDAY, var.set_holiday)
+    for day, month, year in config.get(CONF_HOLIDAYS, []):
+        cg.add(var.add_holiday(day, month, year))
+    cg.add(var.set_holiday_as(config[CONF_HOLIDAY_AS]))
+
     # exposed sensors
     for conf in config.get(CONF_TARIFFS, []):
         sens = await sensor.new_sensor(conf)
@@ -214,6 +305,9 @@ async def to_code(config):
             parts = tm.split("-")
             t = [time_period(parts[0]), time_period(parts[1])]
             cg.add(sens.add_time(t[0].total_minutes, t[1].total_minutes))
+        if CONF_DAYS_OF_WEEK in conf:
+            mask = sum(1 << d for d in conf[CONF_DAYS_OF_WEEK])
+            cg.add(sens.set_days_of_week(mask))
         cg.add(var.add_tariff(sens))
         if CONF_SERVICE in conf:
             cg.add(sens.set_service(conf[CONF_SERVICE]))

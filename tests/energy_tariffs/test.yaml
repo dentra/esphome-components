@@ -1,0 +1,34 @@
+# Spain PVPC 2.0TD (#39): P1/P2 on workdays, P3 on weekends and national holidays.
+packages:
+  common: !include ../common/esp8266.yaml
+
+time:
+  - platform: sntp
+
+binary_sensor:
+  - platform: homeassistant
+    id: holiday
+    entity_id: binary_sensor.workday_sensor
+    filters:
+      - invert:
+
+sensor:
+  - platform: template
+    id: total
+    lambda: return 1.0;
+  - platform: energy_tariffs
+    total: total
+    holidays: ["01.01", "6.1", "25.12", "12.10", "2026-04-03", "29.02"]
+    holiday_as: 1
+    holiday: holiday
+    tariffs:
+      - name: P1
+        time: ["10:00-14:00", "18:00-22:00"]
+        days_of_week: MON-FRI
+      - name: P2
+        time: ["08:00-10:00", "14:00-18:00", "22:00-00:00"]
+        days_of_week: "mon, tue, 4-6"
+      - name: Weekend
+        time: "20:00-23:00"
+        days_of_week: FRI-SUN
+      - name: P3

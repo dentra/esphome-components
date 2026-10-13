@@ -18,6 +18,16 @@ void EnergyTariffs::dump_config() {
     t->dump_config();
   }
   LOG_NUMBER("", "Time offset", this->time_offset_);
+  for (auto h : this->holidays_) {
+    if (h >> 16) {
+      ESP_LOGCONFIG(TAG, "  Holiday: %04u-%02u-%02u", unsigned(h >> 16), unsigned((h >> 8) & 0xFF), unsigned(h & 0xFF));
+    } else {
+      ESP_LOGCONFIG(TAG, "  Holiday: %02u.%02u", unsigned(h & 0xFF), unsigned((h >> 8) & 0xFF));
+    }
+  }
+#ifdef USE_BINARY_SENSOR
+  LOG_BINARY_SENSOR("  ", "Holiday", this->holiday_);
+#endif
 }
 
 void EnergyTariffs::setup() {
@@ -63,7 +73,10 @@ void EnergyTariffs::loop() {
   if (this->before_tariff_callback_) {
     time.increment_second();
     ct = this->get_tariff_(time);
-    if (ct != this->current_tariff_) {
+    if (ct == this->current_tariff_) {
+      this->before_tariff_triggered_ = false;
+    } else if (!this->before_tariff_triggered_) {
+      this->before_tariff_triggered_ = true;
       this->before_tariff_callback_->call();
     }
   }
@@ -88,15 +101,35 @@ void EnergyTariffs::process_(float total) {
 }
 
 EnergyTariff *EnergyTariffs::get_tariff_(const ESPTime &time) const {
+  const uint8_t day_of_week = this->is_holiday_(time) ? this->holiday_as_ : time.day_of_week;
   EnergyTariff *def{};
   for (auto t : this->tariffs_) {
     if (t->is_default()) {
       def = t;
-    } else if (t->time_in_range(time)) {
+    } else if (t->is_active(time, day_of_week)) {
       return t;
     }
   }
   return def;
+}
+
+bool EnergyTariffs::is_holiday_(const ESPTime &time) const {
+#ifdef USE_BINARY_SENSOR
+  if (this->holiday_ && this->holiday_->has_state() && this->holiday_->state) {
+    return true;
+  }
+#endif
+  if (this->holidays_.empty()) {
+    return false;
+  }
+  const auto annual = encode_date_(time.day_of_month, time.month, 0);
+  const auto exact = encode_date_(time.day_of_month, time.month, time.year);
+  for (auto h : this->holidays_) {
+    if (h == annual || h == exact) {
+      return true;
+    }
+  }
+  return false;
 }
 
 }  // namespace energy_tariffs

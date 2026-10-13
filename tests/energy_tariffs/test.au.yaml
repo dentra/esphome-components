@@ -1,0 +1,40 @@
+# Australia TOU (#59): peak/shoulder on workdays, off-peak overnight and on weekends.
+packages:
+  common: !include ../common/esp8266.yaml
+
+time:
+  - platform: sntp
+
+sensor:
+  - platform: template
+    id: total
+    lambda: return 1.0;
+  - platform: energy_tariffs
+    total: total
+    tariffs:
+      - name: Peak
+        time: ["07:00-09:00", "17:00-20:00"]
+        days_of_week: MON-FRI
+      - name: Shoulder
+        time: ["09:00-17:00", "20:00-22:00"]
+        days_of_week: [MON, TUE, WED, THU, FRI]
+      - name: Weekend Bonus
+        days_of_week: SAT
+      - name: Off-Peak
+        id: offpeak
+    on_tariff:
+      - text_sensor.template.publish:
+          id: current_tariff
+          state: !lambda return x->get_name();
+      - if:
+          condition:
+            lambda: return x == id(offpeak);
+          then:
+            - logger.log: off-peak
+    on_before_tariff:
+      - logger.log: before tariff
+
+text_sensor:
+  - platform: template
+    id: current_tariff
+    name: Current Tariff

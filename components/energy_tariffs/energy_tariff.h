@@ -41,12 +41,23 @@ class EnergyTariff : public Sensor,
     });
   }
 
+  // Days of week bitmask, bit 1 is Sunday and bit 7 is Saturday (see ESPTime::day_of_week).
+  void set_days_of_week(uint8_t days_of_week) { this->days_of_week_ = days_of_week; }
+
   void set_service(const std::string &service) { this->service_ = service; }
   void set_initial_value(float initial_value) { this->initial_value_ = initial_value; }
 
-  bool is_default() const { return this->time_.empty(); }
+  bool is_default() const { return this->time_.empty() && this->days_of_week_ == 0; }
 
-  bool time_in_range(const ESPTime &time) const {
+  // Return true if tariff is active at specified time. Day of week is passed separately
+  // because holidays may override it.
+  bool is_active(const ESPTime &time, uint8_t day_of_week) const {
+    if (this->days_of_week_ != 0 && (this->days_of_week_ & (1 << day_of_week)) == 0) {
+      return false;
+    }
+    if (this->time_.empty()) {
+      return true;
+    }
     for (auto const &range : this->time_) {
       if (time_in_range_(range.min, range.max, time)) {
         return true;
@@ -62,6 +73,7 @@ class EnergyTariff : public Sensor,
  protected:
   ESPPreferenceObject rtc_;
   std::vector<time_range_t> time_;
+  uint8_t days_of_week_{};
   std::string service_;
   float initial_value_{0.0f};
 
