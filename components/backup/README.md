@@ -25,7 +25,7 @@ backup:
 
 ## Configuration variables:
 
-- **auth** (_Optional_): Enables basic authentication with username and password.
+- **auth** (_Optional_): Enables basic authentication with username and password. Ignored if `web_server` has its own `auth`, `web_server` credentials are used instead.
 - **username** (**Required**, string): The username to use for authentication.
 - **password** (**Required**, string): The password to check for authentication.
 - **force_update** (_Optional_, boolean): Unnecessary but might be needed when you changes in separated files are not detected properly. Default is False.

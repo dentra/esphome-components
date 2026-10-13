@@ -1,0 +1,7 @@
+packages:
+  common: !include ../common/esp32.yaml
+
+backup:
+  auth:
+    username: backup
+    password: backup

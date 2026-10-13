@@ -12,6 +12,7 @@ from esphome.const import (
     CONF_ID,
     CONF_PASSWORD,
     CONF_USERNAME,
+    CONF_WEB_SERVER,
 )
 from esphome.core import CORE, ID, coroutine_with_priority
 from esphome.cpp_generator import ArrayInitializer
@@ -56,7 +57,11 @@ async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID], paren)
     await cg.register_component(var, config)
 
-    if CONF_AUTH in config:
+    if CONF_AUTH in config and CONF_AUTH in CORE.config.get(CONF_WEB_SERVER, {}):
+        _LOGGER.warning(
+            "backup.auth can't be used together with web_server.auth, web_server.auth will be used"
+        )
+    elif CONF_AUTH in config:
         cg.add_define("USE_WEBSERVER_AUTH")
         username = config[CONF_AUTH][CONF_USERNAME]
         if username:
