@@ -89,16 +89,17 @@ bool MiotExplorer::process_object_(const miot::BLEObject &obj) {
 
 void MiotExplorer::process_string_(miot::MIID miid, const std::string &name, const std::string &data) {
   auto it = this->sensors_.find(miid);
-  TextSensor *sens;
   if (it != this->sensors_.end()) {
-    sens = static_cast<TextSensor *>(it->second);
-  } else {
-    sens = new TextSensor();
-    auto full = str_sprintf("%s [%04X] %s", this->get_name().c_str(), miid, name.c_str());
-    sens->set_name(strdup(full.c_str()));
-    App.register_text_sensor(sens);
-    this->sensors_[miid] = sens;
+    it->second->publish_state(data);
+    return;
   }
+  if (this->sensors_.size() >= this->max_sensors_) {
+    ESP_LOGW(TAG, "No free sensor slots for [%04X] %s, increase max_sensors", miid, name.c_str());
+    return;
+  }
+  auto *sens = new MiotExplorerTextSensor(str_sprintf("%s [%04X] %s", this->get_name().c_str(), miid, name.c_str()));
+  App.register_text_sensor(sens);
+  this->sensors_[miid] = sens;
   sens->publish_state(data);
 }
 

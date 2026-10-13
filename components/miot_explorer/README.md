@@ -20,6 +20,8 @@ text_sensor:
     bindkey: !secret device_bind_key
     # String, (Required), the name of sensor
     name: None # use esphome.friendly_name
+    # Integer, (Optional), maximum number of dynamically created sensors, default: 16
+    max_sensors: 16
     # Sensor (Optional), Humidity, %
     battery_level:
       name: Battery Level

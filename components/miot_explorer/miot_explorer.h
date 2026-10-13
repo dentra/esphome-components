@@ -2,12 +2,27 @@
 
 #include <map>
 #include "esphome/core/component.h"
+#include "esphome/core/version.h"
 #include "esphome/components/text_sensor/text_sensor.h"
 #include "esphome/components/switch/switch.h"
 #include "../miot/miot.h"
 
 namespace esphome {
 namespace miot_explorer {
+
+class MiotExplorerTextSensor : public text_sensor::TextSensor {
+ public:
+  explicit MiotExplorerTextSensor(std::string &&name) : name_(std::move(name)) {
+#if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 3, 0)
+    this->configure_entity_(this->name_.c_str(), 0, 0);
+#else
+    this->set_name(this->name_.c_str());
+#endif
+  }
+
+ protected:
+  std::string name_;
+};
 
 class MiotExplorer : public miot::MiotComponent, public text_sensor::TextSensor {
  public:
@@ -16,9 +31,11 @@ class MiotExplorer : public miot::MiotComponent, public text_sensor::TextSensor 
   bool process_mibeacon(const miot::MiBeacon &mib) override;
 
   void set_consumable(sensor::Sensor *consumable) { this->consumable_ = consumable; }
+  void set_max_sensors(uint8_t max_sensors) { this->max_sensors_ = max_sensors; }
 
  protected:
-  std::map<miot::MIID, EntityBase *> sensors_{};
+  std::map<miot::MIID, MiotExplorerTextSensor *> sensors_{};
+  uint8_t max_sensors_{};
   sensor::Sensor *consumable_{};
 
   bool process_object_(const miot::BLEObject &obj) override;
