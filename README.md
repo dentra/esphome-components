@@ -81,6 +81,7 @@ At this moment there are list of supported device:
 - [Xiaomi MiaoMiaoce Digital Bluetooth Thermometer Hygrometer (MHO-C401)](components/miot_th/)
 - [Xiaomi MiaoMiaoce Digital Temperature and Humidity Monitor (XMWSDJ04MMC)](components/miot_th/)
 - [Yeelight Smart Bluetooth Wireless Dimmer Wall Light Switch Remote Control (YLKG08YL/YLKG07YL)](components/miot_ylkg0xyl/)
+- [Xiaomi Monitor Light Bar 1S Remote (MJGDYK01YL)](components/miot_ylkg0xyl/)
 - [EraClean Refrigerator Odor Eliminator Max (CWBS-01)](components/miot_cwbs01/)
 - [EraClean Intelligent deodorizer (era.airp.cwb03)](components/miot_cwbs01/)
 - [Mijia Smart Temperature and Humidity Monitor 3 (MJWSD05MMC)](components/miot_th/)
@@ -95,7 +96,7 @@ MIOT Platform based component to explore new BLE devices from Xiaomi ecosystem.
 
 ## [MIOT Yeelight Remote pair](components/miot_ylxx0xyl_pair/)
 
-Obtain beakonkey for Yeelight Remote (YLYK01YL), Dimmer (YLKG07YL/YLKG08YL), Bathroom Heater Remote (YLYB01YL-BHFRC), Fan Remote (YLYK01YL-VENFAN) and Ventilator Fan Remote (YLYK01YL-FANCL).
+Obtain beakonkey for Yeelight Remote (YLYK01YL), Dimmer (YLKG07YL/YLKG08YL), Monitor Light Bar Remote (MJGDYK01YL), Bathroom Heater Remote (YLYB01YL-BHFRC), Fan Remote (YLYK01YL-VENFAN) and Ventilator Fan Remote (YLYK01YL-FANCL).
 
 ## [Electrolux Water Heater](https://github.com/dentra/esphome-ewh)
 

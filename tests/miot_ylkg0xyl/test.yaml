@@ -1,0 +1,20 @@
+packages:
+  common: !include ../common/esp32-idf.yaml
+  ble: !include ../common/ble.yaml
+
+sensor:
+  - platform: miot_ylkg0xyl
+    mac_address: F8:24:41:00:00:00
+    bindkey: "00000000000000000000000000000000"
+    on_short_press:
+      - logger.log: short press
+    on_rotate_left:
+      - logger.log:
+          format: "rotate left %d"
+          args: [x]
+  - platform: miot_ylkg0xyl
+    mac_address: F8:24:41:00:00:01
+    bindkey: "00000000000000000000000000000000"
+    model: MJGDYK01YL
+    on_long_press:
+      - logger.log: long press

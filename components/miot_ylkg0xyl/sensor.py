@@ -1,7 +1,7 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import automation
-from esphome.const import CONF_TRIGGER_ID
+from esphome.const import CONF_MODEL, CONF_TRIGGER_ID
 from .. import miot  # pylint: disable=relative-beyond-top-level
 
 CONF_ON_SHORT_PRESS = "on_short_press"
@@ -21,10 +21,16 @@ MiotYLKG0XYLTrigger = miot_ylkg0xyl_ns.class_(
 )
 MiotYLKG0XYLEvent = miot_ylkg0xyl_ns.enum("MiotYLKG0XYLEvent")
 
+MODELS = {
+    "YLKG07YL": 0x03B6,
+    "YLKG08YL": 0x03B6,
+    "MJGDYK01YL": 0x15CE,
+}
+
 CONFIG_SCHEMA = cv.Schema(
     {
         # cv.GenerateID(): cv.declare_id(MiotYLKG0XYL),
-        cv.Optional(miot.CONF_PRODUCT_ID): cv.uint16_t,
+        cv.Optional(CONF_MODEL, default="YLKG07YL"): cv.enum(MODELS, upper=True),
         cv.Optional(CONF_ON_SHORT_PRESS): automation.validate_automation(
             cv.Schema(
                 {cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(MiotYLKG0XYLTrigger)}
@@ -60,12 +66,8 @@ CONFIG_SCHEMA = cv.Schema(
 
 
 async def configure_event_trigger_(config, param, enum):
-    product_id = config.get(miot.CONF_PRODUCT_ID)
     for conf in config.get(param, []):
-        if product_id is not None:
-            trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], enum, product_id)
-        else:
-            trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], enum)
+        trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID], enum, config[CONF_MODEL])
         await miot.register_miot_device(trigger, config)
         await miot.setup_device_core_(trigger, config)
         await automation.build_automation(trigger, [(cg.uint8, "x")], conf)
