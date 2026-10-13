@@ -34,7 +34,15 @@ bool Backup::canHandle(AsyncWebServerRequest *request)
     const
 #endif
 {
-  return request->method() == HTTP_GET && request->url() == URL;
+  if (request->method() != HTTP_GET) {
+    return false;
+  }
+#if defined(USE_ESP32) && ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 2, 0)
+  char url_buf[AsyncWebServerRequest::URL_BUF_SIZE];
+  return request->url_to(url_buf) == URL;
+#else
+  return request->url() == URL;
+#endif
 }
 
 void Backup::handleRequest(AsyncWebServerRequest *request) {
