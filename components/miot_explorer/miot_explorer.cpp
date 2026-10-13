@@ -27,6 +27,7 @@ bool MiotExplorer::process_object_(const miot::BLEObject &obj) {
   switch (obj.id) {
     case miot::MIID_BATTERY:
     case miot::MIID_MIAOMIAOCE_BATTERY_1003:
+    case miot::MIID_BATTERY_1003:
       this->process_default_(obj);
       break;
     case miot::MIID_CONSUMABLE: {

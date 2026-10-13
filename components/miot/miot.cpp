@@ -197,34 +197,35 @@ bool MiotComponent::process_default_(const miot::BLEObject &obj) {
   switch (obj.id) {
     case MIID_BATTERY:
       if (this->battery_level_ || this->battery_voltage_) {
-        auto battery_level = obj.get_battery_level();
-        if (battery_level.has_value()) {
-          if (this->battery_level_) {
-            this->battery_level_->publish_state(*battery_level);
-          }
-          if (this->battery_voltage_) {
-            this->battery_voltage_->publish_state(battery_to_voltage(*battery_level));
-          }
-        }
+        this->publish_battery_level_(obj.get_battery_level());
       }
       break;
     case MIID_MIAOMIAOCE_BATTERY_1003:
       if (this->battery_level_ || this->battery_voltage_) {
-        auto battery_level = obj.get_miaomiaoce_battery_level_1003();
-        if (battery_level.has_value()) {
-          if (this->battery_level_) {
-            this->battery_level_->publish_state(*battery_level);
-          }
-          if (this->battery_voltage_) {
-            this->battery_voltage_->publish_state(battery_to_voltage(*battery_level));
-          }
-        }
+        this->publish_battery_level_(obj.get_miaomiaoce_battery_level_1003());
+      }
+      break;
+    case MIID_BATTERY_1003:
+      if (this->battery_level_ || this->battery_voltage_) {
+        this->publish_battery_level_(obj.get_battery_level_1003());
       }
       break;
     default:
       return this->process_unhandled_(obj);
   }
   return true;
+}
+
+void MiotComponent::publish_battery_level_(const optional<uint8_t> &battery_level) {
+  if (!battery_level.has_value()) {
+    return;
+  }
+  if (this->battery_level_) {
+    this->battery_level_->publish_state(*battery_level);
+  }
+  if (this->battery_voltage_) {
+    this->battery_voltage_->publish_state(battery_to_voltage(*battery_level));
+  }
 }
 
 void MiotComponent::dump_config_(const char *TAG, const char *product_code) const {

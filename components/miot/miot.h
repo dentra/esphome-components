@@ -98,6 +98,7 @@ class MiotComponent : public Component, public MiotListener {
   void dump_config_(const char *TAG, const char *product_code) const;
 
   bool process_default_(const miot::BLEObject &obj);
+  void publish_battery_level_(const optional<uint8_t> &battery_level);
 };
 
 }  // namespace miot

@@ -1,0 +1,17 @@
+packages:
+  common: !include ../common/esp32-idf.yaml
+  ble: !include ../common/ble.yaml
+
+binary_sensor:
+  - platform: miot_sjws02lm
+    mac_address: "00:00:00:00:00:00"
+    bindkey: "00000000000000000000000000000000"
+    name: Water Leak
+    bottom:
+      name: Water Leak Bottom
+    top:
+      name: Water Leak Top
+    battery_level:
+      name: Battery Level
+    battery_voltage:
+      name: Battery Voltage

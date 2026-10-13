@@ -659,6 +659,36 @@ enum MIID : uint16_t {
   //
   // uint16_t time;
   MIID_NO_MOTION_TIME = 0x4818,
+
+  // Battery level (siid 3, piid 1003).
+  //
+  // uint8_t level;
+  //
+  // Battery: range [0,100], accuracy 1, %
+  //
+  // https://home.miot-spec.com/spec/xiaomi.flood.oh83w
+  MIID_BATTERY_1003 = 0x4C03,
+
+  // Water leak detected by bottom contacts (siid 2, piid 1006).
+  //
+  // uint8_t state; 0x00 - dry, 0x01 - wet
+  //
+  // https://home.miot-spec.com/spec/xiaomi.flood.oh83w
+  MIID_WATER_LEAK_BOTTOM = 0x4806,
+
+  // Water leak detected by top contacts (siid 2, piid 1123).
+  //
+  // uint8_t state; 0x00 - dry, 0x01 - wet
+  //
+  // https://home.miot-spec.com/spec/xiaomi.flood.oh83w
+  MIID_WATER_LEAK_TOP = 0x487B,
+
+  // Water leak event (siid 2, eiid 1104).
+  //
+  // uint8_t event_type; 0x00 - bottom wet, 0x01 - bottom dry, 0x02 - top wet, 0x03 - top dry
+  //
+  // https://home.miot-spec.com/spec/xiaomi.flood.oh83w
+  MIID_WATER_LEAK_EVENT = 0x4A68,
 };
 
 // Frame Control.

@@ -285,6 +285,30 @@ struct BLEObject {
   optional<float> get_motion_with_illuminance() const;
 
   optional<uint16_t> get_no_motion_time() const;
+
+  /**
+   * Value for MIID_BATTERY_1003.
+   * @return battery level in %
+   */
+  optional<uint8_t> get_battery_level_1003() const;
+
+  /**
+   * Value for MIID_WATER_LEAK_BOTTOM.
+   * @return true if bottom contacts are wet
+   */
+  optional<bool> get_water_leak_bottom() const;
+
+  /**
+   * Value for MIID_WATER_LEAK_TOP.
+   * @return true if top contacts are wet
+   */
+  optional<bool> get_water_leak_top() const;
+
+  /**
+   * Value for MIID_WATER_LEAK_EVENT.
+   * @return See MIID_WATER_LEAK_EVENT for detailed description for returning value
+   */
+  optional<uint8_t> get_water_leak_event() const;
 };
 
 }  // namespace miot

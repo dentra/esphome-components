@@ -310,5 +310,41 @@ optional<uint16_t> BLEObject::get_no_motion_time() const {
   return time;
 }
 
+optional<uint8_t> BLEObject::get_battery_level_1003() const {
+  CHECK_MIID(MIID_BATTERY_1003);
+  auto battery_level = this->get_uint8();
+  if (battery_level.has_value()) {
+    ESP_LOGD(TAG, "Battery level: %" PRIu8 " %%", *battery_level);
+  }
+  return battery_level;
+}
+
+optional<bool> BLEObject::get_water_leak_bottom() const {
+  CHECK_MIID(MIID_WATER_LEAK_BOTTOM);
+  const auto water_leak = this->get_bool();
+  if (water_leak.has_value()) {
+    ESP_LOGD(TAG, "Water leak bottom: %s", YESNO(*water_leak));
+  }
+  return water_leak;
+}
+
+optional<bool> BLEObject::get_water_leak_top() const {
+  CHECK_MIID(MIID_WATER_LEAK_TOP);
+  const auto water_leak = this->get_bool();
+  if (water_leak.has_value()) {
+    ESP_LOGD(TAG, "Water leak top: %s", YESNO(*water_leak));
+  }
+  return water_leak;
+}
+
+optional<uint8_t> BLEObject::get_water_leak_event() const {
+  CHECK_MIID(MIID_WATER_LEAK_EVENT);
+  const auto event_type = this->get_uint8();
+  if (event_type.has_value()) {
+    ESP_LOGD(TAG, "Water leak event: %" PRIu8, *event_type);
+  }
+  return event_type;
+}
+
 }  // namespace miot
 }  // namespace esphome
