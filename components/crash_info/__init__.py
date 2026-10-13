@@ -9,6 +9,7 @@ from esphome.const import (
     ENTITY_CATEGORY_DIAGNOSTIC,
     PLATFORM_ESP8266,
     CONF_ID,
+    __version__ as ESPHOME_VERSION,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -30,28 +31,41 @@ MAX_STACK_FRAMES = 120
 crash_info_ns = cg.esphome_ns.namespace("crash_info")
 CrashInfo = crash_info_ns.class_("CrashInfo", Component)
 
-CONFIG_SCHEMA = cv.Schema(
-    {
-        cv.GenerateID(): cv.declare_id(CrashInfo),
-        cv.Optional(CONF_MAX_STACK_FRAMES_SIZE, default=10): cv.All(
-            cv.positive_int, cv.int_range(4, MAX_STACK_FRAMES)
-        ),
-        cv.Optional(CONF_MIN_STACK_FRAMES_ADDR, default=0x40000000): cv.All(
-            cv.positive_int, cv.int_range(min=1, max=0x70000000)
-        ),
-        cv.Optional(CONF_MAX_STACK_FRAMES_ADDR, default=0x50000000): cv.All(
-            cv.positive_int, cv.int_range(min=1, max=0x70000000)
-        ),
-        cv.Optional(CONF_INDICATOR): binary_sensor.binary_sensor_schema(
-            device_class=DEVICE_CLASS_PROBLEM,
-            entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
-        ),
-        cv.Optional(CONF_STORE_IN_FLASH, default=False): cv.boolean,
-        cv.Optional(CONF_STORE_FREE_HEAP, default=False): cv.boolean,
-        cv.Optional(CONF_FRAMES_IN_LINE, default=4): cv.All(
-            cv.positive_int, cv.int_range(min=1, max=MAX_STACK_FRAMES)
-        ),
-    }
+
+def _validate_esphome_version(config):
+    if cv.Version.parse(ESPHOME_VERSION) >= cv.Version.parse("2026.4.0"):
+        raise cv.Invalid(
+            "crash_info is unsupported since ESPHome 2026.4.0, "
+            "use the built-in esp8266 crash handler instead"
+        )
+    return config
+
+
+CONFIG_SCHEMA = cv.All(
+    cv.Schema(
+        {
+            cv.GenerateID(): cv.declare_id(CrashInfo),
+            cv.Optional(CONF_MAX_STACK_FRAMES_SIZE, default=10): cv.All(
+                cv.positive_int, cv.int_range(4, MAX_STACK_FRAMES)
+            ),
+            cv.Optional(CONF_MIN_STACK_FRAMES_ADDR, default=0x40000000): cv.All(
+                cv.positive_int, cv.int_range(min=1, max=0x70000000)
+            ),
+            cv.Optional(CONF_MAX_STACK_FRAMES_ADDR, default=0x50000000): cv.All(
+                cv.positive_int, cv.int_range(min=1, max=0x70000000)
+            ),
+            cv.Optional(CONF_INDICATOR): binary_sensor.binary_sensor_schema(
+                device_class=DEVICE_CLASS_PROBLEM,
+                entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
+            ),
+            cv.Optional(CONF_STORE_IN_FLASH, default=False): cv.boolean,
+            cv.Optional(CONF_STORE_FREE_HEAP, default=False): cv.boolean,
+            cv.Optional(CONF_FRAMES_IN_LINE, default=4): cv.All(
+                cv.positive_int, cv.int_range(min=1, max=MAX_STACK_FRAMES)
+            ),
+        }
+    ),
+    _validate_esphome_version,
 )
 
 

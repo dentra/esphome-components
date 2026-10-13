@@ -1,11 +1,11 @@
 #include "user_interface.h"
 #include <Esp.h>
 #include "esphome/core/log.h"
+#include "crash_info.h"
 #ifdef USE_TIME
 #include <ctime>
 #include "esphome/components/time/real_time_clock.h"
 #endif
-#include "crash_info.h"
 
 /*
 Some info for possibly future IDF support

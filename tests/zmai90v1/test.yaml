@@ -4,8 +4,6 @@ packages:
 logger:
   baud_rate: 0
 
-crash_info:
-
 uart:
   rx_pin: GPIO03
   tx_pin: GPIO01

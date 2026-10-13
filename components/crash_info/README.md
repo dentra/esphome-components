@@ -5,6 +5,8 @@ With enabled indicator you can monitor crashes right from your Home Assistant.
 
 > For ESP-IDF please use [coredump](../coredump/) component.
 
+> WARNING: Unsupported since ESPHome 2026.4.0, ESPHome has a built-in ESP8266 crash handler now.
+
 ## Advanced usage
 
 Connect to you ESP8266 and find crash backtrace information in the log.

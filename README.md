@@ -117,6 +117,8 @@ Control Tion Breezers Lite, 4S and 3S via BLE and UART protocol.
 
 An ESP8266 remote crash detector.
 
+> Unsupported since ESPHome 2026.4.0, ESPHome has a built-in ESP8266 crash handler now.
+
 ## [Partitions](components/partitions/)
 
 Control partitions table from your yaml-configuration.

@@ -1,0 +1,11 @@
+# esphome: <2026.4.0
+packages:
+  common: !include ../common/esp8266.yaml
+
+time:
+  - platform: sntp
+
+crash_info:
+  store_free_heap: true
+  indicator:
+    name: Crash
