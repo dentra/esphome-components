@@ -19,6 +19,7 @@ switch:
 
 binary_sensor:
   - platform: miot_cwbs01
+    id: cwbs01
     ble_client_id: ble_client_deodorizer
     name: State
     power:

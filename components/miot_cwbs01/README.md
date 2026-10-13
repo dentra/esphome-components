@@ -41,9 +41,27 @@ binary_sensor:
     # Optional, select mode
     mode:
       name: Mode
+      # Optional, list of exactly 6 unique option names in this order, e.g. to localize them.
+      options:
+        - None
+        - Keep - Freshing
+        - Anion
+        - Deodorization
+        - Purification
+        - Deep Purification
     # Optional, select scene
     scene:
       name: Scene
+      # Optional, list of exactly 8 unique option names in this order, e.g. to localize them.
+      options:
+        - Mini refrigerator (smaller than 150L)
+        - Middle refrigerator (150L - 300L)
+        - Big refrigerator
+        - 5 - seater car
+        - 7 - seater car
+        - Pet House
+        - Toilet / Bathroom
+        - Cabinet (shoe cabinet, wardrobe, cabinet)
     # Optional, state of power plug
     charging:
       name: Charging
@@ -56,3 +74,5 @@ binary_sensor:
     # Optional, Time: The interval that the device state should be checked. Defaults to 1 hour.
     update_interval: 1h
 ```
+
+> The `mode` option `None` may not be accepted by Home Assistant `select.select_option` action (`Option 'None' is not valid`). Rename it with `options`, e.g. to `Off`.

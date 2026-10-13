@@ -14,6 +14,7 @@ from esphome.const import (
     CONF_BATTERY_LEVEL,
     CONF_ID,
     CONF_MODE,
+    CONF_OPTIONS,
     CONF_POWER,
     CONF_TIME_ID,
     CONF_VERSION,
@@ -73,6 +74,19 @@ OPTIONS_SCENE = [
     "Cabinet (shoe cabinet, wardrobe, cabinet)",
 ]
 
+
+def _options_schema(default_options):
+    def validator(value):
+        value = cv.ensure_list(cv.string_strict)(value)
+        if len(value) != len(default_options):
+            raise cv.Invalid(f"Exactly {len(default_options)} options required")
+        if len(set(value)) != len(value):
+            raise cv.Invalid("Options must be unique")
+        return value
+
+    return {cv.Optional(CONF_OPTIONS, default=default_options): validator}
+
+
 CONFIG_SCHEMA = (
     binary_sensor.binary_sensor_schema(MiotCWBS01, device_class=DEVICE_CLASS_POWER)
     .extend(
@@ -85,9 +99,13 @@ CONFIG_SCHEMA = (
                 entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
             ),
             cv.Optional(CONF_POWER): switch.switch_schema(MiotCWBS01PowerSwitch),
-            cv.Optional(CONF_MODE): select.select_schema(MiotCWBS01ModeSelect),
+            cv.Optional(CONF_MODE): select.select_schema(MiotCWBS01ModeSelect).extend(
+                _options_schema(OPTIONS_MODE)
+            ),
             cv.Optional(CONF_CYCLE): switch.switch_schema(MiotCWBS01CycleSwitch),
-            cv.Optional(CONF_SCENE): select.select_schema((MiotCWBS01SceneSelect)),
+            cv.Optional(CONF_SCENE): select.select_schema(MiotCWBS01SceneSelect).extend(
+                _options_schema(OPTIONS_SCENE)
+            ),
             cv.Optional(CONF_CHARGING): binary_sensor.binary_sensor_schema(
                 device_class=DEVICE_CLASS_BATTERY_CHARGING,
                 entity_category=ENTITY_CATEGORY_DIAGNOSTIC,
@@ -146,7 +164,7 @@ async def to_code(config):
     if CONF_MODE in config:
         conf = config[CONF_MODE]
         sens = cg.new_Pvariable(conf[CONF_ID], var)
-        await select.register_select(sens, conf, options=OPTIONS_MODE)
+        await select.register_select(sens, conf, options=conf[CONF_OPTIONS])
         cg.add(var.set_mode(sens))
 
     if CONF_CYCLE in config:
@@ -158,7 +176,7 @@ async def to_code(config):
     if CONF_SCENE in config:
         conf = config[CONF_SCENE]
         sens = cg.new_Pvariable(conf[CONF_ID], var)
-        await select.register_select(sens, conf, options=OPTIONS_SCENE)
+        await select.register_select(sens, conf, options=conf[CONF_OPTIONS])
         cg.add(var.set_scene(sens))
 
     if CONF_CHARGING in config:

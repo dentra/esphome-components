@@ -1,0 +1,22 @@
+packages:
+  main: !include test.yaml
+
+binary_sensor:
+  - id: !extend cwbs01
+    mode:
+      id: cwbs01_mode
+      name: Mode
+      options:
+        - "Off"
+        - Keep - Freshing
+        - Anion
+        - Deodorization
+        - Purification
+        - Deep Purification
+
+interval:
+  - interval: 1h
+    then:
+      - select.set:
+          id: cwbs01_mode
+          option: "Off"
