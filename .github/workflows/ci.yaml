@@ -1,0 +1,92 @@
+name: ci
+
+on:
+  push:
+    branches: [master]
+    paths-ignore:
+      - .vscode/**
+      - .clang-*
+      - .editorconfig
+      - .gitignore
+      - .prettierrc
+      - "**.md"
+      - LICENSE
+      - pylintrc
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # Once per week on wednesday
+    - cron: 0 12 * * 3
+
+env:
+  FORCE_COLOR: 1
+  ESPHOME_VERSION: "2026.9.1"
+
+jobs:
+  checks:
+    if: startsWith(github.server_url, 'https://github.com')
+    runs-on: ubuntu-latest
+    outputs:
+      components: ${{ steps.components.outputs.components }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Install dependencies
+        # esphome version is pinned in pyproject.toml
+        run: uv sync --locked
+      - name: Check ESPHome version
+        run: |
+          version=$(uv run esphome version | awk '{print $2}')
+          if [ "$version" != "$ESPHOME_VERSION" ]; then
+            echo "::error::pyproject.toml esphome $version differs from ESPHOME_VERSION $ESPHOME_VERSION"
+            exit 1
+          fi
+      - name: List components with tests
+        id: components
+        run: |
+          components=$(find tests -mindepth 2 -maxdepth 2 -name 'test*.yaml' -not -path 'tests/common/*' \
+            | cut -d/ -f2 | sort -u | jq -Rnc '[inputs]')
+          echo "components=$components" >> "$GITHUB_OUTPUT"
+      - name: Code generation tests
+        run: script/test
+      - name: Show failed logs
+        if: failure()
+        run: tail -n 50 build.tmp/tests/*.log
+
+  compile:
+    needs: checks
+    runs-on: ubuntu-latest
+    strategy:
+      # don't fail the entire matrix on failure
+      fail-fast: false
+      matrix:
+        component: ${{ fromJSON(needs.checks.outputs.components) }}
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Install dependencies
+        run: uv sync --locked
+      - name: Cache ESPHome and PlatformIO
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.platformio
+            build.tmp/esphome
+          key: ${{ runner.os }}-compile-${{ env.ESPHOME_VERSION }}-${{ matrix.component }}-${{ hashFiles('uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-compile-${{ env.ESPHOME_VERSION }}-${{ matrix.component }}-
+      - name: Register problem matchers
+        run: echo "::add-matcher::.github/workflows/matchers/gcc.json"
+      - name: Compile tests
+        run: script/test --compile ${{ matrix.component }}
+      - name: Show failed logs
+        if: failure()
+        run: cat build.tmp/tests/*.log
