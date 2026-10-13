@@ -1,0 +1,22 @@
+packages:
+  common: !include ../common/esp8266.yaml
+
+time:
+  - platform: sntp
+
+sensor:
+  - platform: template
+    id: total
+    lambda: return 1.0;
+  - platform: energy_statistics
+    total: total
+    energy_today:
+      name: Energy Today
+    energy_yesterday:
+      name: Energy Yesterday
+    energy_week:
+      name: Energy Week
+    energy_month:
+      name: Energy Month
+    energy_year:
+      name: Energy Year
