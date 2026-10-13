@@ -200,6 +200,7 @@ FINAL_VALIDATE_SCHEMA = cv.All(
 
 def add_button_trigger_(id_: core.ID, switch_, button_):
     id = id_.id + "_"
+    cg.add_define("USE_BINARY_SENSOR_CLICK_TRIGGER")
     trigger = cg.new_Pvariable(
         cv.declare_id(binary_sensor.ClickTrigger)(id + "clicktrigger"),
         button_,
