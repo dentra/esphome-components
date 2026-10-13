@@ -76,3 +76,11 @@ binary_sensor:
 ```
 
 > The `mode` option `None` may not be accepted by Home Assistant `select.select_option` action (`Option 'None' is not valid`). Rename it with `options`, e.g. to `Off`.
+
+## Troubleshooting
+
+- `Failed login: 0x0023` in the log: the device supports only one BLE connection at a time. If a phone with Mi Home app and enabled Bluetooth is nearby, the device connects to the phone and ESP32 can't login. Turn off Bluetooth on the phone.
+
+## Home Assistant example
+
+Card and day/night mode automation example: [#44](https://github.com/dentra/esphome-components/issues/44).
