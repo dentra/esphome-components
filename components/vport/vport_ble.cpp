@@ -29,6 +29,7 @@ void VPortBLENode::dump_settings(const char *tag) const {
   ESP_LOGCONFIG(tag, "  BLE Char RX: %s", this->ble_char_rx_.to_str(char_buf));
 #endif
   ESP_LOGCONFIG(tag, "  BLE Sec Act: %u", this->ble_sec_act_);
+  ESP_LOGCONFIG(tag, "  BLE Disconnect on Auth Fail: %s", YESNO(this->ble_disconnect_on_auth_fail_));
 }
 
 void VPortBLENode::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if,
@@ -144,6 +145,22 @@ void VPortBLENode::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
     return;
   }
 #endif
+}
+
+void VPortBLENode::gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param) {
+  if (!this->ble_disconnect_on_auth_fail_) {
+    return;
+  }
+  if (event != ESP_GAP_BLE_AUTH_CMPL_EVT || param->ble_security.auth_cmpl.success) {
+    return;
+  }
+  if (!this->parent_->check_addr(param->ble_security.auth_cmpl.bd_addr)) {
+    return;
+  }
+  // connection stays open after failed auth, but device does not respond, so drop it and reconnect later
+  ESP_LOGW(TAG, "[%s] Auth failed, reason=%u, disconnecting", ble_client_address_str(this->parent_),
+           param->ble_security.auth_cmpl.fail_reason);
+  this->disconnect();
 }
 
 bool VPortBLENode::write_ble_data(const uint8_t *data, uint16_t size) const {

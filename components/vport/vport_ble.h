@@ -23,6 +23,7 @@ class VPortBLENode : public ble_client::BLEClientNode {
   void dump_settings(const char *tag) const;
   void gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t gattc_if,
                            esp_ble_gattc_cb_param_t *param) override;
+  void gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param) override;
 
   virtual void on_ble_ready() = 0;
   virtual bool on_ble_data(const uint8_t *data, uint16_t size) = 0;
@@ -38,6 +39,7 @@ class VPortBLENode : public ble_client::BLEClientNode {
     this->ble_char_rx_ = esp32_ble_tracker::ESPBTUUID::from_raw(ble_char_rx);
   }
   void set_ble_encryption(esp_ble_sec_act_t ble_sec_act) { this->ble_sec_act_ = ble_sec_act; }
+  void set_ble_disconnect_on_auth_fail(bool value) { this->ble_disconnect_on_auth_fail_ = value; }
 
   virtual bool ble_reg_for_notify() const { return true; }
 
@@ -59,7 +61,8 @@ class VPortBLENode : public ble_client::BLEClientNode {
   esp32_ble_tracker::ESPBTUUID ble_service_{};
   esp32_ble_tracker::ESPBTUUID ble_char_tx_{};
   esp32_ble_tracker::ESPBTUUID ble_char_rx_{};
-  esp_ble_sec_act_t ble_sec_act_{esp_ble_sec_act_t::ESP_BLE_SEC_ENCRYPT_MITM};
+  esp_ble_sec_act_t ble_sec_act_{esp_ble_sec_act_t::ESP_BLE_SEC_ENCRYPT};
+  bool ble_disconnect_on_auth_fail_{};
 
   bool disable_scan_{};
 };
