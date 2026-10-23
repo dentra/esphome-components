@@ -83,7 +83,6 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
   static constexpr const char *SCHEDULER_TIMEOUT_NAME = "vport_ble_queue";
   static constexpr const char *CONNECTION_TIMEOUT_NAME = "vport_ble_connect";
   static constexpr uint32_t SCHEDULER_TIMEOUT = 2000;
-  static constexpr uint32_t CONNECTION_TIMEOUT = 2000;
 
  public:
   VPortBLEComponentImpl(io_t *io) : super_t(io) {
@@ -139,7 +138,7 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
           // so we will drop this connection and reconnect.
           this->set_timeout(CONNECTION_TIMEOUT_NAME, this->connection_timeout_, [this]() {
             if (this->io_->is_connecting()) {
-              ESP_LOGW("vport_ble", "Connection was not established for %" PRIu32 " ms", CONNECTION_TIMEOUT);
+              ESP_LOGW("vport_ble", "Connection was not established for %" PRIu32 " ms", this->connection_timeout_);
               this->io_->disconnect();
               // connection will be estabilished on next event loop.
             }
