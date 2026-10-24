@@ -3,7 +3,13 @@ import logging
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome import automation
-from esphome.components import binary_sensor, esp32_ble_tracker, sensor, text_sensor
+from esphome.components import (
+    binary_sensor,
+    esp32,
+    esp32_ble_tracker,
+    sensor,
+    text_sensor,
+)
 from esphome.const import (
     CONF_BATTERY_LEVEL,
     CONF_BATTERY_VOLTAGE,
@@ -21,6 +27,7 @@ from esphome.const import (
     STATE_CLASS_MEASUREMENT,
     UNIT_PERCENT,
     UNIT_VOLT,
+    __version__ as ESPHOME_VERSION,
 )
 from esphome.core import Lambda
 from esphome.cpp_types import Component
@@ -167,6 +174,9 @@ async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
     await esp32_ble_tracker.register_ble_device(var, config)
+    # MiBeacon decryption uses mbedtls_ccm_*
+    if cv.Version.parse(ESPHOME_VERSION) >= cv.Version.parse("2026.10.0"):
+        esp32.require_mbedtls_tls_extras(["CONFIG_MBEDTLS_CCM_C"])
 
     for conf in config.get(CONF_ON_MIOT_ADVERTISE, []):
         trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID])

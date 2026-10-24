@@ -2,11 +2,12 @@ import logging
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.core import CORE
-from esphome.components import ble_client
+from esphome.components import ble_client, esp32
 from esphome.const import (
     CONF_ID,
     CONF_MAC_ADDRESS,
     PLATFORM_ESP32,
+    __version__ as ESPHOME_VERSION,
 )
 from .. import xiaomi_account
 
@@ -45,6 +46,12 @@ def as_token(value):
 
 
 CONFIG_SCHEMA = cv.Schema({})
+
+
+async def to_code(config):
+    # session encryption uses mbedtls_ccm_*
+    if cv.Version.parse(ESPHOME_VERSION) >= cv.Version.parse("2026.10.0"):
+        esp32.require_mbedtls_tls_extras(["CONFIG_MBEDTLS_CCM_C"])
 
 
 def client_schema(node) -> cv.Schema:
