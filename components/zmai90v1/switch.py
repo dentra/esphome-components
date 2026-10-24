@@ -5,6 +5,7 @@ import esphome.config_validation as cv
 import esphome.final_validate as fv
 from esphome import automation
 from esphome.components import binary_sensor, sensor, uart, switch
+from esphome.cpp_generator import LambdaExpression
 from esphome.const import (
     CONF_ACTIVE_POWER,
     CONF_APPARENT_POWER,
@@ -212,10 +213,11 @@ def add_button_trigger_(id_: core.ID, switch_, button_):
         cg.TemplateArguments(),
         trigger,
     )
+    # switch.ToggleAction was removed in ESPHome 2026.10
     action = cg.new_Pvariable(
-        cv.declare_id(switch.ToggleAction)(id + "toggleaction"),
+        cv.declare_id(automation.StatelessLambdaAction)(id + "toggleaction"),
         cg.TemplateArguments(),
-        switch_,
+        LambdaExpression([switch_, "->toggle();"], [], capture=""),
     )
     cg.add(automat.add_actions([action]))
 
