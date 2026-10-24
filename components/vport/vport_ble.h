@@ -53,9 +53,14 @@ class VPortBLENode : public ble_client::BLEClientNode {
   void connect();
   void disconnect();
 
+  using on_rssi_type = std::function<void(int8_t rssi)>;
+  /// Request RSSI of the active connection, on_rssi is called with the result.
+  bool read_rssi(on_rssi_type &&on_rssi);
+
   void set_disable_scan(bool disable_scan) { this->disable_scan_ = disable_scan; }
 
  protected:
+  on_rssi_type on_rssi_{};
   uint16_t char_rx_{};
   uint16_t char_tx_{};
   esp32_ble_tracker::ESPBTUUID ble_service_{};
@@ -93,6 +98,9 @@ class VPortBLEComponentImpl : public VPortIO<io_t, frame_spec_t>, public compone
   void set_persistent_connection(bool persistent_connection) { this->persistent_connection_ = persistent_connection; }
   bool is_persistent_connection() const { return this->persistent_connection_; }
   void set_connection_timeout(uint32_t connection_timeout) { this->connection_timeout_ = connection_timeout; }
+
+  /// Request RSSI of the active connection, does nothing if not connected.
+  bool read_rssi(VPortBLENode::on_rssi_type &&on_rssi) { return this->io_->read_rssi(std::move(on_rssi)); }
 
   using io_type = io_t;
   using frame_spec_type = frame_spec_t;

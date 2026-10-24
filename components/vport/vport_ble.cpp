@@ -148,6 +148,13 @@ void VPortBLENode::gattc_event_handler(esp_gattc_cb_event_t event, esp_gatt_if_t
 }
 
 void VPortBLENode::gap_event_handler(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t *param) {
+  if (event == ESP_GAP_BLE_READ_RSSI_COMPLETE_EVT) {
+    if (this->on_rssi_ && param->read_rssi_cmpl.status == ESP_BT_STATUS_SUCCESS &&
+        this->parent_->check_addr(param->read_rssi_cmpl.remote_addr)) {
+      this->on_rssi_(param->read_rssi_cmpl.rssi);
+    }
+    return;
+  }
   if (!this->ble_disconnect_on_auth_fail_) {
     return;
   }
@@ -180,6 +187,14 @@ bool VPortBLENode::write_ble_data(const uint8_t *data, uint16_t size) const {
 #endif
   return esp_ble_gattc_write_char(ble_client->get_gattc_if(), ble_client->get_conn_id(), this->char_tx_, size,
                                   const_cast<uint8_t *>(data), write_type, ESP_GATT_AUTH_REQ_NONE) == ESP_OK;
+}
+
+bool VPortBLENode::read_rssi(on_rssi_type &&on_rssi) {
+  if (!this->is_connected()) {
+    return false;
+  }
+  this->on_rssi_ = std::move(on_rssi);
+  return esp_ble_gap_read_rssi(this->parent_->get_remote_bda()) == ESP_OK;
 }
 
 void VPortBLENode::connect() {
