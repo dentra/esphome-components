@@ -9,18 +9,18 @@
 
 [license-shield]: https://img.shields.io/static/v1?label=License&message=MIT&color=orange&logo=license
 [license]: https://opensource.org/licenses/MIT
-[esphome-release-shield]: https://img.shields.io/static/v1?label=ESPHome&message=2026.9&color=green&logo=esphome
+[esphome-release-shield]: https://img.shields.io/static/v1?label=ESPHome&message=2026.10&color=green&logo=esphome
 [esphome-release]: https://GitHub.com/esphome/esphome/releases/
 [open-in-vscode-shield]: https://img.shields.io/static/v1?label=+&message=Open+in+VSCode&color=blue&logo=visualstudiocode
 [open-in-vscode]: https://open.vscode.dev/dentra/esphome-components
-[donate-tinkoff-shield]: https://img.shields.io/static/v1?label=Donate&message=Tinkoff&color=yellow
-[donate-tinkoff]: https://www.tinkoff.ru/cf/3dZPaLYDBAI
+[donate-tinkoff-shield]: https://img.shields.io/static/v1?label=Donate&message=T-Bank&color=yellow
+[donate-tinkoff]: https://t.tb.ru/pm_short/3dZPaLYDBAI
 [donate-boosty-shield]: https://img.shields.io/static/v1?label=Donate&message=Boosty&color=red
 [donate-boosty]: https://boosty.to/dentra
 [paypal-me-shield]: https://img.shields.io/static/v1?label=+&message=PayPal.Me&logo=paypal
 [paypal-me]: https://paypal.me/dentra0
 [PayPal]: https://paypal.me/dentra0
-[Card2Card]: https://www.tinkoff.ru/cf/3dZPaLYDBAI
+[Card2Card]: https://t.tb.ru/pm_short/3dZPaLYDBAI
 [Boosty]: https://boosty.to/dentra
 
 A collection of my ESPHome components.
