@@ -1,3 +1,4 @@
+#include "esphome/core/alloc_helpers.h"
 #include "inttypes.h"
 #include "esphome/core/log.h"
 #include "miot_object.h"
