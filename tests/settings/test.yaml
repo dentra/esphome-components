@@ -1,0 +1,19 @@
+packages:
+  common: !include ../common/esp32-idf.yaml
+
+web_server:
+  port: 80
+  auth:
+    username: admin
+    password: secret
+
+mqtt:
+  broker: 192.168.1.2
+  discovery: false
+
+settings:
+  base_url: /settings
+  presets:
+    - node
+    - web_server
+    - mqtt

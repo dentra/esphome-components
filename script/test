@@ -7,6 +7,9 @@
 #
 # A test file may restrict ESPHome version with a header line:
 #   # esphome: <2026.3.0
+# A test file may declare a runner with a header line, so the binary is executed
+# after a full compile (only "host" is supported):
+#   # run: host
 
 set -u
 
@@ -24,7 +27,7 @@ for arg in "$@"; do
   case "$arg" in
     -c | --compile) mode= ;;
     -h | --help)
-      sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'
+      sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'
       exit 0
       ;;
     *) filters+=("$arg") ;;
@@ -71,6 +74,11 @@ version_match() {
   "$python" -c 'import sys; from packaging.specifiers import SpecifierSet; sys.exit(sys.argv[2] not in SpecifierSet(sys.argv[1]))' "$1" "$version"
 }
 
+# Prints the runner declared in the test header or nothing.
+run_spec() {
+  sed -n 's/^# run: *//p' "$1" | head -1
+}
+
 mkdir -p "$logs"
 echo "ESPHome $version, mode: ${mode:-compile}, logs: ${logs#"$root/"}"
 
@@ -95,8 +103,31 @@ for f in "${tests[@]}"; do
   fi
 
   start=$(date +%s)
+  ok=1
   # shellcheck disable=SC2086
-  if "$esphome" -s node_name "$id" compile $mode "$f" >"$log" 2>&1; then
+  if ! "$esphome" -s node_name "$id" compile $mode "$f" >"$log" 2>&1; then
+    ok=0
+  elif [ -z "$mode" ]; then
+    case "$(run_spec "$f")" in
+      "") ;;
+      host)
+        prog="$ESPHOME_DATA_DIR/build/$id/.pioenvs/$id/program"
+        if [ ! -x "$prog" ]; then
+          echo "test binary not found: $prog" >>"$log"
+          ok=0
+        elif ! "$prog" >>"$log" 2>&1; then
+          echo "test program failed: $prog" >>"$log"
+          ok=0
+        fi
+        ;;
+      *)
+        echo "unknown runner: $(run_spec "$f")" >>"$log"
+        ok=0
+        ;;
+    esac
+  fi
+
+  if [ $ok -eq 1 ]; then
     printf 'OK    %s (%ss)\n' "$rel" $(($(date +%s) - start))
     passed=$((passed + 1))
   else

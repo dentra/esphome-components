@@ -52,6 +52,7 @@ USE_API = "USE_API"
 USE_ESP32 = "USE_ESP32"
 USE_MQTT = "USE_MQTT"
 USE_WEB_SERVER = "USE_WEBSERVER"
+USE_WEBSERVER_AUTH = "USE_WEBSERVER_AUTH"
 USE_WIFI = "USE_WIFI"
 
 _PRESET_DEFAULTS = {
@@ -291,31 +292,29 @@ _PRESETS = OrderedDict(
             {
                 "web_server_username": {
                     const.CONF_VAR_TYPE: var.VT_STR,
+                    const.CONF_VAR_IFDEF: USE_WEBSERVER_AUTH,
                     const.CONF_VAR_HELP: "The username to use for authentication. Set to empty for remove authentication",
                     const.CONF_VAR_GETTER: lambda c, _: (
                         c[web_server.CONF_AUTH][web_server.CONF_USERNAME]
                         if web_server.CONF_AUTH in c
                         else ""
                     ),
-                    const.CONF_VAR_SETTER: lambda c, _: (
-                        cg.MockObj(
-                            c[web_server.CONF_WEB_SERVER_BASE_ID], "->"
-                        ).set_auth_username
-                    ),
+                    const.CONF_VAR_SETTER: lambda c, _: _web_server_access(
+                        cg.MockObj(c[web_server.CONF_WEB_SERVER_BASE_ID], "->")
+                    ).set_auth_username,
                 },
                 "web_server_password": {
                     const.CONF_VAR_TYPE: var.VT_PASSWORD,
+                    const.CONF_VAR_IFDEF: USE_WEBSERVER_AUTH,
                     const.CONF_VAR_HELP: "The password to check for authentication",
                     const.CONF_VAR_GETTER: lambda c, _: (
                         c[web_server.CONF_AUTH][web_server.CONF_PASSWORD]
                         if web_server.CONF_AUTH in c
                         else ""
                     ),
-                    const.CONF_VAR_SETTER: lambda c, _: (
-                        cg.MockObj(
-                            c[web_server.CONF_WEB_SERVER_BASE_ID], "->"
-                        ).set_auth_password
-                    ),
+                    const.CONF_VAR_SETTER: lambda c, _: _web_server_access(
+                        cg.MockObj(c[web_server.CONF_WEB_SERVER_BASE_ID], "->")
+                    ).set_auth_password,
                 },
                 "web_server_log": {
                     const.CONF_VAR_TYPE: var.VT_BOOL,
@@ -378,27 +377,42 @@ def _node_setter(config, App: cg.MockObj):
     # name_add_mac_suffix based on ESPHOME_NAME_ADD_MAC_SUFFIX
 
     if cv.Version.parse(ESPHOME_VERSION) >= cv.Version.parse("2026.3.0"):
-        ss.append(
-            cgp.IfStatement(
-                f"{node_name.has_value()}",
-                [
-                    cpp.log_expression(KEY_NODE_NAME, var.VT_STR, node_name.value()),
-                    cg.RawExpression(
-                        f"const size_t node_name_size = {node_name.value().size()}"
-                    ),
-                    cg.RawExpression(
-                        f"memcpy(esphome_app_name_buf, {node_name.value().c_str()}, node_name_size)"
-                    ),
-                    cg.RawExpression("esphome_app_name_buf[node_name_size + 1] = 0"),
-                    App.pre_setup(
-                        cg.RawExpression("esphome_app_name_buf"),
-                        cg.RawExpression("node_name_size"),
-                        cg.RawExpression("\n  esphome_app_friendly_name_buf"),
-                        cg.RawExpression("sizeof(esphome_app_friendly_name_buf)"),
-                    ),
-                ],
+        # App keeps a reference to the name, so it must live in a static buffer owned by
+        # settings. ESPHome's esphome_app_name_buf is sized from the YAML name and cannot
+        # be used here: the stored name may be longer than the YAML one.
+        add_mac_suffix = bool(config.get(CONF_NAME_ADD_MAC_SUFFIX, False))
+        stmt = [
+            cpp.log_expression(KEY_NODE_NAME, var.VT_STR, node_name.value()),
+            cg.RawExpression("static char node_name_buf[settings::NODE_NAME_BUF_SIZE]"),
+            cg.RawExpression(
+                f"const size_t node_name_size = settings::restore_node_name(node_name_buf, "
+                f"{node_name.value()}, {'true' if add_mac_suffix else 'false'})"
+            ),
+        ]
+        if add_mac_suffix:
+            # pre_setup overwrites the placeholder with the real MAC suffix, so the buffer
+            # ends with "-XXXXXX". The friendly name belongs to ESPHome and already has the
+            # MAC suffix appended, so only its real content length may be passed.
+            friendly = config[CONF_FRIENDLY_NAME]
+            friendly_len = len(friendly.encode("utf-8")) + 7 if friendly else 0
+            stmt.append(
+                App.pre_setup(
+                    cg.RawExpression("node_name_buf"),
+                    cg.RawExpression("node_name_size"),
+                    cg.RawExpression("esphome_app_friendly_name_buf"),
+                    friendly_len,
+                )
             )
-        )
+        else:
+            stmt.append(
+                App.pre_setup(
+                    cg.RawExpression("node_name_buf"),
+                    cg.RawExpression("node_name_size"),
+                    cppg.safe_exp(config[CONF_FRIENDLY_NAME]),
+                    len(config[CONF_FRIENDLY_NAME].encode("utf-8")),
+                )
+            )
+        ss.append(cgp.IfStatement(f"{node_name.has_value()}", stmt))
     else:
         pre_setup_params = [
             cgp.ConditionalExperession(
@@ -503,7 +517,11 @@ def _wifi_network_setter(index: int, c: dict, wifi_comp: cg.MockObj) -> cg.State
 
 
 def _mqtt_access(mqtt_comp: cg.MockObj):
-    return cg.MockObj("settings::mqtt_access", "->")(mqtt_comp)
+    return cg.MockObj("settings::mqtt_access", ".")(mqtt_comp)
+
+
+def _web_server_access(ws_base: cg.MockObj):
+    return cg.MockObj("settings::web_server_access", ".")(ws_base)
 
 
 def _mqtt_set_broker_host(config, mqtt_comp: cg.MockObj):

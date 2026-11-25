@@ -1,0 +1,76 @@
+# run: host
+# Runtime test for the node name restore logic used by the settings presets. The settings
+# component is ESP32-only, so the host build exercises its node name helper together with
+# Application::pre_setup().
+
+esphome:
+  name: ${node_name}
+  name_add_mac_suffix: true
+  friendly_name: Friendly
+  includes:
+    - ../../components/settings/node_name.h
+  on_boot:
+    priority: -100
+    then:
+      - lambda: |-
+          const char *failure = nullptr;
+          auto check = [&failure](bool ok, const char *message) {
+            if (!ok && failure == nullptr) {
+              failure = message;
+            }
+          };
+
+          char storage[settings::NODE_NAME_BUF_SIZE + 8];
+          memset(storage, 0xAA, sizeof(storage));
+          char *buf = storage;
+          auto untouched = [&storage]() {
+            for (size_t i = settings::NODE_NAME_BUF_SIZE; i < sizeof(storage); i++) {
+              if (storage[i] != (char) 0xAA) {
+                return false;
+              }
+            }
+            return true;
+          };
+
+          size_t len = settings::restore_node_name(buf, "abc", true);
+          check(len == 10 && strcmp(buf, "abc-XXXXXX") == 0, "mac suffix placeholder");
+
+          const std::string long_name(200, 'n');
+          len = settings::restore_node_name(buf, long_name, true);
+          check(len == settings::NODE_NAME_BUF_SIZE - 1, "long name is clamped");
+          check(buf[len] == 0 && strlen(buf) == len, "long name is terminated");
+          check(untouched(), "long name overflows the buffer");
+
+          len = settings::restore_node_name(buf, "abc", false);
+          check(len == 3 && strcmp(buf, "abc") == 0, "no mac suffix");
+
+          len = settings::restore_node_name(buf, "", false);
+          check(len == 0 && buf[0] == 0, "empty name");
+
+          // Application::pre_setup() integration, host MAC is 98:35:69:ab:f6:79.
+          len = settings::restore_node_name(buf, "abc", true);
+          App.pre_setup(buf, len, esphome_app_friendly_name_buf,
+                        sizeof(esphome_app_friendly_name_buf) - 1);
+          check(App.get_name().str() == "abc-abf679", "app name");
+          check(strlen(App.get_name().c_str()) == App.get_name().size(), "app name is terminated");
+          check(App.get_friendly_name().str() == "Friendly abf679", "friendly name");
+          check(strlen(App.get_friendly_name().c_str()) == App.get_friendly_name().size(),
+                "friendly name is terminated");
+
+          len = settings::restore_node_name(buf, long_name, true);
+          App.pre_setup(buf, len, esphome_app_friendly_name_buf,
+                        sizeof(esphome_app_friendly_name_buf) - 1);
+          check(App.get_name().size() == settings::NODE_NAME_BUF_SIZE - 1,
+                "long app name is clamped");
+          check(strlen(App.get_name().c_str()) == App.get_name().size(),
+                "long app name is terminated");
+
+          if (failure != nullptr) {
+            ESP_LOGE("test", "FAILED: %s", failure);
+            exit(1);
+          }
+          ESP_LOGI("test", "PASSED");
+          exit(0);
+
+host:
+logger:
