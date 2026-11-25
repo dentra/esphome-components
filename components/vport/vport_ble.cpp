@@ -1,5 +1,6 @@
 #include "esphome/core/defines.h"
 #ifdef USE_VPORT_BLE
+#include "esphome/core/alloc_helpers.h"
 #include "esphome/core/log.h"
 #include "esphome/core/version.h"
 #include "esphome/core/application.h"
