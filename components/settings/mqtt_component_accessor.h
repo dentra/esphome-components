@@ -67,10 +67,10 @@ class MQTTClientComponentAccessor {
         s.append(suffix);
       }
     }
-#if ESPHOME_VERSION_CODE < VERSION_CODE(2025, 2, 0)
-    this->ref_->set_topic_prefix(s);
-#else
+#if ESPHOME_VERSION_CODE >= VERSION_CODE(2025, 2, 0) && ESPHOME_VERSION_CODE < VERSION_CODE(2026, 11, 0)
     this->ref_->set_topic_prefix(s, "");
+#else
+    this->ref_->set_topic_prefix(s);
 #endif
   }
 

@@ -1,4 +1,5 @@
 
+#include "esphome/core/alloc_helpers.h"
 #include "esphome/core/log.h"
 #include "esphome/core/version.h"
 #include "miot_client.h"

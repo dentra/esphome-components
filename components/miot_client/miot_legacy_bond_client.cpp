@@ -1,3 +1,4 @@
+#include "esphome/core/alloc_helpers.h"
 #include "esphome/core/log.h"
 #include <array>
 #include "miot_legacy_cipher.h"

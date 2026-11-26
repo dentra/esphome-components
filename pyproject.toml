@@ -6,8 +6,10 @@ requires-python = ">=3.14,<3.15"
 [dependency-groups]
 dev = [
     "black",
-    "esphome==2026.10.0",
+    "esphome==2026.11.1",
 ]
 
 [tool.uv]
 package = false
+# esphome 2026.11.1: метаданные aioesphomeapi 46.25.1 несовместимы с macOS x86_64
+environments = ["sys_platform == 'linux' or (sys_platform == 'darwin' and platform_machine == 'arm64')"]

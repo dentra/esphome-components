@@ -1,11 +1,11 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import esp32, partitions, web_server_base
+from esphome.components import esp32, web_server_base
 from esphome.components.web_server_base import CONF_WEB_SERVER_BASE_ID
 from esphome.const import CONF_ID
 from esphome.core import CORE
 
-KEY_PARTITIONS = partitions.DOMAIN
+KEY_PARTITIONS = esp32.CONF_PARTITIONS
 
 AUTO_LOAD = ["web_server_base", KEY_PARTITIONS]
 DEPENDENCIES = ["wifi"]
@@ -32,7 +32,7 @@ CONFIG_SCHEMA = cv.All(
             cv.Optional(CONF_ENABLE_TEST_CRASH, default=False): cv.boolean,
         }
     ).extend(cv.COMPONENT_SCHEMA),
-    cv.only_with_esp_idf,
+    cv.only_with_framework("esp-idf"),
     update_partitions,
 )
 

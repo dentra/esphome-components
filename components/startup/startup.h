@@ -1,5 +1,6 @@
 #pragma once
 
+#include "esphome/core/version.h"
 #include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
 #include "esphome/components/time/real_time_clock.h"
@@ -16,7 +17,9 @@ class StartupSensor : public sensor::Sensor, public PollingComponent {
   void loop() override;
   void update() override;
 
+#if ESPHOME_VERSION_CODE < VERSION_CODE(2026, 11, 0)
   std::string unique_id() override { return get_mac_address() + "-startup"; };
+#endif
 
   void set_time(time::RealTimeClock *time) { this->time_ = time; }
 

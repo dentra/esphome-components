@@ -1,5 +1,6 @@
 #include <cstring>
 #include <inttypes.h>
+#include "esphome/core/alloc_helpers.h"
 #include "esphome/core/log.h"
 #include "mbedtls/ccm.h"
 #include "miot_decrypt.h"

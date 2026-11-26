@@ -1,5 +1,6 @@
 #include <cinttypes>
 
+#include "esphome/core/alloc_helpers.h"
 #include "esphome/core/helpers.h"
 
 #include "sys.h"

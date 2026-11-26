@@ -1,3 +1,4 @@
+#include "esphome/core/alloc_helpers.h"
 #include "esphome/core/log.h"
 
 #include "miot_cwbs01_api.h"

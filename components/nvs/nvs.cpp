@@ -1,4 +1,5 @@
 #include "nvs.h"
+#include "esphome/core/alloc_helpers.h"
 #include "esphome/core/log.h"
 
 namespace esphome {

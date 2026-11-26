@@ -1,3 +1,4 @@
+#include "esphome/core/alloc_helpers.h"
 #include "helpers.h"
 
 namespace esphome {
