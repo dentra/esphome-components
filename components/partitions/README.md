@@ -4,6 +4,9 @@ An ESP32 component to customize partitions from ESPHome configuration.
 
 > WARNING: This is an advanced component and you need to understand what you are doing.
 
+> NOTE: Since ESPHome 2026.11 this component is not available — use the built-in
+> `esp32: partitions:` option (a list of `name`/`type`/`subtype`/`size` entries or a CSV file) instead.
+
 For usage instructions please see examples with comments bellow:
 
 ```yaml

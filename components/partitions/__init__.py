@@ -3,6 +3,7 @@ import logging
 import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import esp32
+from esphome.const import __version__ as ESPHOME_VERSION
 from esphome.core import CORE
 
 from .const import *
@@ -47,7 +48,18 @@ PARTITION_SCHEMA = cv.Any(
     validate_size_shorthand,
 )
 
+
+def _validate_esphome_version(config):
+    if cv.Version.parse(ESPHOME_VERSION) >= cv.Version.parse("2026.11.0"):
+        raise cv.Invalid(
+            "partitions is not supported on ESPHome 2026.11.0+, "
+            "use esp32: partitions: (a list of name/type/subtype/size or a csv file) instead"
+        )
+    return config
+
+
 CONFIG_SCHEMA = cv.All(
+    _validate_esphome_version,
     cv.Schema({str: PARTITION_SCHEMA}),
 )
 
