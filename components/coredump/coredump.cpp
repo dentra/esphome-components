@@ -44,7 +44,12 @@ bool Coredump::canHandle(AsyncWebServerRequest *request) const {
   if (request->method() != HTTP_GET) {
     return false;
   }
+#if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 11, 0)
+  char url_buf[AsyncWebServerRequest::URL_BUF_SIZE];
+  auto url = request->url_to(url_buf);
+#else
   auto url = request->url();
+#endif
   if (url == this->index_url_) {
     return true;
   }
@@ -64,7 +69,12 @@ bool Coredump::canHandle(AsyncWebServerRequest *request) const {
 }
 
 void Coredump::handleRequest(AsyncWebServerRequest *request) {
+#if ESPHOME_VERSION_CODE >= VERSION_CODE(2026, 11, 0)
+  char url_buf[AsyncWebServerRequest::URL_BUF_SIZE];
+  auto url = request->url_to(url_buf);
+#else
   auto url = request->url();
+#endif
   if (url == this->index_url_) {
     this->index_(request);
   } else if (url == this->download_url_) {

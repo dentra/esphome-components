@@ -1,0 +1,7 @@
+packages:
+  common: !include ../common/esp32-idf.yaml
+
+web_server:
+  port: 80
+
+coredump:
